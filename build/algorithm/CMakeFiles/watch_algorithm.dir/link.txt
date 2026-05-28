@@ -1,0 +1,2 @@
+C:\msys64\ucrt64\bin\ar.exe qc libwatch_algorithm.a CMakeFiles/watch_algorithm.dir/GeneticAlgorithm.cpp.obj CMakeFiles/watch_algorithm.dir/SelectionStrategy.cpp.obj CMakeFiles/watch_algorithm.dir/CrossoverStrategy.cpp.obj CMakeFiles/watch_algorithm.dir/MutationStrategy.cpp.obj
+C:\msys64\ucrt64\bin\ranlib.exe libwatch_algorithm.a

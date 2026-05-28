@@ -1,0 +1,2 @@
+C:\msys64\ucrt64\bin\ar.exe qc libwatch_fileio.a CMakeFiles/watch_fileio.dir/WatchFileIO.cpp.obj CMakeFiles/watch_fileio.dir/ConfigManager.cpp.obj CMakeFiles/watch_fileio.dir/EvolutionHistory.cpp.obj
+C:\msys64\ucrt64\bin\ranlib.exe libwatch_fileio.a
