@@ -1,0 +1,3 @@
+# Stop core files being accidentally changed by needing permission to change
+
+core/ @kevvnnn
