@@ -1,2 +1,0 @@
-C:\msys64\ucrt64\bin\ar.exe qc libwatch_genome.a CMakeFiles/watch_genome.dir/WatchComponent.cpp.obj CMakeFiles/watch_genome.dir/Watch.cpp.obj CMakeFiles/watch_genome.dir/FitnessEvaluator.cpp.obj CMakeFiles/watch_genome.dir/components/Gear.cpp.obj CMakeFiles/watch_genome.dir/components/Jewel.cpp.obj CMakeFiles/watch_genome.dir/components/BalanceWheel.cpp.obj CMakeFiles/watch_genome.dir/components/Spring.cpp.obj
-C:\msys64\ucrt64\bin\ranlib.exe libwatch_genome.a
