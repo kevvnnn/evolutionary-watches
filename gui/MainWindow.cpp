@@ -1,30 +1,33 @@
 #include "MainWindow.h"
 
 #include <QWidget>
-#include <QLabel>
-#include <QVBoxLayout>
+#include <QHBoxLayout>
+
+#include "ControlPanel.h"
+#include "WatchCanvas.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
     setupUI();
-    setWindowTitle("WatchGA GUI");
-    resize(1000, 700);
+    setWindowTitle("WatchGA");
+    setFixedSize(1200, 700); // Set Size here: vertical,horizontal 
 }
 
-MainWindow::~MainWindow()
-{
-}
+MainWindow::~MainWindow() {}
 
 void MainWindow::setupUI()
 {
     QWidget* central = new QWidget(this);
     setCentralWidget(central);
 
-    QVBoxLayout* layout = new QVBoxLayout(central);
+    QHBoxLayout* layout = new QHBoxLayout(central);
 
-    QLabel* label = new QLabel("WatchGA GUI Running", central);
-    label->setAlignment(Qt::AlignCenter);
+    WatchCanvas* canvas = new WatchCanvas(central);
+    ControlPanel* controls = new ControlPanel(central);
 
-    layout->addWidget(label);
+    controls->setFixedWidth(250);
+
+    layout->addWidget(canvas, 1);
+    layout->addWidget(controls, 0);
 }
