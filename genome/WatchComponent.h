@@ -9,7 +9,7 @@ enum ComponentType { // Unscoped enum, Can assign specific values for different 
     BALANCE_WHEEL, // 2
     SPRING, // 3
     HAND // 4
-}
+};
 
 class WatchComponent {
     protected:
