@@ -10,8 +10,9 @@ class Gear : public WatchComponent {
     double m_meshingQuality;
 
     public:
-    Gear(unsigned int id, unsigned int teeth, double diameter, double meshQuality);
+    Gear(unsigned int id, unsigned int teeth, double diameter, double meshQuality, double baseFriction);
     double calculateEfficiency() const override;
+    double calculateActualFriction () const override;
     std::string getTypeName() const override;
 
     unsigned int getToothCount() const;
