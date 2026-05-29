@@ -3,6 +3,7 @@ add_library(watch_algorithm STATIC
     SelectionStrategy.cpp
     CrossoverStrategy.cpp
     MutationStrategy.cpp
+    ../core/SystemObject.cpp
 )
 
 target_include_directories(watch_algorithm PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
