@@ -13,7 +13,7 @@ enum ComponentType { // Unscoped enum, Can assign specific values for different 
 
 class WatchComponent {
     protected:
-    unsigned int m_id; //id is for like gear 1, hand 1 etc.
+    unsigned int m_componentID; //id is for like gear 1, hand 1 etc.
     ComponentType m_componentType;
 
     public:
