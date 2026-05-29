@@ -1,7 +1,7 @@
 #ifndef GEAR_H
 #define GEAR_H
 
-#include "genome/WatchComponent.h"
+#include "../WatchComponent.h"
 
 class Gear : public WatchComponent {
     private:
