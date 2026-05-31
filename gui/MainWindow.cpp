@@ -24,7 +24,7 @@ void MainWindow::setupUI()
     QHBoxLayout* layout = new QHBoxLayout(central);
 
     WatchCanvas* canvas = new WatchCanvas(central);
-    ControlPanel* controls = new ControlPanel(central);
+    WatchGA::GUI::ControlPanel* controls = new WatchGA::GUI::ControlPanel(central);
 
     controls->setFixedWidth(250);
 

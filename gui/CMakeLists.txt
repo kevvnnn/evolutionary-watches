@@ -14,6 +14,8 @@ add_library(watch_gui STATIC
     WatchCanvas.cpp
     StatsPanel.cpp
     ComponentInspector.cpp
+    ui_ControlPanel.h
+    ControlPanel.ui
 )
 
 target_include_directories(watch_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
