@@ -6,6 +6,7 @@ add_library(watch_genome STATIC
     components/Jewel.cpp
     components/BalanceWheel.cpp
     components/Spring.cpp
+    components/Hand.cpp
 )
 
 # Publicly expose the base genome path, and link back to core interfaces

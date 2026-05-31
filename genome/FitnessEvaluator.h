@@ -11,12 +11,12 @@ private:
     double m_complexityPenaltyFactor = 0.01;
     double m_logBase = 10.0;
 
+public:
     double calculateAccuracy(const Watch& watch) const;
     double calculateAvgEfficiency(const Watch& watch) const;
     double calculateTotalFriction(const Watch& watch) const;
     double calculateJewelPlacementScore(const Watch& watch) const;
 
-public:
     double calculateFitness(const Watch& watch) const;
     void setWeights(double accuracy, double efficiency, double frictionPenalty, double complexity);
 };

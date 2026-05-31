@@ -1,3 +1,6 @@
+#ifndef WATCH_H
+#define WATCH_H
+
 #include <vector>
 #include <map>
 
@@ -21,3 +24,5 @@ class Watch {
 
     void updateJewelPlacementFriction();
 };
+
+#endif
