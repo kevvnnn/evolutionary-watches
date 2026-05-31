@@ -6,6 +6,9 @@
 namespace WatchGA {
 namespace Algorithm {
 
+// ------------------------------
+// CONSTRUCTORS
+// ------------------------------
 // Default constructor
 GeneticAlgorithm::GeneticAlgorithm()
 	: m_populationSize(100), // these are default values to pass in
@@ -40,7 +43,10 @@ GeneticAlgorithm::GeneticAlgorithm(unsigned int populationSize, double mutationR
 	// Initializer list has done all the initialization necessary
 }
 
-void GeneticAlgorithm::InitializePopulation() {
+// ------------------------------
+// PRIVATE HELPER METHODS
+// ------------------------------
+void GeneticAlgorithm::initializePopulation() {
 	// TODO: temp cout
 	std::cout << "Initializing population of " << m_populationSize << "...\n";
 
@@ -66,13 +72,13 @@ void GeneticAlgorithm::InitializePopulation() {
 	std::cout << "Initialization complete. " << m_population.size() << " watches created.\n";
 }
 
-void GeneticAlgorithm::EvaluatePopulation() {
+void GeneticAlgorithm::evaluatePopulation() {
 	// TODO: temp cout
 	std::cout << "Evaluating generation " << m_currentGeneration << "...\n";
 
 	m_fitnessScores.clear();
 	m_bestFitness = -1.0; // reset best tracker
-	// m_worstFitness = 101.0; // reset worst tracker // TODO: test this!
+	m_worstFitness = 101.0; // reset worst tracker // TODO: test this!
 	double totalFitness = 0.0;
 
 	for (const auto& watch : m_population) {
@@ -93,6 +99,10 @@ void GeneticAlgorithm::EvaluatePopulation() {
             m_bestFitness = score;
             m_bestWatch = watch; // shared_ptr copy! The reference count goes up safely.
         }
+        // Track the worst watch of this generation
+        else if (score < m_worstFitness) {
+            m_worstFitness = score;
+        }
     }
 
 	m_averageFitness = totalFitness / m_populationSize;
@@ -102,30 +112,124 @@ void GeneticAlgorithm::EvaluatePopulation() {
 }
 
 // ---------------------------------------------------------
-// GETTERS (Required for testing)
+// CONFIGURATION GETTERS & SETTERS
 // ---------------------------------------------------------
-const std::vector<std::shared_ptr<Genome::Watch>>& GeneticAlgorithm::GetPopulation() const {
+unsigned int GeneticAlgorithm::getPopulationSize() const {
+    return m_populationSize;
+}
+
+void GeneticAlgorithm::setPopulationSize(unsigned int size) {
+    // Prevent a population size of 0, which would cause divide-by-zero 
+    // errors when calculating average fitness later.
+    m_populationSize = (size > 0) ? size : 1;
+}
+
+unsigned int GeneticAlgorithm::getCurrentGeneration() const {
+    return m_currentGeneration;
+}
+
+double GeneticAlgorithm::getMutationRate() const {
+    return m_mutationRate;
+}
+
+void GeneticAlgorithm::setMutationRate(double rate) {
+    // Clamp between 0.0 (0%) and 1.0 (100%)
+    if (rate < 0.0) m_mutationRate = 0.0;
+    else if (rate > 1.0) m_mutationRate = 1.0;
+    else m_mutationRate = rate;
+}
+
+double GeneticAlgorithm::getCrossoverRate() const {
+    return m_crossoverRate;
+}
+
+void GeneticAlgorithm::setCrossoverRate(double rate) {
+    // Clamp between 0.0 (0%) and 1.0 (100%)
+    if (rate < 0.0) m_crossoverRate = 0.0;
+    else if (rate > 1.0) m_crossoverRate = 1.0;
+    else m_crossoverRate = rate;
+}
+
+unsigned int GeneticAlgorithm::getElitismCount() const {
+    return m_elitismCount;
+}
+
+void GeneticAlgorithm::setElitismCount(unsigned int count) {
+    m_elitismCount = count;
+}
+
+
+// ---------------------------------------------------------
+// STATISTIC GETTERS
+// ---------------------------------------------------------
+double GeneticAlgorithm::getBestFitness() const {
+    return m_bestFitness;
+}
+
+double GeneticAlgorithm::getAverageFitness() const {
+    return m_averageFitness;
+}
+
+double GeneticAlgorithm::getWorstFitness() const {
+    return m_worstFitness;
+}
+
+const std::vector<std::shared_ptr<Genome::Watch>>& GeneticAlgorithm::getPopulation() const {
     return m_population;
 }
 
-const std::shared_ptr<Genome::Watch>& GeneticAlgorithm::GetBestWatch() const {
+const std::shared_ptr<Genome::Watch>& GeneticAlgorithm::getBestWatch() const {
     return m_bestWatch;
+}
+
+// ---------------------------------------------------------
+// STRATEGY SETTERS
+// ---------------------------------------------------------
+void GeneticAlgorithm::setSelectionStrategy(std::unique_ptr<Core::ISelectionStrategy> strategy) {
+    // Only accept the new strategy if it is a valid pointer.
+    // This prevents accidental null-pointer crashes if the UI passes empty data.
+    if (strategy) {
+        // We must use std::move again to transfer ownership from the 
+        // local parameter into the class member variable.
+        m_selectionStrategy = std::move(strategy);
+    }
+}
+
+void GeneticAlgorithm::setCrossoverStrategy(std::unique_ptr<Core::ICrossoverStrategy> strategy) {
+    if (strategy) {
+        m_crossoverStrategy = std::move(strategy);
+    }
+}
+
+void GeneticAlgorithm::setMutationStrategy(std::unique_ptr<Core::IMutationStrategy> strategy) {
+    if (strategy) {
+        m_mutationStrategy = std::move(strategy);
+    }
+}
+
+// ---------------------------------------------------------
+// FITNESS EVALUATOR SETTER
+// ---------------------------------------------------------
+void GeneticAlgorithm::setFitnessEvaluator(std::unique_ptr<Genome::FitnessEvaluator> evaluator) {
+    if (evaluator) {
+        m_fitnessEvaluator = std::move(evaluator);
+    }
 }
 
 // ---------------------------------------------------------
 // PUBLIC WORKFLOW METHODS
 // ---------------------------------------------------------
-void GeneticAlgorithm::Reset() {
+void GeneticAlgorithm::reset() {
     std::cout << "Resetting Genetic Algorithm...\n";
     
-    // 1. Reset generation counter
+    // 1. reset generation counter
     m_currentGeneration = 0;
     
     // 2. Safely call the private helper methods in the exact required order
-    InitializePopulation();
-    EvaluatePopulation();
+    initializePopulation();
+    evaluatePopulation();
     
-    // 3. Reset any history or UI tracking variables here if necessary
+    // 3. reset any history or UI tracking variables here if necessary
     
     std::cout << "GA is ready for Generation 1.\n";
 }

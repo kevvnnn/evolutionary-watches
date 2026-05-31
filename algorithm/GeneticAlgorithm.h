@@ -71,23 +71,23 @@ private:
     /**
      * @brief Creates an initial population of random watches
      */
-    void InitializePopulation();
+    void initializePopulation();
     
     /**
      * @brief Evaluates the fitness of all watches in the population
      */
-    void EvaluatePopulation();
+    void evaluatePopulation();
     
     /**
      * @brief Updates the statistics (best, average, worst fitness)
      */
-    void UpdateStatistics();
+    void updateStatistics();
     
     /**
      * @brief Performs elitism (keeps the best watches from the previous generation)
      * @param newPopulation The new population to add the elite watches to
      */
-    void PerformElitism(std::vector<std::shared_ptr<Genome::Watch>>& newPopulation);
+    void performElitism(std::vector<std::shared_ptr<Genome::Watch>>& newPopulation);
 
 public:
     /**
@@ -112,40 +112,40 @@ public:
     // CONFIGURATION GETTERS & SETTERS
     // ------------------------------
     
-    unsigned int GetPopulationSize() const;
-    void SetPopulationSize(unsigned int size);
-    unsigned int GetCurrentGeneration() const;
-    double GetMutationRate() const;
-    void SetMutationRate(double rate);
-    double GetCrossoverRate() const;
-    void SetCrossoverRate(double rate);
-    unsigned int GetElitismCount() const;
-    void SetElitismCount(unsigned int count);
+    unsigned int getPopulationSize() const;
+    void setPopulationSize(unsigned int size);
+    unsigned int getCurrentGeneration() const;
+    double getMutationRate() const;
+    void setMutationRate(double rate);
+    double getCrossoverRate() const;
+    void setCrossoverRate(double rate);
+    unsigned int getElitismCount() const;
+    void setElitismCount(unsigned int count);
 
     // ------------------------------
     // STRATEGY SETTERS
     // ------------------------------
     // These allow us to change the algorithm behavior at runtime without changing code
     
-    void SetSelectionStrategy(std::unique_ptr<Core::ISelectionStrategy> strategy);
-    void SetCrossoverStrategy(std::unique_ptr<Core::ICrossoverStrategy> strategy);
-    void SetMutationStrategy(std::unique_ptr<Core::IMutationStrategy> strategy);
+    void setSelectionStrategy(std::unique_ptr<Core::ISelectionStrategy> strategy);
+    void setCrossoverStrategy(std::unique_ptr<Core::ICrossoverStrategy> strategy);
+    void setMutationStrategy(std::unique_ptr<Core::IMutationStrategy> strategy);
 
     // ------------------------------
     // FITNESS EVALUATOR SETTER
     // ------------------------------
     
-    void SetFitnessEvaluator(std::unique_ptr<Genome::FitnessEvaluator> evaluator);
+    void setFitnessEvaluator(std::unique_ptr<Genome::FitnessEvaluator> evaluator);
 
     // ------------------------------
     // STATISTICS GETTERS
     // ------------------------------
     
-    double GetBestFitness() const;
-    double GetAverageFitness() const;
-    double GetWorstFitness() const;
-    const std::shared_ptr<Genome::Watch>& GetBestWatch() const;
-    const std::vector<std::shared_ptr<Genome::Watch>>& GetPopulation() const;
+    double getBestFitness() const;
+    double getAverageFitness() const;
+    double getWorstFitness() const;
+    const std::shared_ptr<Genome::Watch>& getBestWatch() const;
+    const std::vector<std::shared_ptr<Genome::Watch>>& getPopulation() const;
 
     // ------------------------------
     // MAIN EVOLUTION METHODS
@@ -154,19 +154,19 @@ public:
     /**
      * @brief Runs ONE generation of evolution
      */
-    void RunGeneration();
+    void runGeneration();
     
     /**
      * @brief Runs MULTIPLE generations of evolution
      * @param numGenerations Number of generations to run
      */
-    void RunGenerations(unsigned int numGenerations);
+    void runGenerations(unsigned int numGenerations);
     
     /**
      * @brief Resets the algorithm to its initial state
      * Clears the population and statistics, and starts over.
      */
-    void Reset();
+    void reset();
 };
 
 } // namespace Algorithm
