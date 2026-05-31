@@ -1,28 +1,46 @@
-#ifndef HAND_H
-#define HAND_H
+#ifndef WATCH_GA_GENOME_COMPONENTS_HAND_H
+#define WATCH_GA_GENOME_COMPONENTS_HAND_H
 
 #include "../WatchComponent.h"
 
-enum class HandType {
-    HOUR,
-    MINUTE,
-    SECOND
-};
+namespace WatchGA {
+namespace Genome {
+namespace Components {
 
 class Hand : public WatchComponent {
-    private:
+public:
+    enum class HandType {
+        HOUR,
+        MINUTE,
+        SECOND
+    };
+
+private:
     HandType m_type;
     double m_length;
     double m_balance;
-    double m_weight;
 
-    public:
-    Hand(unsigned int id, HandType type, double length, double balance, double weight = 0.5, double baseFriction = 0.05);
-    double calculateEfficiency() const override;
-    double calculateActualFriction() const override;
-    std::string getTypeName() const override;
+public:
+    Hand();
+    Hand(const std::string& name, double weight, double friction, double x, double y,
+         HandType type, double length, double balance);
+    ~Hand() override = default;
 
-    HandType getHandType() const;
+    HandType GetType() const;
+    double GetLength() const;
+    double GetBalance() const;
+
+    void SetType(HandType type);
+    void SetLength(double length);
+    void SetBalance(double balance);
+
+    double CalculateEfficiency() const override;
+    std::unique_ptr<WatchComponent> Clone() const override;
+    std::string ToString() const override;
 };
 
-#endif
+} // namespace Components
+} // namespace Genome
+} // namespace WatchGA
+
+#endif // WATCH_GA_GENOME_COMPONENTS_HAND_H

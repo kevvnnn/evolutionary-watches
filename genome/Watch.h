@@ -1,28 +1,51 @@
-#ifndef WATCH_H
-#define WATCH_H
+#ifndef WATCH_GA_GENOME_WATCH_H
+#define WATCH_GA_GENOME_WATCH_H
 
+#include "../core/SystemObject.h"
+#include "WatchComponent.h"
 #include <vector>
+#include <memory>
 #include <map>
 
-#include "WatchComponent.h"
+namespace WatchGA {
+namespace Genome {
 
-class Watch {
-    private:
-    std::vector<WatchComponent*> m_components;
+class Watch : public Core::SystemObject {
+private:
+    std::vector<std::unique_ptr<WatchComponent>> m_components;
     std::map<unsigned int, std::vector<unsigned int>> m_connections;
+    double m_fitnessScore;
+    bool m_isValid;
 
-    WatchComponent* findConponentByID(unsigned int id) const;
+public:
+    Watch();
+    explicit Watch(const std::string& name);
+    Watch(const Watch& other);
+    Watch& operator=(const Watch& other);
+    ~Watch() override = default;
 
-    public:
-    Watch() = default;
-    ~Watch();
+    void AddComponent(std::unique_ptr<WatchComponent> component);
+    bool RemoveComponent(unsigned int componentId);
+    WatchComponent* GetComponent(unsigned int componentId) const;
+    const std::vector<std::unique_ptr<WatchComponent>>& GetAllComponents() const;
+    unsigned int GetComponentCount() const;
 
-    void addComponent(WatchComponent* component);
-    void connect(unsigned int idA, unsigned int idB);
-    bool isValid() const;
-    const std::vector<WatchComponent*>& getComponents() const;
+    void AddConnection(unsigned int fromComponentId, unsigned int toComponentId);
+    bool RemoveConnection(unsigned int fromComponentId, unsigned int toComponentId);
+    const std::vector<unsigned int>& GetConnections(unsigned int componentId) const;
+    bool AreConnected(unsigned int componentId1, unsigned int componentId2) const;
 
-    void updateJewelPlacementFriction();
+    double GetFitnessScore() const;
+    void SetFitnessScore(double score);
+    bool IsValid() const;
+    void SetValid(bool valid);
+    bool CheckEssentialComponents() const;
+
+    std::unique_ptr<Watch> Clone() const;
+    std::string ToString() const override;
 };
 
-#endif
+} // namespace Genome
+} // namespace WatchGA
+
+#endif // WATCH_GA_GENOME_WATCH_H

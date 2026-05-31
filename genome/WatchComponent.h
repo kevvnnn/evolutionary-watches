@@ -1,33 +1,44 @@
-#ifndef WATCHCOMPONENT_H
-#define WATCHCOMPONENT_H
+#ifndef WATCH_GA_GENOME_WATCHCOMPONENT_H
+#define WATCH_GA_GENOME_WATCHCOMPONENT_H
 
+#include "../core/SystemObject.h"
+#include <utility>
 #include <string>
+#include <memory>
 
-enum ComponentType { // Unscoped enum, Can assign specific values for different parts. Good for the rng part
-    GEAR, // 0
-    JEWEL, // 1
-    BALANCE_WHEEL, // 2
-    SPRING, // 3
-    HAND // 4
+namespace WatchGA {
+namespace Genome {
+
+class WatchComponent : public Core::SystemObject {
+private:
+    double m_weight;
+    double m_friction;
+    double m_x;
+    double m_y;
+    double m_rotation;
+
+public:
+    WatchComponent();
+    WatchComponent(const std::string& name, double weight, double friction, double x, double y);
+    ~WatchComponent() override = default;
+
+    double GetWeight() const;
+    double GetFriction() const;
+    double GetX() const;
+    double GetY() const;
+    double GetRotation() const;
+
+    void SetWeight(double weight);
+    void SetFriction(double friction);
+    void SetPosition(double x, double y);
+    void SetRotation(double rotation);
+
+    virtual double CalculateEfficiency() const = 0;
+    virtual std::unique_ptr<WatchComponent> Clone() const = 0;
+    std::string ToString() const override;
 };
 
-class WatchComponent {
-    protected:
-    unsigned int m_componentID; //id is for like gear 1, hand 1 etc.
-    ComponentType m_componentType;
-    double m_baseFriction;
+} // namespace Genome
+} // namespace WatchGA
 
-    public:
-    WatchComponent(unsigned int id, ComponentType type, double baseFriction);
-    virtual ~WatchComponent();
-
-    unsigned int getID() const;
-    ComponentType getComponentType() const;
-    double getBaseFriction() const;
-
-    virtual double calculateEfficiency() const = 0;
-    virtual double calculateActualFriction() const = 0;
-    virtual std::string getTypeName() const = 0;
-};
-
-#endif
+#endif // WATCH_GA_GENOME_WATCHCOMPONENT_H

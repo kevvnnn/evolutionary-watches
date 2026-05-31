@@ -1,27 +1,48 @@
-#ifndef SPRING_H
-#define SPRING_H
+#ifndef WATCH_GA_GENOME_COMPONENTS_SPRING_H
+#define WATCH_GA_GENOME_COMPONENTS_SPRING_H
 
 #include "../WatchComponent.h"
 
-enum class SpringType {
-    MAINSPRING,
-    HAIRSPRING
-};
+namespace WatchGA {
+namespace Genome {
+namespace Components {
 
 class Spring : public WatchComponent {
-    private:
+public:
+    enum class SpringType {
+        MAINSPRING,
+        HAIRSPRING
+    };
+
+private:
     SpringType m_type;
     double m_elasticity;
     double m_fatigueResistance;
     double m_length;
 
-    public:
-    Spring(unsigned int id, SpringType type, double elasticity, double fatigueResistance, double length, double baseFriction);
-    double calculateEfficiency() const override;
-    double calculateActualFriction() const override;
-    std::string getTypeName() const override;
+public:
+    Spring();
+    Spring(const std::string& name, double weight, double friction, double x, double y,
+           SpringType type, double elasticity, double fatigueResistance, double length);
+    ~Spring() override = default;
 
-    SpringType getSpringType() const;
+    SpringType GetType() const;
+    double GetElasticity() const;
+    double GetFatigueResistance() const;
+    double GetLength() const;
+
+    void SetType(SpringType type);
+    void SetElasticity(double elasticity);
+    void SetFatigueResistance(double resistance);
+    void SetLength(double length);
+
+    double CalculateEfficiency() const override;
+    std::unique_ptr<WatchComponent> Clone() const override;
+    std::string ToString() const override;
 };
 
-#endif
+} // namespace Components
+} // namespace Genome
+} // namespace WatchGA
+
+#endif // WATCH_GA_GENOME_COMPONENTS_SPRING_H

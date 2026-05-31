@@ -1,21 +1,39 @@
-#ifndef GEAR_H
-#define GEAR_H
+#ifndef WATCH_GA_GENOME_COMPONENTS_GEAR_H
+#define WATCH_GA_GENOME_COMPONENTS_GEAR_H
 
 #include "../WatchComponent.h"
 
+namespace WatchGA {
+namespace Genome {
+namespace Components {
+
 class Gear : public WatchComponent {
-    private:
+private:
     unsigned int m_toothCount;
     double m_diameter;
     double m_meshingQuality;
 
-    public:
-    Gear(unsigned int id, unsigned int teeth, double diameter, double meshQuality, double baseFriction);
-    double calculateEfficiency() const override;
-    double calculateActualFriction () const override;
-    std::string getTypeName() const override;
+public:
+    Gear();
+    Gear(const std::string& name, double weight, double friction, double x, double y,
+         unsigned int toothCount, double diameter, double meshingQuality);
+    ~Gear() override = default;
 
-    unsigned int getToothCount() const;
+    unsigned int GetToothCount() const;
+    double GetDiameter() const;
+    double GetMeshingQuality() const;
+
+    void SetToothCount(unsigned int toothCount);
+    void SetDiameter(double diameter);
+    void SetMeshingQuality(double quality);
+
+    double CalculateEfficiency() const override;
+    std::unique_ptr<WatchComponent> Clone() const override;
+    std::string ToString() const override;
 };
 
-#endif
+} // namespace Components
+} // namespace Genome
+} // namespace WatchGA
+
+#endif // WATCH_GA_GENOME_COMPONENTS_GEAR_H

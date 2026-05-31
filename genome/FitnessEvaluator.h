@@ -1,24 +1,43 @@
-#ifndef FITNESS_EVALUATOR_H
-#define FITNESS_EVALUATOR_H
+#ifndef WATCH_GA_GENOME_FITNESSEVALUATOR_H
+#define WATCH_GA_GENOME_FITNESSEVALUATOR_H
 
 #include "Watch.h"
+#include <memory>
+
+namespace WatchGA {
+namespace Genome {
 
 class FitnessEvaluator {
 private:
-    double m_accuracyWeight = 0.7;
-    double m_efficiencyWeight = 0.3;
-    double m_frictionPenaltyFactor = 0.4; // Higher friction = bigger penalty
-    double m_complexityPenaltyFactor = 0.01;
-    double m_logBase = 10.0;
+    double m_accuracyWeight;
+    double m_efficiencyWeight;
+    double m_complexityPenaltyFactor;
+    double m_logBase;
+
+    double CalculateAccuracyScore(const Watch& watch) const;
+    double CalculateEfficiencyScore(const Watch& watch) const;
+    double CalculateComplexityPenalty(const Watch& watch) const;
+    double ApplyLogScaling(double rawScore) const;
 
 public:
-    double calculateAccuracy(const Watch& watch) const;
-    double calculateAvgEfficiency(const Watch& watch) const;
-    double calculateTotalFriction(const Watch& watch) const;
-    double calculateJewelPlacementScore(const Watch& watch) const;
+    FitnessEvaluator();
+    FitnessEvaluator(double accuracyWeight, double efficiencyWeight,
+                     double complexityPenaltyFactor, double logBase);
+    ~FitnessEvaluator() = default;
 
-    double calculateFitness(const Watch& watch) const;
-    void setWeights(double accuracy, double efficiency, double frictionPenalty, double complexity);
+    double GetAccuracyWeight() const;
+    void SetAccuracyWeight(double weight);
+    double GetEfficiencyWeight() const;
+    void SetEfficiencyWeight(double weight);
+    double GetComplexityPenaltyFactor() const;
+    void SetComplexityPenaltyFactor(double factor);
+    double GetLogBase() const;
+    void SetLogBase(double logBase);
+
+    double Evaluate(const Watch& watch) const;
 };
 
-#endif
+} // namespace Genome
+} // namespace WatchGA
+
+#endif // WATCH_GA_GENOME_FITNESSEVALUATOR_H
