@@ -30,7 +30,7 @@ public:
      * 
      * Example: A mutation rate of 0.01 means each gene has a 1% chance to mutate.
      */
-    virtual void Mutate(
+    virtual void mutate(
         std::shared_ptr<Genome::Watch>& watch,
         double mutationRate
     ) const = 0;
@@ -39,7 +39,7 @@ public:
      * @brief Gets the name of this mutation strategy
      * @return The strategy name (e.g., "Swap", "Parameter", "Add/Remove")
      */
-    virtual std::string GetName() const = 0;
+    virtual std::string getName() const = 0;
 };
 
 } // namespace Core

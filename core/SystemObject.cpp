@@ -27,18 +27,18 @@ SystemObject::SystemObject(const std::string& name)
     : m_objectId(m_nextObjectId++) 
 {
     // We use the setter here to take advantage of any validation we might add later
-    SetObjectName(name);
+    setObjectName(name);
 }
 
 // ---------------------------------------------------------
 // GETTERS
 // ---------------------------------------------------------
 
-unsigned int SystemObject::GetObjectId() const {
+unsigned int SystemObject::getObjectId() const {
     return m_objectId;
 }
 
-const std::string& SystemObject::GetObjectName() const {
+const std::string& SystemObject::getObjectName() const {
     return m_objectName;
 }
 
@@ -46,7 +46,7 @@ const std::string& SystemObject::GetObjectName() const {
 // SETTERS
 // ---------------------------------------------------------
 
-void SystemObject::SetObjectName(const std::string& name) {
+void SystemObject::setObjectName(const std::string& name) {
     // Basic validation: Don't allow completely empty names
     if (name.empty()) {
         m_objectName = "Unnamed_Object_" + std::to_string(m_objectId);
@@ -59,7 +59,7 @@ void SystemObject::SetObjectName(const std::string& name) {
 // VIRTUAL METHODS
 // ---------------------------------------------------------
 
-std::string SystemObject::ToString() const {
+std::string SystemObject::toString() const {
     // Returns a clean, standardized string format: "[ID: 42] Mainspring"
     return "[ID: " + std::to_string(m_objectId) + "] " + m_objectName;
 }

@@ -13,7 +13,7 @@ namespace Core {
 /**
  * @brief INTERFACE for all crossover (mating) strategies
  * 
- * Crossover is how we combine the genes of two parents to create offspring.
+ * crossover is how we combine the genes of two parents to create offspring.
  * Different crossover strategies mix the genes in different ways.
  * 
  * OWNER: Person B (Algorithm module)
@@ -32,7 +32,7 @@ public:
      * @param parent2 The second parent watch
      * @return A pair of child watches (offspring)
      */
-    virtual std::pair<std::shared_ptr<Genome::Watch>, std::shared_ptr<Genome::Watch>> Crossover(
+    virtual std::pair<std::shared_ptr<Genome::Watch>, std::shared_ptr<Genome::Watch>> crossover(
         const std::shared_ptr<Genome::Watch>& parent1,
         const std::shared_ptr<Genome::Watch>& parent2
     ) const = 0;
@@ -41,7 +41,7 @@ public:
      * @brief Gets the name of this crossover strategy
      * @return The strategy name (e.g., "One-Point", "Uniform")
      */
-    virtual std::string GetName() const = 0;
+    virtual std::string getName() const = 0;
 };
 
 } // namespace Core
