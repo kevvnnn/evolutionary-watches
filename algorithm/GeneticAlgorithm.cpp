@@ -90,7 +90,7 @@ void GeneticAlgorithm::evaluatePopulation() {
         m_fitnessScores.push_back(score);
         
         // Update the watch's internal record
-        watch->SetFitnessScore(score);
+        watch->setFitnessScore(score);
         
         totalFitness += score;
         

@@ -20,13 +20,13 @@ namespace Algorithm {
  */
 class RouletteWheelSelection : public Core::ISelectionStrategy {
 public:
-    std::vector<std::shared_ptr<Genome::Watch>> Select(
+    std::vector<std::shared_ptr<Genome::Watch>> select(
         const std::vector<std::shared_ptr<Genome::Watch>>& population,
         const std::vector<double>& fitnessScores,
         unsigned int numParents
     ) const override;
 
-    std::string GetName() const override;
+    std::string getName() const override;
 };
 
 /**
@@ -50,13 +50,13 @@ public:
     unsigned int GetTournamentSize() const;
     void SetTournamentSize(unsigned int size);
 
-    std::vector<std::shared_ptr<Genome::Watch>> Select(
+    std::vector<std::shared_ptr<Genome::Watch>> select(
         const std::vector<std::shared_ptr<Genome::Watch>>& population,
         const std::vector<double>& fitnessScores,
         unsigned int numParents
     ) const override;
 
-    std::string GetName() const override;
+    std::string getName() const override;
 };
 
 } // namespace Algorithm

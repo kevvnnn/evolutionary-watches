@@ -11,7 +11,7 @@ namespace Algorithm {
 // ROULETTE WHEEL SELECTION
 // ==========================================
 
-std::vector<std::shared_ptr<Genome::Watch>> RouletteWheelSelection::Select(
+std::vector<std::shared_ptr<Genome::Watch>> RouletteWheelSelection::select(
     const std::vector<std::shared_ptr<Genome::Watch>>& population,
     const std::vector<double>& fitnessScores,
     unsigned int numParents
@@ -58,7 +58,7 @@ std::vector<std::shared_ptr<Genome::Watch>> RouletteWheelSelection::Select(
     return parents;
 }
 
-std::string RouletteWheelSelection::GetName() const {
+std::string RouletteWheelSelection::getName() const {
     return "Roulette Wheel";
 }
 
@@ -72,7 +72,7 @@ TournamentSelection::TournamentSelection(unsigned int tournamentSize)
 unsigned int TournamentSelection::GetTournamentSize() const { return m_tournamentSize; }
 void TournamentSelection::SetTournamentSize(unsigned int size) { m_tournamentSize = size; }
 
-std::vector<std::shared_ptr<Genome::Watch>> TournamentSelection::Select(
+std::vector<std::shared_ptr<Genome::Watch>> TournamentSelection::select(
     const std::vector<std::shared_ptr<Genome::Watch>>& population,
     const std::vector<double>& fitnessScores,
     unsigned int numParents
@@ -113,7 +113,7 @@ std::vector<std::shared_ptr<Genome::Watch>> TournamentSelection::Select(
     return parents;
 }
 
-std::string TournamentSelection::GetName() const {
+std::string TournamentSelection::getName() const {
     return "Tournament";
 }
 
