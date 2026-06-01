@@ -61,13 +61,13 @@ public:
      * @brief Gets the unique ID of this object
      * @return The object's ID number
      */
-    unsigned int GetObjectId() const;
+    unsigned int getObjectId() const;
     
     /**
      * @brief Gets the human-readable name of this object
      * @return The object's name
      */
-    const std::string& GetObjectName() const;
+    const std::string& getObjectName() const;
 
     // ------------------------------
     // SETTERS (Write access with validation)
@@ -77,7 +77,7 @@ public:
      * @brief Sets the human-readable name of this object
      * @param name The new name (cannot be empty)
      */
-    void SetObjectName(const std::string& name);
+    void setObjectName(const std::string& name);
 
     // ------------------------------
     // VIRTUAL METHODS (Polymorphic)
@@ -90,7 +90,7 @@ public:
      * Every derived class should override this to include its own properties.
      * This is used for debugging, logging, and saving to files.
      */
-    virtual std::string ToString() const;
+    virtual std::string toString() const;
 };
 
 } // namespace Core
