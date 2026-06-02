@@ -19,22 +19,22 @@ public:
 
     ~ConfigManager() = default;
 
-    bool LoadConfig();
+    bool loadConfig();
 
-    bool SaveConfig() const;
+    bool saveConfig() const;
 
-    std::string GetString(const std::string& key, const std::string& defaultValue = "") const;
-    int GetInt(const std::string& key, int defaultValue = 0) const;
-    double GetDouble(const std::string& key, double defaultValue = 0.0) const;
-    bool GetBool(const std::string& key, bool defaultValue = false) const;
+    std::string getString(const std::string& key, const std::string& defaultValue = "") const;
+    int getInt(const std::string& key, int defaultValue = 0) const;
+    double getDouble(const std::string& key, double defaultValue = 0.0) const;
+    bool getBool(const std::string& key, bool defaultValue = false) const;
 
-    void SetString(const std::string& key, const std::string& value);
-    void SetInt(const std::string& key, int value);
-    void SetDouble(const std::string& key, double value);
-    void SetBool(const std::string& key, bool value);
+    void setString(const std::string& key, const std::string& value);
+    void setInt(const std::string& key, int value);
+    void setDouble(const std::string& key, double value);
+    void setBool(const std::string& key, bool value);
 
-    bool HasKey(const std::string& key) const;
-    void RemoveKey(const std::string& key);
+    bool hasKey(const std::string& key) const;
+    void removeKey(const std::string& key);
     void Clear();
 };
 
