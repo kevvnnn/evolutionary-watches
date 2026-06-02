@@ -3,6 +3,7 @@
 using namespace WatchGA::Genome;
 using namespace WatchGA::Genome::Components;
 
+// Default
 Spring::Spring()
     : m_type(SpringType::MAINSPRING),
       m_elasticity(0.9),
@@ -24,6 +25,7 @@ Spring::Spring(const std::string& name, double weight, double friction, double x
     setLength(length);
 }
 
+// Getters
 Spring::SpringType Spring::getType() const { return m_type; }
 double Spring::getElasticity() const { return m_elasticity; }
 double Spring::getFatigueResistance() const { return m_fatigueResistance; }
@@ -48,11 +50,13 @@ void Spring::setLength(double length) {
     else m_length = length;
 }
 
+// Hairspring gets accuracy bonus
 double Spring::calculateEfficiency() const {
     double bonus = (m_type == SpringType::HAIRSPRING) ? 1.5 : 1.0;
     return m_elasticity * m_fatigueResistance * bonus;
 }
 
+// Deep copy
 std::unique_ptr<WatchComponent> Spring::clone() const {
     return std::make_unique<Spring>(*this);
 }
