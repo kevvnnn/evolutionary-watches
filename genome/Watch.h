@@ -10,6 +10,7 @@
 namespace WatchGA {
 namespace Genome {
 
+// Complete watch assembly
 class Watch : public Core::SystemObject {
 private:
     std::vector<std::unique_ptr<WatchComponent>> m_components;
@@ -24,23 +25,27 @@ public:
     Watch& operator=(const Watch& other);
     ~Watch() override = default;
 
+    // Component management
     void addComponent(std::unique_ptr<WatchComponent> component);
     bool removeComponent(unsigned int componentId);
     WatchComponent* getComponent(unsigned int componentId) const;
     const std::vector<std::unique_ptr<WatchComponent>>& getAllComponents() const;
     unsigned int getComponentCount() const;
 
+    // Connection system
     void addConnection(unsigned int fromComponentId, unsigned int toComponentId);
     bool removeConnection(unsigned int fromComponentId, unsigned int toComponentId);
     const std::vector<unsigned int>& getConnections(unsigned int componentId) const;
     bool areConnected(unsigned int componentId1, unsigned int componentId2) const;
 
+    // Fitness & validity
     double getFitnessScore() const;
     void setFitnessScore(double score);
     bool isValid() const;
     void setValid(bool valid);
     bool checkEssentialComponents() const;
 
+    // Clone for genetic algorithm
     std::unique_ptr<Watch> clone() const;
     std::string toString() const override;
 };

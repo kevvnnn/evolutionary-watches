@@ -7,6 +7,7 @@ namespace WatchGA {
 namespace Genome {
 namespace Components {
 
+// Gear component for power transmission
 class Gear : public WatchComponent {
 private:
     unsigned int m_toothCount;
@@ -19,14 +20,17 @@ public:
          unsigned int toothCount, double diameter, double meshingQuality);
     ~Gear() override = default;
 
+    // Getters
     unsigned int getToothCount() const;
     double getDiameter() const;
     double getMeshingQuality() const;
 
+    // Setters
     void setToothCount(unsigned int toothCount);
     void setDiameter(double diameter);
     void setMeshingQuality(double quality);
 
+    // Overrides
     double calculateEfficiency() const override;
     std::unique_ptr<WatchComponent> clone() const override;
     std::string toString() const override;

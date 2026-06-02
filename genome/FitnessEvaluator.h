@@ -7,6 +7,7 @@
 namespace WatchGA {
 namespace Genome {
 
+// Evaluates watch performance for genetic algorithm
 class FitnessEvaluator {
 private:
     double m_accuracyWeight;
@@ -14,6 +15,7 @@ private:
     double m_complexityPenaltyFactor;
     double m_logBase;
 
+    // Scoring functions
     double calculateAccuracyScore(const Watch& watch) const;
     double calculateEfficiencyScore(const Watch& watch) const;
     double calculateComplexityPenalty(const Watch& watch) const;
@@ -25,6 +27,7 @@ public:
                      double complexityPenaltyFactor, double logBase);
     ~FitnessEvaluator() = default;
 
+    // Getters and setters
     double getAccuracyWeight() const;
     void setAccuracyWeight(double weight);
     double getEfficiencyWeight() const;
@@ -34,6 +37,7 @@ public:
     double getLogBase() const;
     void setLogBase(double logBase);
 
+    // Main evaluation
     double evaluate(const Watch& watch) const;
 };
 

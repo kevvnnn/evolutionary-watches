@@ -7,6 +7,7 @@ namespace WatchGA {
 namespace Genome {
 namespace Components {
 
+// Jewel bearing for low-friction movement
 class Jewel : public WatchComponent {
 private:
     double m_hardness;
@@ -18,12 +19,15 @@ public:
           double hardness, bool isCapJewel);
     ~Jewel() override = default;
 
+    // Getters
     double getHardness() const;
     bool isCapJewel() const;
 
+    // Setters
     void setHardness(double hardness);
     void setIsCapJewel(bool isCapJewel);
 
+    // Overrides
     double calculateEfficiency() const override;
     std::unique_ptr<WatchComponent> clone() const override;
     std::string toString() const override;

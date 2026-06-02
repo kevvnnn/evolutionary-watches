@@ -7,6 +7,7 @@ namespace WatchGA {
 namespace Genome {
 namespace Components {
 
+// Time indicator hands
 class Hand : public WatchComponent {
 public:
     enum class HandType {
@@ -26,14 +27,17 @@ public:
          HandType type, double length, double balance);
     ~Hand() override = default;
 
+    // Getters
     HandType getType() const;
     double getLength() const;
     double getBalance() const;
 
+    // Setters
     void setType(HandType type);
     void setLength(double length);
     void setBalance(double balance);
 
+    // Overrides
     double calculateEfficiency() const override;
     std::unique_ptr<WatchComponent> clone() const override;
     std::string toString() const override;

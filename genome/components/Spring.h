@@ -7,6 +7,7 @@ namespace WatchGA {
 namespace Genome {
 namespace Components {
 
+// Power and regulation springs
 class Spring : public WatchComponent {
 public:
     enum class SpringType {
@@ -26,16 +27,19 @@ public:
            SpringType type, double elasticity, double fatigueResistance, double length);
     ~Spring() override = default;
 
+    // Getters
     SpringType getType() const;
     double getElasticity() const;
     double getFatigueResistance() const;
     double getLength() const;
 
+    // Setters
     void setType(SpringType type);
     void setElasticity(double elasticity);
     void setFatigueResistance(double resistance);
     void setLength(double length);
 
+    // Overrides
     double calculateEfficiency() const override;
     std::unique_ptr<WatchComponent> clone() const override;
     std::string toString() const override;
