@@ -31,50 +31,50 @@ private:
 
 private slots:
     // These slots are called when the user changes a value
-    void OnPopulationSizeChanged(int value);
-    void OnMutationRateChanged(double value);
-    void OnCrossoverRateChanged(double value);
-    void OnElitismCountChanged(int value);
-    void OnMaxComponentsChanged(int value);
-    void OnSelectionStrategyChanged(int index);
-    void OnCrossoverStrategyChanged(int index);
-    void OnMutationStrategyChanged(int index);
+    void onPopulationSizeChanged(int value);
+    void onMutationRateChanged(double value);
+    void onCrossoverRateChanged(double value);
+    void onElitismCountChanged(int value);
+    void onMaxComponentsChanged(int value);
+    void onSelectionStrategyChanged(int index);
+    void onCrossoverStrategyChanged(int index);
+    void onMutationStrategyChanged(int index);
 
 signals:
     // These signals are emitted when the user changes a value
     // The MainWindow connects to these signals to update the genetic algorithm
-    void PopulationSizeChanged(unsigned int size);
-    void MutationRateChanged(double rate);
-    void CrossoverRateChanged(double rate);
-    void ElitismCountChanged(unsigned int count);
-    void MaxComponentsChanged(unsigned int max);
-    void SelectionStrategyChanged(const QString& strategyName);
-    void CrossoverStrategyChanged(const QString& strategyName);
-    void MutationStrategyChanged(const QString& strategyName);
+    void populationSizeChanged(unsigned int size);
+    void mutationRateChanged(double rate);
+    void crossoverRateChanged(double rate);
+    void elitismCountChanged(unsigned int count);
+    void maxComponentsChanged(unsigned int max);
+    void selectionStrategyChanged(const QString& strategyName);
+    void crossoverStrategyChanged(const QString& strategyName);
+    void mutationStrategyChanged(const QString& strategyName);
 
 public:
     explicit ControlPanel(QWidget* parent = nullptr);
     ~ControlPanel() override;
 
     // Getters for current values
-    unsigned int GetPopulationSize() const;
-    double GetMutationRate() const;
-    double GetCrossoverRate() const;
-    unsigned int GetElitismCount() const;
-    unsigned int GetMaxComponents() const;
-    QString GetSelectionStrategy() const;
-    QString GetCrossoverStrategy() const;
-    QString GetMutationStrategy() const;
+    unsigned int getPopulationSize() const;
+    double getMutationRate() const;
+    double getCrossoverRate() const;
+    unsigned int getElitismCount() const;
+    unsigned int getMaxComponents() const;
+    QString getSelectionStrategy() const;
+    QString getCrossoverStrategy() const;
+    QString getMutationStrategy() const;
 
     // Setters
-    void SetPopulationSize(unsigned int size);
-    void SetMutationRate(double rate);
-    void SetCrossoverRate(double rate);
-    void SetElitismCount(unsigned int count);
-    void SetMaxComponents(unsigned int max);
-    void SetSelectionStrategy(const QString& strategyName);
-    void SetCrossoverStrategy(const QString& strategyName);
-    void SetMutationStrategy(const QString& strategyName);
+    void setPopulationSize(unsigned int size);
+    void setMutationRate(double rate);
+    void setCrossoverRate(double rate);
+    void setElitismCount(unsigned int count);
+    void setMaxComponents(unsigned int max);
+    void setSelectionStrategy(const QString& strategyName);
+    void setCrossoverStrategy(const QString& strategyName);
+    void setMutationStrategy(const QString& strategyName);
 };
 
 } // namespace GUI

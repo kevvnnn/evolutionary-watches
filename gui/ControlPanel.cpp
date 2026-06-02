@@ -12,15 +12,15 @@ ControlPanel::ControlPanel(QWidget* parent) :
     ui->setupUi(this);
     
     // Connect signals from UI elements to our private slots
-    connect(ui->populationSpin, &QSpinBox::valueChanged, this, &ControlPanel::OnPopulationSizeChanged);
-    connect(ui->mutationSpin, &QDoubleSpinBox::valueChanged, this, &ControlPanel::OnMutationRateChanged);
-    connect(ui->crossoverSpin, &QDoubleSpinBox::valueChanged, this, &ControlPanel::OnCrossoverRateChanged);
-    connect(ui->elitismSpin, &QSpinBox::valueChanged, this, &ControlPanel::OnElitismCountChanged);
-    connect(ui->maxComponentsSpin, &QSpinBox::valueChanged, this, &ControlPanel::OnMaxComponentsChanged);
+    connect(ui->populationSpin, &QSpinBox::valueChanged, this, &ControlPanel::onPopulationSizeChanged);
+    connect(ui->mutationSpin, &QDoubleSpinBox::valueChanged, this, &ControlPanel::onMutationRateChanged);
+    connect(ui->crossoverSpin, &QDoubleSpinBox::valueChanged, this, &ControlPanel::onCrossoverRateChanged);
+    connect(ui->elitismSpin, &QSpinBox::valueChanged, this, &ControlPanel::onElitismCountChanged);
+    connect(ui->maxComponentsSpin, &QSpinBox::valueChanged, this, &ControlPanel::onMaxComponentsChanged);
     
-    connect(ui->selectionCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::OnSelectionStrategyChanged);
-    connect(ui->crossoverCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::OnCrossoverStrategyChanged);
-    connect(ui->mutationCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::OnMutationStrategyChanged);
+    connect(ui->selectionCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::onSelectionStrategyChanged);
+    connect(ui->crossoverCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::onCrossoverStrategyChanged);
+    connect(ui->mutationCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::onMutationStrategyChanged);
     
     // Connect control buttons
     connect(ui->runBtn, &QPushButton::clicked, this, [this](){
@@ -55,125 +55,125 @@ ControlPanel::~ControlPanel()
 }
 
 // Private slots implementation
-void ControlPanel::OnPopulationSizeChanged(int value)
+void ControlPanel::onPopulationSizeChanged(int value)
 {
     qDebug() << "Population size changed to:" << value;
-    emit PopulationSizeChanged(static_cast<unsigned int>(value));
+    emit populationSizeChanged(static_cast<unsigned int>(value));
 }
 
-void ControlPanel::OnMutationRateChanged(double value)
+void ControlPanel::onMutationRateChanged(double value)
 {
     qDebug() << "Mutation rate changed to:" << value;
-    emit MutationRateChanged(value);
+    emit mutationRateChanged(value);
 }
 
-void ControlPanel::OnCrossoverRateChanged(double value)
+void ControlPanel::onCrossoverRateChanged(double value)
 {
     qDebug() << "Crossover rate changed to:" << value;
-    emit CrossoverRateChanged(value);
+    emit crossoverRateChanged(value);
 }
 
-void ControlPanel::OnElitismCountChanged(int value)
+void ControlPanel::onElitismCountChanged(int value)
 {
     qDebug() << "Elitism count changed to:" << value;
-    emit ElitismCountChanged(static_cast<unsigned int>(value));
+    emit elitismCountChanged(static_cast<unsigned int>(value));
 }
 
-void ControlPanel::OnMaxComponentsChanged(int value)
+void ControlPanel::onMaxComponentsChanged(int value)
 {
     qDebug() << "Max components changed to:" << value;
-    emit MaxComponentsChanged(static_cast<unsigned int>(value));
+    emit maxComponentsChanged(static_cast<unsigned int>(value));
 }
 
-void ControlPanel::OnSelectionStrategyChanged(int index)
+void ControlPanel::onSelectionStrategyChanged(int index)
 {
     QString strategy = ui->selectionCombo->itemText(index);
     qDebug() << "Selection strategy changed to:" << strategy;
-    emit SelectionStrategyChanged(strategy);
+    emit selectionStrategyChanged(strategy);
 }
 
-void ControlPanel::OnCrossoverStrategyChanged(int index)
+void ControlPanel::onCrossoverStrategyChanged(int index)
 {
     QString strategy = ui->crossoverCombo->itemText(index);
     qDebug() << "Crossover strategy changed to:" << strategy;
-    emit CrossoverStrategyChanged(strategy);
+    emit crossoverStrategyChanged(strategy);
 }
 
-void ControlPanel::OnMutationStrategyChanged(int index)
+void ControlPanel::onMutationStrategyChanged(int index)
 {
     QString strategy = ui->mutationCombo->itemText(index);
     qDebug() << "Mutation strategy changed to:" << strategy;
-    emit MutationStrategyChanged(strategy);
+    emit mutationStrategyChanged(strategy);
 }
 
 // Getters implementation
-unsigned int ControlPanel::GetPopulationSize() const
+unsigned int ControlPanel::getPopulationSize() const
 {
     return static_cast<unsigned int>(ui->populationSpin->value());
 }
 
-double ControlPanel::GetMutationRate() const
+double ControlPanel::getMutationRate() const
 {
     return ui->mutationSpin->value();
 }
 
-double ControlPanel::GetCrossoverRate() const
+double ControlPanel::getCrossoverRate() const
 {
     return ui->crossoverSpin->value();
 }
 
-unsigned int ControlPanel::GetElitismCount() const
+unsigned int ControlPanel::getElitismCount() const
 {
     return static_cast<unsigned int>(ui->elitismSpin->value());
 }
 
-unsigned int ControlPanel::GetMaxComponents() const
+unsigned int ControlPanel::getMaxComponents() const
 {
     return static_cast<unsigned int>(ui->maxComponentsSpin->value());
 }
 
-QString ControlPanel::GetSelectionStrategy() const
+QString ControlPanel::getSelectionStrategy() const
 {
     return ui->selectionCombo->currentText();
 }
 
-QString ControlPanel::GetCrossoverStrategy() const
+QString ControlPanel::getCrossoverStrategy() const
 {
     return ui->crossoverCombo->currentText();
 }
 
-QString ControlPanel::GetMutationStrategy() const
+QString ControlPanel::getMutationStrategy() const
 {
     return ui->mutationCombo->currentText();
 }
 
 // Setters implementation
-void ControlPanel::SetPopulationSize(unsigned int size)
+void ControlPanel::setPopulationSize(unsigned int size)
 {
     ui->populationSpin->setValue(static_cast<int>(size));
 }
 
-void ControlPanel::SetMutationRate(double rate)
+void ControlPanel::setMutationRate(double rate)
 {
     ui->mutationSpin->setValue(rate);
 }
 
-void ControlPanel::SetCrossoverRate(double rate)
+void ControlPanel::setCrossoverRate(double rate)
 {
     ui->crossoverSpin->setValue(rate);
 }
 
-void ControlPanel::SetElitismCount(unsigned int count)
+void ControlPanel::setElitismCount(unsigned int count)
 {
     ui->elitismSpin->setValue(static_cast<int>(count));
 }
 
-void ControlPanel::SetMaxComponents(unsigned int max)
+void ControlPanel::setMaxComponents(unsigned int max)
 {
     ui->maxComponentsSpin->setValue(static_cast<int>(max));
 }
 
-void ControlPanel::SetSelectionStrategy(const QString& strategyName)
+void ControlPanel::setSelectionStrategy(const QString& strategyName)
 {
     int index = ui->selectionCombo->findText(strategyName);
     if (index != -1) {
@@ -181,7 +181,7 @@ void ControlPanel::SetSelectionStrategy(const QString& strategyName)
     }
 }
 
-void ControlPanel::SetCrossoverStrategy(const QString& strategyName)
+void ControlPanel::setCrossoverStrategy(const QString& strategyName)
 {
     int index = ui->crossoverCombo->findText(strategyName);
     if (index != -1) {
@@ -189,7 +189,7 @@ void ControlPanel::SetCrossoverStrategy(const QString& strategyName)
     }
 }
 
-void ControlPanel::SetMutationStrategy(const QString& strategyName)
+void ControlPanel::setMutationStrategy(const QString& strategyName)
 {
     int index = ui->mutationCombo->findText(strategyName);
     if (index != -1) {
