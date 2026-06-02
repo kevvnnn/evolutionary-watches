@@ -40,7 +40,7 @@ public:
      * @param numParents How many parents we need to select
      * @return A list of selected parent watches
      */
-    virtual std::vector<std::shared_ptr<Genome::Watch>> Select(
+    virtual std::vector<std::shared_ptr<Genome::Watch>> select(
         const std::vector<std::shared_ptr<Genome::Watch>>& population,
         const std::vector<double>& fitnessScores,
         unsigned int numParents
@@ -50,7 +50,7 @@ public:
      * @brief Gets the name of this selection strategy
      * @return The strategy name (e.g., "Roulette Wheel", "Tournament")
      */
-    virtual std::string GetName() const = 0;
+    virtual std::string getName() const = 0;
 };
 
 } // namespace Core
