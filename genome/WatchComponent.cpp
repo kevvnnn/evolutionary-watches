@@ -20,55 +20,41 @@ WatchComponent::WatchComponent(const std::string& name, double weight, double fr
       m_y(y),
       m_rotation(0.0)
 {
-    SetWeight(weight);
-    SetFriction(friction);
+    setWeight(weight);
+    setFriction(friction);
 }
 
-double WatchComponent::GetWeight() const {
-    return m_weight;
-}
+double WatchComponent::getWeight() const { return m_weight; }
+double WatchComponent::getFriction() const { return m_friction; }
+double WatchComponent::getX() const { return m_x; }
+double WatchComponent::getY() const { return m_y; }
+double WatchComponent::getRotation() const { return m_rotation; }
 
-double WatchComponent::GetFriction() const {
-    return m_friction;
-}
-
-double WatchComponent::GetX() const {
-    return m_x;
-}
-
-double WatchComponent::GetY() const {
-    return m_y;
-}
-
-double WatchComponent::GetRotation() const {
-    return m_rotation;
-}
-
-void WatchComponent::SetWeight(double weight) {
+void WatchComponent::setWeight(double weight) {
     if (weight <= 0.0)
         throw std::invalid_argument("Weight must be positive.");
     m_weight = weight;
 }
 
-void WatchComponent::SetFriction(double friction) {
+void WatchComponent::setFriction(double friction) {
     if (friction < 0.0) m_friction = 0.0;
     else if (friction > 1.0) m_friction = 1.0;
     else m_friction = friction;
 }
 
-void WatchComponent::SetPosition(double x, double y) {
+void WatchComponent::setPosition(double x, double y) {
     m_x = x;
     m_y = y;
 }
 
-void WatchComponent::SetRotation(double rotation) {
+void WatchComponent::setRotation(double rotation) {
     m_rotation = rotation;
     while (m_rotation >= 360.0) m_rotation -= 360.0;
     while (m_rotation < 0.0) m_rotation += 360.0;
 }
 
-std::string WatchComponent::ToString() const {
-    return Core::SystemObject::ToString() +
+std::string WatchComponent::toString() const {
+    return Core::SystemObject::toString() +
            " [Weight: " + std::to_string(m_weight) +
            "g, Friction: " + std::to_string(m_friction) + "]";
 }
