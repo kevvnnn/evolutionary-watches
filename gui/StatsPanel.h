@@ -19,11 +19,11 @@ private:
     QVBoxLayout* mainLayout;
     QHBoxLayout* headerLayout;
     QLabel* titleLabel;
-    QPushButton* closeButton;
+    // QPushButton* closeButton;
     QLabel* placeholderLabel;
 
-private slots:
-    void handleClose();
+// private slots:
+//     void handleClose();
 };
 
 #endif // STATSPANEL_H

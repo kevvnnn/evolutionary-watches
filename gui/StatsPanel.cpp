@@ -22,10 +22,10 @@ StatsPanel::StatsPanel(QWidget *parent) : QDialog(parent)
 
     headerLayout->addStretch();
 
-    closeButton = new QPushButton("X", this);
-    closeButton->setFixedSize(30, 30);
-    closeButton->setStyleSheet("background-color: #363636; border: 2px solid #292929; border-radius: 3px;");
-    headerLayout->addWidget(closeButton);
+    // closeButton = new QPushButton("X", this);
+    // closeButton->setFixedSize(30, 30);
+    // closeButton->setStyleSheet("background-color: #363636; border: 2px solid #292929; border-radius: 3px;");
+    // headerLayout->addWidget(closeButton);
 
     mainLayout->addLayout(headerLayout);
 
@@ -36,14 +36,14 @@ StatsPanel::StatsPanel(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(placeholderLabel, 1);
 
     // Connect signals
-    connect(closeButton, &QPushButton::clicked, this, &StatsPanel::handleClose);
+    // connect(closeButton, &QPushButton::clicked, this, &StatsPanel::handleClose);
 }
 
 StatsPanel::~StatsPanel()
 {
 }
 
-void StatsPanel::handleClose()
-{
-    close();
-}
+// void StatsPanel::handleClose()
+// {
+//     close();
+// }
