@@ -1,6 +1,5 @@
 #include <iostream>
-#include <iomanip>
-
+#include <memory>
 #include "../genome/WatchComponent.h"
 #include "../genome/Watch.h"
 #include "../genome/FitnessEvaluator.h"
@@ -10,127 +9,71 @@
 #include "../genome/components/Spring.h"
 #include "../genome/components/Hand.h"
 
+using namespace WatchGA::Genome;
+using namespace WatchGA::Genome::Components;
 using namespace std;
 
 int main()
 {
-    cout << fixed << setprecision(3);
+    cout << "=========================================" << endl;
+    cout << " WATCH GENETIC ALGORITHM - TEST PROGRAM  " << endl;
+    cout << "=========================================" << endl;
+    cout << endl;
 
-    Watch myWatch;
-    unsigned int componentId = 1;
+    // 1. Create a new watch
+    unique_ptr<Watch> myWatch = make_unique<Watch>("TestWatch_001");
+    cout << "[INFO] Created watch: " << myWatch->toString() << endl;
 
-    cout << "=== WATCH GENOME TEST PROGRAM ===" << endl << endl;
+    // 2. Add essential components
+    myWatch->addComponent(make_unique<Gear>("Gear_Main", 2.0, 0.1, 10, 10, 12, 6.0, 0.9));
+    myWatch->addComponent(make_unique<Jewel>("Jewel_Cap", 0.5, 0.02, 10, 15, 9.5, true));
+    myWatch->addComponent(make_unique<BalanceWheel>("Balance_Main", 1.8, 0.05, 10, 20, 1.2, 0.95, 270.0));
+    myWatch->addComponent(make_unique<Spring>("Spring_Main", 1.2, 0.03, 10, 25, Spring::SpringType::MAINSPRING, 0.92, 0.95, 12.0));
+    myWatch->addComponent(make_unique<Spring>("Spring_Hair", 0.3, 0.01, 10, 30, Spring::SpringType::HAIRSPRING, 0.98, 0.97, 4.0));
+    myWatch->addComponent(make_unique<Hand>("Hand_Hour", 0.7, 0.04, 10, 35, Hand::HandType::HOUR, 12.0, 0.96));
+    myWatch->addComponent(make_unique<Hand>("Hand_Minute", 0.5, 0.03, 10, 40, Hand::HandType::MINUTE, 15.0, 0.97));
 
-    // Add required core components
-    // Balance Wheel
-    myWatch.addComponent(new BalanceWheel(
-        componentId++,
-        0.5,
-        0.95,
-        270,
-        0.80
-    ));
+    cout << "[INFO] Added " << myWatch->getComponentCount() << " components." << endl;
+    cout << endl;
 
-    // Mainspring
-    myWatch.addComponent(new Spring(
-        componentId++,
-        SpringType::MAINSPRING,
-        0.90,
-        0.90,
-        10.0,
-        0.15
-    ));
+    // 3. Connect some components (bidirectional)
+    myWatch->addConnection(0, 1);
+    myWatch->addConnection(1, 2);
+    myWatch->addConnection(2, 4);
+    cout << "[INFO] Created internal connections." << endl;
+    cout << endl;
 
-    // Hairspring
-    myWatch.addComponent(new Spring(
-        componentId++,
-        SpringType::HAIRSPRING,
-        0.95,
-        0.95,
-        6.0,
-        0.15
-    ));
+    // 4. Mark watch as valid
+    myWatch->setValid(true);
+    cout << "[INFO] Watch valid: " << boolalpha << myWatch->isValid() << endl;
 
-    // Hour Hand
-    myWatch.addComponent(new Hand(
-        componentId++,
-        HandType::HOUR,
-        8.0,
-        0.90,
-        0.5,
-        0.05
-    ));
+    // 5. Check if all essential parts exist
+    bool hasAllParts = myWatch->checkEssentialComponents();
+    cout << "[CHECK] Has all essential components: " << boolalpha << hasAllParts << endl;
+    cout << endl;
 
-    // Minute Hand
-    myWatch.addComponent(new Hand(
-        componentId++,
-        HandType::MINUTE,
-        12.0,
-        0.90,
-        0.5,
-        0.05
-    ));
+    // 6. Evaluate fitness
+    FitnessEvaluator evaluator;
+    double fitness = evaluator.evaluate(*myWatch);
 
-    // Add extra mechanical parts
-    Gear* testGear = new Gear(
-        componentId++,
-        24,
-        6.0,
-        0.92,
-        0.50
-    );
-    myWatch.addComponent(testGear);
+    cout << "=========================================" << endl;
+    cout << "FINAL FITNESS SCORE: " << fitness << endl;
+    cout << "=========================================" << endl;
+    cout << endl;
 
-    Jewel* testJewel = new Jewel(
-        componentId++,
-        9.0,
-        true,
-        0.03
-    );
-    myWatch.addComponent(testJewel);
-
-    // Connect gear and jewel, then update friction detection
-    myWatch.connect(testGear->getID(), testJewel->getID());
-    myWatch.updateJewelPlacementFriction();
-
-    // Print all component details
-    cout << "--- LIST OF ALL COMPONENTS ---" << endl;
-    for (const auto* comp : myWatch.getComponents())
-    {
-        cout << "[" << comp->getTypeName() << "]"
-             << " Base Friction: " << comp->getBaseFriction()
-             << " | Efficiency: " << comp->calculateEfficiency()
-             << endl;
-
-        // Check jewel placement status
-        if (const Jewel* jewel = dynamic_cast<const Jewel*>(comp))
-        {
-            if (jewel->isPlacedCorrectly())
-                cout << "   ✅ Jewel placed in valid high-friction zone" << endl;
-            else
-                cout << "   ❌ Jewel placed in low-friction zone (penalty applied)" << endl;
-        }
-        cout << "--------------------------------------------" << endl;
+    // 7. Test component retrieval
+    WatchComponent* comp = myWatch->getComponent(2);
+    if (comp) {
+        cout << "[TEST] Retrieved component: " << comp->toString() << endl;
     }
 
-    // Check if the watch assembly is valid
-    bool watchValid = myWatch.isValid();
-    cout << "\nWatch Assembly Valid: " << (watchValid ? "YES" : "NO") << endl;
+    // 8. Test removal
+    bool removed = myWatch->removeComponent(6);
+    cout << "[TEST] Removed component 6: " << boolalpha << removed << endl;
+    cout << "[TEST] New component count: " << myWatch->getComponentCount() << endl;
 
-    // Calculate and display performance scores
-    FitnessEvaluator evaluator;
-    double accuracy = evaluator.calculateAccuracy(myWatch);
-    double avgEfficiency = evaluator.calculateAvgEfficiency(myWatch);
-    double totalFriction = evaluator.calculateTotalFriction(myWatch);
-    double jewelScore = evaluator.calculateJewelPlacementScore(myWatch);
-    double finalFitness = evaluator.calculateFitness(myWatch);
-
-    cout << "\n--- PERFORMANCE SCORES ---" << endl;
-    cout << "Timekeeping Accuracy:   " << accuracy << endl;
-    cout << "Average Efficiency:     " << avgEfficiency << endl;
-    cout << "Total Watch Friction:   " << totalFriction << endl;
-    cout << "Jewel Placement Score:  " << jewelScore << endl;
-    cout << "Final Fitness Score:    " << finalFitness << endl;
+    cout << endl;
+    cout << "[SUCCESS] All tests completed!" << endl;
 
     return 0;
 }
