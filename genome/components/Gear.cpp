@@ -4,6 +4,7 @@
 using namespace WatchGA::Genome;
 using namespace WatchGA::Genome::Components;
 
+// Default gear
 Gear::Gear()
     : m_toothCount(10),
       m_diameter(5.0),
@@ -11,6 +12,7 @@ Gear::Gear()
 {
 }
 
+// Full constructor with validation
 Gear::Gear(const std::string& name, double weight, double friction, double x, double y,
            unsigned int toothCount, double diameter, double meshingQuality)
     : WatchComponent(name, weight, friction, x, y),
@@ -23,10 +25,12 @@ Gear::Gear(const std::string& name, double weight, double friction, double x, do
     setMeshingQuality(meshingQuality);
 }
 
+// Getter
 unsigned int Gear::getToothCount() const { return m_toothCount; }
 double Gear::getDiameter() const { return m_diameter; }
 double Gear::getMeshingQuality() const { return m_meshingQuality; }
 
+// Validation
 void Gear::setToothCount(unsigned int toothCount) {
     if (toothCount < 8)
         throw std::invalid_argument("Tooth count minimum is 8.");
@@ -45,14 +49,17 @@ void Gear::setMeshingQuality(double quality) {
     else m_meshingQuality = quality;
 }
 
+// Gear efficiency formula
 double Gear::calculateEfficiency() const {
     return m_meshingQuality * (1.0 - (1.0 / m_toothCount)) * (1.0 - (m_diameter / 100.0));
 }
 
+// Deep copy for GA
 std::unique_ptr<WatchComponent> Gear::clone() const {
     return std::make_unique<Gear>(*this);
 }
 
+// Debug string
 std::string Gear::toString() const {
     return WatchComponent::toString() +
            " [Gear | Teeth: " + std::to_string(m_toothCount) +
