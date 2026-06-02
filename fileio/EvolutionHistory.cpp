@@ -28,7 +28,7 @@ EvolutionHistory::EvolutionHistory(const std::string& experimentName)
 /// Adds a new generation record to the history.
 /// </summary>
 /// <param name="record">Generation data to store.</param>
-void EvolutionHistory::AddRecord(const GenerationRecord& record)
+void EvolutionHistory::addRecord(const GenerationRecord& record)
 {
     m_records.push_back(record);
 }
@@ -37,7 +37,8 @@ void EvolutionHistory::AddRecord(const GenerationRecord& record)
 /// Returns all stored generation records.
 /// </summary>
 /// <returns>Constant reference to the record vector.</returns>
-const std::vector<EvolutionHistory::GenerationRecord>& EvolutionHistory::GetAllRecords() const
+const std::vector<EvolutionHistory::GenerationRecord>&
+EvolutionHistory::getAllRecords() const
 {
     return m_records;
 }
@@ -51,7 +52,7 @@ const std::vector<EvolutionHistory::GenerationRecord>& EvolutionHistory::GetAllR
 /// Thrown if the generation does not exist.
 /// </exception>
 const EvolutionHistory::GenerationRecord&
-EvolutionHistory::GetRecord(unsigned int generationNumber) const
+EvolutionHistory::getRecord(unsigned int generationNumber) const
 {
     // Search through every stored generation record.
     for (const auto& currentRecord : m_records)
@@ -70,7 +71,7 @@ EvolutionHistory::GetRecord(unsigned int generationNumber) const
 /// Returns the number of records currently stored.
 /// </summary>
 /// <returns>Total record count.</returns>
-unsigned int EvolutionHistory::GetRecordCount() const
+unsigned int EvolutionHistory::getRecordCount() const
 {
     return static_cast<unsigned int>(m_records.size());
 }
@@ -79,7 +80,7 @@ unsigned int EvolutionHistory::GetRecordCount() const
 /// Gets the experiment name.
 /// </summary>
 /// <returns>Experiment name.</returns>
-const std::string& EvolutionHistory::GetExperimentName() const
+const std::string& EvolutionHistory::getExperimentName() const
 {
     return m_experimentName;
 }
@@ -88,7 +89,7 @@ const std::string& EvolutionHistory::GetExperimentName() const
 /// Sets or changes the experiment name.
 /// </summary>
 /// <param name="name">New experiment name.</param>
-void EvolutionHistory::SetExperimentName(const std::string& name)
+void EvolutionHistory::setExperimentName(const std::string& name)
 {
     m_experimentName = name;
 }
@@ -96,7 +97,7 @@ void EvolutionHistory::SetExperimentName(const std::string& name)
 /// <summary>
 /// Removes all stored records.
 /// </summary>
-void EvolutionHistory::Clear()
+void EvolutionHistory::clear()
 {
     m_records.clear();
 }
@@ -106,7 +107,7 @@ void EvolutionHistory::Clear()
 /// </summary>
 /// <param name="filePath">Destination file path.</param>
 /// <returns>True if save succeeded; otherwise false.</returns>
-bool EvolutionHistory::SaveToFile(const std::string& filePath) const
+bool EvolutionHistory::saveToFile(const std::string& filePath) const
 {
     std::ofstream outputFile(filePath);
 
@@ -142,7 +143,7 @@ bool EvolutionHistory::SaveToFile(const std::string& filePath) const
 /// </summary>
 /// <param name="filePath">Source file path.</param>
 /// <returns>True if load succeeded; otherwise false.</returns>
-bool EvolutionHistory::LoadFromFile(const std::string& filePath)
+bool EvolutionHistory::loadFromFile(const std::string& filePath)
 {
     std::ifstream inputFile(filePath);
 
@@ -153,7 +154,7 @@ bool EvolutionHistory::LoadFromFile(const std::string& filePath)
     }
 
     // Remove any existing records before loading.
-    Clear();
+    clear();
 
     // Read experiment name from first line.
     std::getline(inputFile, m_experimentName);
