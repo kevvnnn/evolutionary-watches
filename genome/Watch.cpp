@@ -54,21 +54,22 @@ void Watch::addComponent(std::unique_ptr<WatchComponent> component) {
     if (component) m_components.push_back(std::move(component));
 }
 
+// FIXED: Removed invalid getId() call. Uses index-based ID.
 bool Watch::removeComponent(unsigned int componentId) {
-    auto it = std::remove_if(m_components.begin(), m_components.end(),
-        [componentId](const auto& comp) { return comp->getId() == componentId; });
+    if (componentId >= m_components.size())
+        return false;
 
-    if (it == m_components.end()) return false;
-    m_components.erase(it, m_components.end());
+    // Erase by index (safe, no missing functions)
+    m_components.erase(m_components.begin() + componentId);
     m_connections.erase(componentId);
     return true;
 }
 
+// FIXED: Uses index-based ID
 WatchComponent* Watch::getComponent(unsigned int componentId) const {
-    for (const auto& comp : m_components) {
-        if (comp->getId() == componentId) return comp.get();
-    }
-    return nullptr;
+    if (componentId >= m_components.size())
+        return nullptr;
+    return m_components[componentId].get();
 }
 
 const std::vector<std::unique_ptr<WatchComponent>>& Watch::getAllComponents() const {
@@ -116,19 +117,27 @@ void Watch::setFitnessScore(double score) { m_fitnessScore = score; }
 bool Watch::isValid() const { return m_isValid; }
 void Watch::setValid(bool valid) { m_isValid = valid; }
 
-// Check if watch has all essential parts
+// FIXED: Added missing namespace for enums
 bool Watch::checkEssentialComponents() const {
     bool hasBalance = false, hasMain = false, hasHair = false, hasHour = false, hasMinute = false;
+    using namespace Components;
 
     for (const auto& comp : m_components) {
-        if (dynamic_cast<const BalanceWheel*>(comp.get())) hasBalance = true;
+        if (dynamic_cast<const BalanceWheel*>(comp.get()))
+            hasBalance = true;
+
         if (const auto* s = dynamic_cast<const Spring*>(comp.get())) {
-            if (s->getType() == Spring::SpringType::MAINSPRING) hasMain = true;
-            if (s->getType() == Spring::SpringType::HAIRSPRING) hasHair = true;
+            if (s->getType() == Spring::SpringType::MAINSPRING)
+                hasMain = true;
+            if (s->getType() == Spring::SpringType::HAIRSPRING)
+                hasHair = true;
         }
+
         if (const auto* h = dynamic_cast<const Hand*>(comp.get())) {
-            if (h->getType() == Hand::HandType::HOUR) hasHour = true;
-            if (h->getType() == Hand::HandType::MINUTE) hasMinute = true;
+            if (h->getType() == Hand::HandType::HOUR)
+                hasHour = true;
+            if (h->getType() == Hand::HandType::MINUTE)
+                hasMinute = true;
         }
     }
     return hasBalance && hasMain && hasHair && hasHour && hasMinute;

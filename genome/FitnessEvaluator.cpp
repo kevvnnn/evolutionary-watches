@@ -1,67 +1,82 @@
 #include "FitnessEvaluator.h"
 #include "components/BalanceWheel.h"
-#include "components/Jewel.h"
 #include <cmath>
 
-// Time keeping accuracy (isochronism)
-double FitnessEvaluator::calculateAccuracy(const Watch& watch) const {
-    for (const auto* comp : watch.getComponents()) {
-        if (const auto* b = dynamic_cast<const BalanceWheel*>(comp)) return b->getIsochronism();
+using namespace WatchGA::Genome;
+
+// Default weights for good watch evolution
+FitnessEvaluator::FitnessEvaluator()
+    : m_accuracyWeight(0.7),
+      m_efficiencyWeight(0.3),
+      m_complexityPenaltyFactor(0.01),
+      m_logBase(10.0)
+{
+}
+
+FitnessEvaluator::FitnessEvaluator(double accuracyWeight, double efficiencyWeight,
+                                   double complexityPenaltyFactor, double logBase)
+    : m_accuracyWeight(accuracyWeight),
+      m_efficiencyWeight(efficiencyWeight),
+      m_complexityPenaltyFactor(complexityPenaltyFactor),
+      m_logBase(logBase)
+{
+}
+
+// FIXED: Added namespace to find BalanceWheel
+double FitnessEvaluator::calculateAccuracyScore(const Watch& watch) const {
+    using namespace Components;
+
+    for (const auto& comp : watch.getAllComponents()) {
+        if (const auto* bw = dynamic_cast<const BalanceWheel*>(comp.get())) {
+            return bw->getIsochronism();
+        }
     }
     return 0.0;
 }
 
-// Average efficiency for all components
-double FitnessEvaluator::calculateAvgEfficiency(const Watch& watch) const {
+// Average efficiency of all components
+double FitnessEvaluator::calculateEfficiencyScore(const Watch& watch) const {
     double total = 0.0;
-    const auto& comps = watch.getComponents();
-    for (const auto* c : comps) total += c->calculateEfficiency();
-    return comps.empty() ? 0.0 : total / comps.size();
-}
-
-// Total watch friction
-double FitnessEvaluator::calculateTotalFriction(const Watch& watch) const {
-    double total = 0.0;
-    for (const auto* c : watch.getComponents()) total += c->calculateActualFriction();
-    return total;
-}
-
-// Jewel score
-double FitnessEvaluator::calculateJewelPlacementScore(const Watch& watch) const {
-    double score = 0.0;
-    for (const auto* comp : watch.getComponents()) {
-        if (const Jewel* j = dynamic_cast<const Jewel*>(comp)) {
-            score += j->getPlacementBonus();
-            score -= j->getPlacementPenalty();
-        }
+    unsigned int count = 0;
+    for (const auto& comp : watch.getAllComponents()) {
+        total += comp->calculateEfficiency();
+        count++;
     }
-    return score;
+    return (count == 0) ? 0.0 : (total / count);
 }
 
-// Final friction score (including the jewel)
-double FitnessEvaluator::calculateFitness(const Watch& watch) const {
-    if (!watch.isValid()) return 0.0;
-
-    double accuracy = calculateAccuracy(watch);
-    double efficiency = calculateAvgEfficiency(watch);
-    double totalFriction = calculateTotalFriction(watch);
-    double jewelScore = calculateJewelPlacementScore(watch);
-    int complexity = watch.getComponents().size();
-
-    double fitness = (accuracy * m_accuracyWeight) + (efficiency * m_efficiencyWeight);
-
-    fitness -= (totalFriction * m_frictionPenaltyFactor);
-
-    fitness += jewelScore;
-
-    fitness -= m_complexityPenaltyFactor * std::log(complexity + 1) / std::log(m_logBase);
-
-    return std::max(0.0, std::min(1.0, fitness));
+// Penalize overly complex watches
+double FitnessEvaluator::calculateComplexityPenalty(const Watch& watch) const {
+    return watch.getComponentCount() * m_complexityPenaltyFactor;
 }
 
-void FitnessEvaluator::setWeights(double acc, double eff, double friction, double complexity) {
-    m_accuracyWeight = acc;
-    m_efficiencyWeight = eff;
-    m_frictionPenaltyFactor = friction;
-    m_complexityPenaltyFactor = complexity;
+// Log scaling prevents score inflation
+double FitnessEvaluator::applyLogScaling(double raw) const {
+    if (raw <= 0.0) return 0.0;
+    return log(raw * (m_logBase - 1.0) + 1.0) / log(m_logBase);
 }
+
+// MAIN FITNESS FUNCTION
+double FitnessEvaluator::evaluate(const Watch& watch) const {
+    if (!watch.isValid() || !watch.checkEssentialComponents())
+        return 0.0;
+
+    double accuracy = calculateAccuracyScore(watch);
+    double efficiency = calculateEfficiencyScore(watch);
+    double penalty = calculateComplexityPenalty(watch);
+
+    double raw = (accuracy * m_accuracyWeight) + (efficiency * m_efficiencyWeight) - penalty;
+    if (raw < 0.0) raw = 0.0;
+
+    return applyLogScaling(raw);
+}
+
+// Getters and setters
+double FitnessEvaluator::getAccuracyWeight() const { return m_accuracyWeight; }
+void FitnessEvaluator::setAccuracyWeight(double weight) { m_accuracyWeight = weight; }
+double FitnessEvaluator::getEfficiencyWeight() const { return m_efficiencyWeight; }
+void FitnessEvaluator::setEfficiencyWeight(double weight) { m_efficiencyWeight = weight; }
+double FitnessEvaluator::getComplexityPenaltyFactor() const { return m_complexityPenaltyFactor; }
+void FitnessEvaluator::setComplexityPenaltyFactor(double factor) { m_complexityPenaltyFactor = factor; }
+double FitnessEvaluator::getLogBase() const { return m_logBase; }
+void FitnessEvaluator::setLogBase(double logBase) { m_logBase = logBase; }
