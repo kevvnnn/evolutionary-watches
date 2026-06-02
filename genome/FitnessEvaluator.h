@@ -14,10 +14,10 @@ private:
     double m_complexityPenaltyFactor;
     double m_logBase;
 
-    double CalculateAccuracyScore(const Watch& watch) const;
-    double CalculateEfficiencyScore(const Watch& watch) const;
-    double CalculateComplexityPenalty(const Watch& watch) const;
-    double ApplyLogScaling(double rawScore) const;
+    double calculateAccuracyScore(const Watch& watch) const;
+    double calculateEfficiencyScore(const Watch& watch) const;
+    double calculateComplexityPenalty(const Watch& watch) const;
+    double applyLogScaling(double rawScore) const;
 
 public:
     FitnessEvaluator();
@@ -25,16 +25,16 @@ public:
                      double complexityPenaltyFactor, double logBase);
     ~FitnessEvaluator() = default;
 
-    double GetAccuracyWeight() const;
-    void SetAccuracyWeight(double weight);
-    double GetEfficiencyWeight() const;
-    void SetEfficiencyWeight(double weight);
-    double GetComplexityPenaltyFactor() const;
-    void SetComplexityPenaltyFactor(double factor);
-    double GetLogBase() const;
-    void SetLogBase(double logBase);
+    double getAccuracyWeight() const;
+    void setAccuracyWeight(double weight);
+    double getEfficiencyWeight() const;
+    void setEfficiencyWeight(double weight);
+    double getComplexityPenaltyFactor() const;
+    void setComplexityPenaltyFactor(double factor);
+    double getLogBase() const;
+    void setLogBase(double logBase);
 
-    double Evaluate(const Watch& watch) const;
+    double evaluate(const Watch& watch) const;
 };
 
 } // namespace Genome

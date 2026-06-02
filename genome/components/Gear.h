@@ -19,17 +19,17 @@ public:
          unsigned int toothCount, double diameter, double meshingQuality);
     ~Gear() override = default;
 
-    unsigned int GetToothCount() const;
-    double GetDiameter() const;
-    double GetMeshingQuality() const;
+    unsigned int getToothCount() const;
+    double getDiameter() const;
+    double getMeshingQuality() const;
 
-    void SetToothCount(unsigned int toothCount);
-    void SetDiameter(double diameter);
-    void SetMeshingQuality(double quality);
+    void setToothCount(unsigned int toothCount);
+    void setDiameter(double diameter);
+    void setMeshingQuality(double quality);
 
-    double CalculateEfficiency() const override;
-    std::unique_ptr<WatchComponent> Clone() const override;
-    std::string ToString() const override;
+    double calculateEfficiency() const override;
+    std::unique_ptr<WatchComponent> clone() const override;
+    std::string toString() const override;
 };
 
 } // namespace Components

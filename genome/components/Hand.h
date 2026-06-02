@@ -26,17 +26,17 @@ public:
          HandType type, double length, double balance);
     ~Hand() override = default;
 
-    HandType GetType() const;
-    double GetLength() const;
-    double GetBalance() const;
+    HandType getType() const;
+    double getLength() const;
+    double getBalance() const;
 
-    void SetType(HandType type);
-    void SetLength(double length);
-    void SetBalance(double balance);
+    void setType(HandType type);
+    void setLength(double length);
+    void setBalance(double balance);
 
-    double CalculateEfficiency() const override;
-    std::unique_ptr<WatchComponent> Clone() const override;
-    std::string ToString() const override;
+    double calculateEfficiency() const override;
+    std::unique_ptr<WatchComponent> clone() const override;
+    std::string toString() const override;
 };
 
 } // namespace Components

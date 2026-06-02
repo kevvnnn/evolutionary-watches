@@ -24,25 +24,25 @@ public:
     Watch& operator=(const Watch& other);
     ~Watch() override = default;
 
-    void AddComponent(std::unique_ptr<WatchComponent> component);
-    bool RemoveComponent(unsigned int componentId);
-    WatchComponent* GetComponent(unsigned int componentId) const;
-    const std::vector<std::unique_ptr<WatchComponent>>& GetAllComponents() const;
-    unsigned int GetComponentCount() const;
+    void addComponent(std::unique_ptr<WatchComponent> component);
+    bool removeComponent(unsigned int componentId);
+    WatchComponent* getComponent(unsigned int componentId) const;
+    const std::vector<std::unique_ptr<WatchComponent>>& getAllComponents() const;
+    unsigned int getComponentCount() const;
 
-    void AddConnection(unsigned int fromComponentId, unsigned int toComponentId);
-    bool RemoveConnection(unsigned int fromComponentId, unsigned int toComponentId);
-    const std::vector<unsigned int>& GetConnections(unsigned int componentId) const;
-    bool AreConnected(unsigned int componentId1, unsigned int componentId2) const;
+    void addConnection(unsigned int fromComponentId, unsigned int toComponentId);
+    bool removeConnection(unsigned int fromComponentId, unsigned int toComponentId);
+    const std::vector<unsigned int>& getConnections(unsigned int componentId) const;
+    bool areConnected(unsigned int componentId1, unsigned int componentId2) const;
 
-    double GetFitnessScore() const;
-    void SetFitnessScore(double score);
-    bool IsValid() const;
-    void SetValid(bool valid);
-    bool CheckEssentialComponents() const;
+    double getFitnessScore() const;
+    void setFitnessScore(double score);
+    bool isValid() const;
+    void setValid(bool valid);
+    bool checkEssentialComponents() const;
 
-    std::unique_ptr<Watch> Clone() const;
-    std::string ToString() const override;
+    std::unique_ptr<Watch> clone() const;
+    std::string toString() const override;
 };
 
 } // namespace Genome

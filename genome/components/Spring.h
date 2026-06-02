@@ -26,19 +26,19 @@ public:
            SpringType type, double elasticity, double fatigueResistance, double length);
     ~Spring() override = default;
 
-    SpringType GetType() const;
-    double GetElasticity() const;
-    double GetFatigueResistance() const;
-    double GetLength() const;
+    SpringType getType() const;
+    double getElasticity() const;
+    double getFatigueResistance() const;
+    double getLength() const;
 
-    void SetType(SpringType type);
-    void SetElasticity(double elasticity);
-    void SetFatigueResistance(double resistance);
-    void SetLength(double length);
+    void setType(SpringType type);
+    void setElasticity(double elasticity);
+    void setFatigueResistance(double resistance);
+    void setLength(double length);
 
-    double CalculateEfficiency() const override;
-    std::unique_ptr<WatchComponent> Clone() const override;
-    std::string ToString() const override;
+    double calculateEfficiency() const override;
+    std::unique_ptr<WatchComponent> clone() const override;
+    std::string toString() const override;
 };
 
 } // namespace Components

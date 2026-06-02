@@ -19,17 +19,17 @@ public:
                  double momentOfInertia, double isochronism, double amplitude);
     ~BalanceWheel() override = default;
 
-    double GetMomentOfInertia() const;
-    double GetIsochronism() const;
-    double GetAmplitude() const;
+    double getMomentOfInertia() const;
+    double getIsochronism() const;
+    double getAmplitude() const;
 
-    void SetMomentOfInertia(double moi);
-    void SetIsochronism(double isochronism);
-    void SetAmplitude(double amplitude);
+    void setMomentOfInertia(double moi);
+    void setIsochronism(double isochronism);
+    void setAmplitude(double amplitude);
 
-    double CalculateEfficiency() const override;
-    std::unique_ptr<WatchComponent> Clone() const override;
-    std::string ToString() const override;
+    double calculateEfficiency() const override;
+    std::unique_ptr<WatchComponent> clone() const override;
+    std::string toString() const override;
 };
 
 } // namespace Components

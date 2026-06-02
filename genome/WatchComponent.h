@@ -22,20 +22,20 @@ public:
     WatchComponent(const std::string& name, double weight, double friction, double x, double y);
     ~WatchComponent() override = default;
 
-    double GetWeight() const;
-    double GetFriction() const;
-    double GetX() const;
-    double GetY() const;
-    double GetRotation() const;
+    double getWeight() const;
+    double getFriction() const;
+    double getX() const;
+    double getY() const;
+    double getRotation() const;
 
-    void SetWeight(double weight);
-    void SetFriction(double friction);
-    void SetPosition(double x, double y);
-    void SetRotation(double rotation);
+    void setWeight(double weight);
+    void setFriction(double friction);
+    void setPosition(double x, double y);
+    void setRotation(double rotation);
 
-    virtual double CalculateEfficiency() const = 0;
-    virtual std::unique_ptr<WatchComponent> Clone() const = 0;
-    std::string ToString() const override;
+    virtual double calculateEfficiency() const = 0;
+    virtual std::unique_ptr<WatchComponent> clone() const = 0;
+    std::string toString() const override;
 };
 
 } // namespace Genome

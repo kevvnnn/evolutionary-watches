@@ -18,15 +18,15 @@ public:
           double hardness, bool isCapJewel);
     ~Jewel() override = default;
 
-    double GetHardness() const;
-    bool IsCapJewel() const;
+    double getHardness() const;
+    bool isCapJewel() const;
 
-    void SetHardness(double hardness);
-    void SetIsCapJewel(bool isCapJewel);
+    void setHardness(double hardness);
+    void setIsCapJewel(bool isCapJewel);
 
-    double CalculateEfficiency() const override;
-    std::unique_ptr<WatchComponent> Clone() const override;
-    std::string ToString() const override;
+    double calculateEfficiency() const override;
+    std::unique_ptr<WatchComponent> clone() const override;
+    std::string toString() const override;
 };
 
 } // namespace Components
