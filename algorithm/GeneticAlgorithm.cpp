@@ -65,6 +65,9 @@ void GeneticAlgorithm::initializePopulation() {
         // This creates both the Watch on the Heap and the Reference Counter in one go.
         // It is significantly safer and faster than using 'new'.
         auto newWatch = std::make_shared<Genome::Watch>(watchName);
+
+        // Trigger the random physical generation
+        newWatch->randomize();
 		
 		m_population.push_back(newWatch);
 	}
@@ -84,7 +87,7 @@ void GeneticAlgorithm::evaluatePopulation() {
 	for (const auto& watch : m_population) {
         // We pass the watch by dereferencing the shared_ptr (*watch)
         // because Evaluate() expects a const Watch& reference.
-        double score = m_fitnessEvaluator->Evaluate(*watch);
+        double score = m_fitnessEvaluator->evaluate(*watch);
         
         // Store the score in our parallel array
         m_fitnessScores.push_back(score);

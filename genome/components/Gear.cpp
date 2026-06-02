@@ -1,8 +1,9 @@
 #include "Gear.h"
 #include <stdexcept>
 
-using namespace WatchGA::Genome;
-using namespace WatchGA::Genome::Components;
+namespace WatchGA {
+namespace Genome {
+namespace Components {
 
 // Default gear
 Gear::Gear()
@@ -65,3 +66,7 @@ std::string Gear::toString() const {
            " [Gear | Teeth: " + std::to_string(m_toothCount) +
            ", Diameter: " + std::to_string(m_diameter) + "mm]";
 }
+
+} // namespace Components
+} // namespace Genome
+} // namespace WatchGA

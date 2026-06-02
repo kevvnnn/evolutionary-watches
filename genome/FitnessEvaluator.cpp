@@ -2,7 +2,8 @@
 #include "components/BalanceWheel.h"
 #include <cmath>
 
-using namespace WatchGA::Genome;
+namespace WatchGA {
+namespace Genome {
 
 // Default weights for good watch evolution
 FitnessEvaluator::FitnessEvaluator()
@@ -80,3 +81,6 @@ double FitnessEvaluator::getComplexityPenaltyFactor() const { return m_complexit
 void FitnessEvaluator::setComplexityPenaltyFactor(double factor) { m_complexityPenaltyFactor = factor; }
 double FitnessEvaluator::getLogBase() const { return m_logBase; }
 void FitnessEvaluator::setLogBase(double logBase) { m_logBase = logBase; }
+
+}
+}

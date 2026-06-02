@@ -1,7 +1,10 @@
 #include "WatchComponent.h"
 #include <stdexcept>
 
-using namespace WatchGA::Genome;
+namespace WatchGA {
+namespace Genome {
+
+// TODO FIX: deal with rotation
 
 // Default constructor with safe default values
 WatchComponent::WatchComponent()
@@ -64,4 +67,7 @@ std::string WatchComponent::toString() const {
     return Core::SystemObject::toString() +
            " [Weight: " + std::to_string(m_weight) +
            "g, Friction: " + std::to_string(m_friction) + "]";
+}
+
+}
 }

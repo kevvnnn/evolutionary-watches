@@ -48,6 +48,9 @@ public:
     // Clone for genetic algorithm
     std::unique_ptr<Watch> clone() const;
     std::string toString() const override;
+
+    // Fill an empty watch for Generation 0 of the Genetic Algorithm
+    void randomize();
 };
 
 } // namespace Genome

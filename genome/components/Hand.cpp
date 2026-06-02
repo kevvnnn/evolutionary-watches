@@ -1,8 +1,9 @@
 #include "Hand.h"
 #include <stdexcept>
 
-using namespace WatchGA::Genome;
-using namespace WatchGA::Genome::Components;
+namespace WatchGA {
+namespace Genome {
+namespace Components {
 
 Hand::Hand()
     : m_type(HandType::HOUR),
@@ -60,3 +61,7 @@ std::string Hand::toString() const {
     }
     return WatchComponent::toString() + " [" + typeStr + " Hand]";
 }
+
+} // namespace Components
+} // namespace Genome
+} // namespace WatchGA

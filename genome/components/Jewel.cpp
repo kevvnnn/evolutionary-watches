@@ -1,7 +1,8 @@
 #include "Jewel.h"
 
-using namespace WatchGA::Genome;
-using namespace WatchGA::Genome::Components;
+namespace WatchGA {
+namespace Genome {
+namespace Components {
 
 Jewel::Jewel()
     : m_hardness(9.0),  // Real life sapphire/ruby hardness
@@ -48,3 +49,7 @@ std::string Jewel::toString() const {
            " [Jewel | Hardness: " + std::to_string(m_hardness) +
            ", Cap: " + (m_isCapJewel ? "Yes" : "No") + "]";
 }
+
+} // namespace Components
+} // namespace Genome
+} // namespace WatchGA

@@ -2,8 +2,9 @@
 #include <cmath>
 #include <stdexcept>
 
-using namespace WatchGA::Genome;
-using namespace WatchGA::Genome::Components;
+namespace WatchGA {
+namespace Genome {
+namespace Components {
 
 // Default
 BalanceWheel::BalanceWheel()
@@ -65,3 +66,7 @@ std::string BalanceWheel::toString() const {
     return WatchComponent::toString() +
            " [BalanceWheel | Isochronism: " + std::to_string(m_isochronism) + "]";
 }
+
+} // namespace Components
+} // namespace Genome
+} // namespace WatchGA
