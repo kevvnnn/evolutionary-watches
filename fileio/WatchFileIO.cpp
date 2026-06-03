@@ -1,59 +1,87 @@
 #include "WatchFileIO.h"
 
 #include <fstream>
+#include <iostream>
 
 namespace WatchGA {
 namespace FileIO {
 
-/// <summary>
-/// Creates a file handler with no assigned file path.
-/// </summary>
+using namespace Genome;
+using namespace Algorithm;
+
+// Default constructor
+// Creates an object with no file path and a closed state.
 WatchFileIO::WatchFileIO()
     : m_filePath(""),
       m_isOpen(false)
 {
 }
 
-/// <summary>
-/// Creates a file handler for the specified file.
-/// </summary>
-/// <param name="filePath">
-/// Path of the file to manage.
-/// </param>
-WatchFileIO::WatchFileIO(const std::string& filePath)
-    : m_filePath(filePath),
+// Constructor that accepts a file path.
+WatchFileIO::WatchFileIO(const std::string& path)
+    : m_filePath(path),
       m_isOpen(false)
 {
 }
 
-/// <summary>
-/// Destructor.
-/// Ensures the file is closed before destruction.
-/// </summary>
+// Destructor.
+// Ensures the file is closed before the object is destroyed.
 WatchFileIO::~WatchFileIO()
 {
-    close();
+    if (m_isOpen)
+    {
+        close();
+    }
 }
 
-/// <summary>
-/// Opens the file.
-/// </summary>
-/// <param name="createIfNotExists">
-/// Creates the file if it does not already exist.
-/// </param>
-/// <returns>
-/// True if successful; otherwise false.
-/// </returns>
-bool WatchFileIO::open(bool createIfNotExists)
+// Writes a single Watch object to the file.
+// The actual serialization logic still needs to be implemented.
+void WatchFileIO::writeWatch(const Genome::Watch& watch)
 {
-    std::ifstream inputFile(m_filePath);
+    // TODO:
+    // Convert the Watch object into binary data
+    // and write it to the file.
 
-    if (!inputFile.is_open() && createIfNotExists)
+    std::cerr << "writeWatch() not implemented.\n";
+}
+
+// Reads a single Watch object from the file.
+// The actual deserialization logic still needs to be implemented.
+std::unique_ptr<Genome::Watch> WatchFileIO::readWatch()
+{
+    // TODO:
+    // Read binary data from the file and
+    // reconstruct a Watch object.
+
+    std::cerr << "readWatch() not implemented.\n";
+    return nullptr;
+}
+
+// Opens the file.
+// If createIfMissing is true, a new file will be created if one does not exist.
+bool WatchFileIO::open(bool createIfMissing)
+{
+    if (m_filePath.empty())
     {
-        std::ofstream outputFile(m_filePath);
+        std::cerr << "No file path specified.\n";
+        return false;
+    }
 
-        if (!outputFile.is_open())
+    std::ifstream input(m_filePath, std::ios::binary);
+
+    if (!input.is_open())
+    {
+        if (!createIfMissing)
         {
+            return false;
+        }
+
+        std::ofstream output(m_filePath, std::ios::binary);
+
+        if (!output.is_open())
+        {
+            std::cerr << "Unable to create file: "
+                      << m_filePath << '\n';
             return false;
         }
     }
@@ -62,111 +90,57 @@ bool WatchFileIO::open(bool createIfNotExists)
     return true;
 }
 
-/// <summary>
-/// Closes the file.
-/// </summary>
+// Closes the file.
+// Since this implementation does not store a stream object,
+// we only update the state flag.
 void WatchFileIO::close()
 {
     m_isOpen = false;
 }
 
-/// <summary>
-/// Checks whether the file is open.
-/// </summary>
-/// <returns>
-/// True if open; otherwise false.
-/// </returns>
+// Returns whether the file is currently considered open.
 bool WatchFileIO::isOpen() const
 {
     return m_isOpen;
 }
 
-/// <summary>
-/// Writes a watch object to the file.
-/// Serialization logic should be implemented here.
-/// </summary>
-/// <param name="watch">
-/// Watch object to write.
-/// </param>
-void WatchFileIO::writeWatch(const Genome::Watch& watch)
-{
-    // TODO:
-    // Serialize watch data and write to file.
-}
-
-/// <summary>
-/// Reads a watch object from the file.
-/// </summary>
-/// <returns>
-/// Loaded watch object.
-/// </returns>
-std::unique_ptr<Genome::Watch> WatchFileIO::readWatch()
-{
-    // TODO:
-    // Deserialize watch data from file.
-
-    return nullptr;
-}
-
-/// <summary>
-/// Saves a watch at the specified index.
-/// </summary>
-/// <param name="watch">
-/// Watch object to save.
-/// </param>
-/// <param name="index">
-/// Storage index.
-/// </param>
-/// <returns>
-/// True if successful.
-/// </returns>
-bool WatchFileIO::saveWatch(
-    const Genome::Watch& watch,
-    unsigned int index)
+// Saves a Watch object at a specified index.
+bool WatchFileIO::saveWatch(const Genome::Watch& watch,
+                            unsigned int index)
 {
     if (!m_isOpen)
     {
         return false;
     }
 
-    // TODO:
-    // Seek to index and write watch.
+    // The index parameter is not currently used.
+    // Future implementations may seek to the correct position
+    // in the file before writing.
+    (void)index;
+
+    writeWatch(watch);
 
     return true;
 }
 
-/// <summary>
-/// Loads a watch from the specified index.
-/// </summary>
-/// <param name="index">
-/// Position of watch in file.
-/// </param>
-/// <returns>
-/// Loaded watch object.
-/// </returns>
-std::unique_ptr<Genome::Watch> WatchFileIO::loadWatch(
-    unsigned int index)
+// Loads a Watch object from a specified index.
+std::unique_ptr<Genome::Watch>
+WatchFileIO::loadWatch(unsigned int index)
 {
     if (!m_isOpen)
     {
         return nullptr;
     }
 
-    // TODO:
-    // Seek to index and load watch.
+    // The index parameter is not currently used.
+    // Future implementations may seek to the correct position
+    // in the file before reading.
+    (void)index;
 
     return readWatch();
 }
 
-/// <summary>
-/// Saves an entire population.
-/// </summary>
-/// <param name="ga">
-/// Genetic algorithm containing the population.
-/// </param>
-/// <returns>
-/// True if successful.
-/// </returns>
+// Saves the entire population from the Genetic Algorithm.
 bool WatchFileIO::savePopulation(
     const Algorithm::GeneticAlgorithm& ga)
 {
@@ -176,20 +150,13 @@ bool WatchFileIO::savePopulation(
     }
 
     // TODO:
-    // Iterate through population and save watches.
+    // Loop through the population and save each Watch.
 
-    return true;
+    std::cerr << "savePopulation() not implemented.\n";
+    return false;
 }
 
-/// <summary>
-/// Loads an entire population.
-/// </summary>
-/// <param name="ga">
-/// Genetic algorithm to populate.
-/// </param>
-/// <returns>
-/// True if successful.
-/// </returns>
+// Loads an entire population into the Genetic Algorithm.
 bool WatchFileIO::loadPopulation(
     Algorithm::GeneticAlgorithm& ga)
 {
@@ -199,20 +166,15 @@ bool WatchFileIO::loadPopulation(
     }
 
     // TODO:
-    // Load watches and add to population.
+    // Read population data from the file and
+    // recreate all Watch objects.
 
-    return true;
+    std::cerr << "loadPopulation() not implemented.\n";
+    return false;
 }
 
-/// <summary>
-/// Saves the complete state of the genetic algorithm.
-/// </summary>
-/// <param name="ga">
-/// Genetic algorithm to save.
-/// </param>
-/// <returns>
-/// True if successful.
-/// </returns>
+// Saves all Genetic Algorithm state information,
+// including population and any runtime metadata.
 bool WatchFileIO::saveCompleteState(
     const Algorithm::GeneticAlgorithm& ga)
 {
@@ -222,21 +184,14 @@ bool WatchFileIO::saveCompleteState(
     }
 
     // TODO:
-    // Save GA parameters, generation count,
-    // population, fitness data, etc.
+    // Save generation count, population,
+    // fitness values, mutation rates, etc.
 
-    return true;
+    std::cerr << "saveCompleteState() not implemented.\n";
+    return false;
 }
 
-/// <summary>
-/// Loads the complete state of the genetic algorithm.
-/// </summary>
-/// <param name="ga">
-/// Genetic algorithm receiving loaded data.
-/// </param>
-/// <returns>
-/// True if successful.
-/// </returns>
+// Restores a complete Genetic Algorithm state from disk.
 bool WatchFileIO::loadCompleteState(
     Algorithm::GeneticAlgorithm& ga)
 {
@@ -246,17 +201,14 @@ bool WatchFileIO::loadCompleteState(
     }
 
     // TODO:
-    // Restore GA parameters and population.
+    // Read all state information and restore
+    // the Genetic Algorithm.
 
-    return true;
+    std::cerr << "loadCompleteState() not implemented.\n";
+    return false;
 }
 
-/// <summary>
-/// Returns the number of watches stored in the file.
-/// </summary>
-/// <returns>
-/// Number of watches.
-/// </returns>
+// Returns the number of Watch objects stored in the file.
 unsigned int WatchFileIO::getWatchCount() const
 {
     if (!m_isOpen)
@@ -265,8 +217,10 @@ unsigned int WatchFileIO::getWatchCount() const
     }
 
     // TODO:
-    // Calculate actual count from file contents.
+    // Either read a count stored in the file header
+    // or calculate it by scanning the file.
 
+    std::cerr << "getWatchCount() not implemented.\n";
     return 0;
 }
 

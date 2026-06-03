@@ -1,186 +1,165 @@
-#include "EvolutionHistory.h"
+/**
+ * @file EvolutionHistory.cpp
+ * @brief Implementation for EvolutionHistory class
+ * @ownership Person C
+ */
 
+#include "EvolutionHistory.h"
 #include <fstream>
 #include <stdexcept>
 
 namespace WatchGA {
 namespace FileIO {
 
-/// <summary>
-/// Default constructor.
-/// Creates an empty evolution history with no experiment name.
-/// </summary>
+/**
+ * @brief Default constructor
+ * Initializes an empty evolution history with no experiment name
+ */
 EvolutionHistory::EvolutionHistory()
     : m_experimentName("")
 {
 }
 
-/// <summary>
-/// Creates an evolution history and assigns the experiment name.
-/// </summary>
-/// <param name="experimentName">Name of the experiment.</param>
-EvolutionHistory::EvolutionHistory(const std::string& experimentName)
-    : m_experimentName(experimentName)
+/**
+ * @brief Constructor with experiment name
+ * @param name Name of the evolutionary experiment
+ */
+EvolutionHistory::EvolutionHistory(const std::string& name)
+    : m_experimentName(name)
 {
 }
 
-/// <summary>
-/// Adds a new generation record to the history.
-/// </summary>
-/// <param name="record">Generation data to store.</param>
+/**
+ * @brief Add a new generation record to the history
+ * @param record Generation data to store
+ */
 void EvolutionHistory::addRecord(const GenerationRecord& record)
 {
     m_records.push_back(record);
 }
 
-/// <summary>
-/// Returns all stored generation records.
-/// </summary>
-/// <returns>Constant reference to the record vector.</returns>
-const std::vector<EvolutionHistory::GenerationRecord>&
-EvolutionHistory::getAllRecords() const
+/**
+ * @brief Get all stored generation records (read-only)
+ * @return Constant reference to the record vector
+ */
+const std::vector<EvolutionHistory::GenerationRecord>& EvolutionHistory::getAllRecords() const
 {
     return m_records;
 }
 
-/// <summary>
-/// Finds a record by generation number.
-/// </summary>
-/// <param name="generationNumber">Generation to search for.</param>
-/// <returns>Matching generation record.</returns>
-/// <exception cref="std::out_of_range">
-/// Thrown if the generation does not exist.
-/// </exception>
-const EvolutionHistory::GenerationRecord&
-EvolutionHistory::getRecord(unsigned int generationNumber) const
+/**
+ * @brief Get a single record by generation number
+ * @param gen Target generation number
+ * @return Matching generation record
+ * @throws std::out_of_range if generation not found
+ */
+const EvolutionHistory::GenerationRecord& EvolutionHistory::getRecord(unsigned int gen) const
 {
-    // Search through every stored generation record.
-    for (const auto& currentRecord : m_records)
+    for (const auto& record : m_records)
     {
-        if (currentRecord.generationNumber == generationNumber)
+        if (record.generationNumber == gen)
         {
-            return currentRecord;
+            return record;
         }
     }
 
-    // No matching generation was found.
-    throw std::out_of_range("Generation record not found.");
+    throw std::out_of_range("Generation not found in evolution history.");
 }
 
-/// <summary>
-/// Returns the number of records currently stored.
-/// </summary>
-/// <returns>Total record count.</returns>
+/**
+ * @brief Get total number of stored records
+ * @return Count of generation records
+ */
 unsigned int EvolutionHistory::getRecordCount() const
 {
     return static_cast<unsigned int>(m_records.size());
 }
 
-/// <summary>
-/// Gets the experiment name.
-/// </summary>
-/// <returns>Experiment name.</returns>
+/**
+ * @brief Get the experiment name
+ * @return Constant reference to experiment name
+ */
 const std::string& EvolutionHistory::getExperimentName() const
 {
     return m_experimentName;
 }
 
-/// <summary>
-/// Sets or changes the experiment name.
-/// </summary>
-/// <param name="name">New experiment name.</param>
+/**
+ * @brief Set the experiment name
+ * @param name New experiment name
+ */
 void EvolutionHistory::setExperimentName(const std::string& name)
 {
     m_experimentName = name;
 }
 
-/// <summary>
-/// Removes all stored records.
-/// </summary>
+/**
+ * @brief Clear all stored generation records
+ */
 void EvolutionHistory::clear()
 {
     m_records.clear();
 }
 
-/// <summary>
-/// Saves the evolution history to a text file.
-/// </summary>
-/// <param name="filePath">Destination file path.</param>
-/// <returns>True if save succeeded; otherwise false.</returns>
-bool EvolutionHistory::saveToFile(const std::string& filePath) const
+/**
+ * @brief Save evolution history to a file
+ * @param path File path to save
+ * @return True on success, false on failure
+ */
+bool EvolutionHistory::saveToFile(const std::string& path) const
 {
-    std::ofstream outputFile(filePath);
-
-    // Ensure the file was opened successfully.
-    if (!outputFile.is_open())
-    {
+    std::ofstream file(path);
+    if (!file.is_open())
         return false;
-    }
 
-    // Write experiment metadata.
-    outputFile << m_experimentName << '\n';
+    // Save experiment metadata
+    file << m_experimentName << '\n';
+    file << m_records.size() << '\n';
 
-    // Write number of stored records.
-    outputFile << m_records.size() << '\n';
-
-    // Write each generation record.
-    for (const auto& currentRecord : m_records)
+    // Save each generation's statistics
+    for (const auto& rec : m_records)
     {
-        outputFile << currentRecord.generationNumber << ' '
-                   << currentRecord.bestFitness << ' '
-                   << currentRecord.averageFitness << ' '
-                   << currentRecord.worstFitness << '\n';
-
-        // If Genome::Watch serialization is implemented later,
-        // the bestWatch object can be saved here as well.
+        file << rec.generationNumber << ' '
+             << rec.bestFitness << ' '
+             << rec.averageFitness << ' '
+             << rec.worstFitness << '\n';
     }
 
+    file.close();
     return true;
 }
 
-/// <summary>
-/// Loads evolution history data from a text file.
-/// </summary>
-/// <param name="filePath">Source file path.</param>
-/// <returns>True if load succeeded; otherwise false.</returns>
-bool EvolutionHistory::loadFromFile(const std::string& filePath)
+/**
+ * @brief Load evolution history from a file
+ * @param path File path to load
+ * @return True on success, false on failure
+ */
+bool EvolutionHistory::loadFromFile(const std::string& path)
 {
-    std::ifstream inputFile(filePath);
-
-    // Ensure the file exists and can be opened.
-    if (!inputFile.is_open())
-    {
+    std::ifstream file(path);
+    if (!file.is_open())
         return false;
-    }
 
-    // Remove any existing records before loading.
     clear();
 
-    // Read experiment name from first line.
-    std::getline(inputFile, m_experimentName);
+    // Load metadata
+    size_t recordCount = 0;
+    std::getline(file, m_experimentName);
+    file >> recordCount;
 
-    // Read total number of records.
-    std::size_t recordCount = 0;
-    inputFile >> recordCount;
-
-    // Read each stored generation record.
-    for (std::size_t recordIndex = 0;
-         recordIndex < recordCount;
-         ++recordIndex)
+    // Load generation records
+    GenerationRecord rec;
+    for (size_t i = 0; i < recordCount; ++i)
     {
-        GenerationRecord newRecord;
-
-        inputFile >> newRecord.generationNumber
-                  >> newRecord.bestFitness
-                  >> newRecord.averageFitness
-                  >> newRecord.worstFitness;
-
-        // Watch data is not currently serialized.
-        newRecord.bestWatch = nullptr;
-
-        m_records.push_back(newRecord);
+        file >> rec.generationNumber
+             >> rec.bestFitness
+             >> rec.averageFitness
+             >> rec.worstFitness;
+        rec.bestWatch = nullptr; // Watch object not serialized in basic implementation
+        m_records.push_back(rec);
     }
 
+    file.close();
     return true;
 }
 
