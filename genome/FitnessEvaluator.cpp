@@ -1,5 +1,6 @@
 #include "FitnessEvaluator.h"
 #include "components/BalanceWheel.h"
+#include "components/Hand.h"
 #include <cmath>
 
 namespace WatchGA {
@@ -66,12 +67,37 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
     double efficiency = calculateEfficiencyScore(watch);
     double penalty = calculateComplexityPenalty(watch);
 
+    // Calculate the raw base score
     double raw = (accuracy * m_accuracyWeight) + (efficiency * m_efficiencyWeight) - penalty;
+
+    // Watch-hand relationship check
+    double hourHandLength = 0.0;
+    double minuteHandLength = 0.0;
+
+    // Scan the assembly to find the dimensions of both hands
+    using namespace Components;
+    for (const auto& comp : watch.getAllComponents()) {
+        if (const auto* hand = dynamic_cast<const Hand*>(comp.get())) {
+            if (hand->getType() == Hand::HandType::HOUR) {
+                hourHandLength = hand->getLength();
+            } else if (hand->getType() == Hand::HandType::MINUTE) {
+                minuteHandLength = hand->getLength();
+            }
+        }
+    }
+
+    // If the hour hand is realistically longer than or equal to the minute hand,
+    // apply a severe penalty to tank its survival chances in the tournament.
+    if (hourHandLength >= minuteHandLength && minuteHandLength > 0.0) {
+        raw -= 0.35; // Harsh deduction
+    }
+    // =========================================================================
+
+    // Floor the raw score to 0.0 so negative penalties don't break the log math
     if (raw < 0.0) raw = 0.0;
 
     return applyLogScaling(raw);
 }
-
 // Getters and setters
 double FitnessEvaluator::getAccuracyWeight() const { return m_accuracyWeight; }
 void FitnessEvaluator::setAccuracyWeight(double weight) { m_accuracyWeight = weight; }
