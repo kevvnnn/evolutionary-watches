@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     setWindowTitle("WatchGA");
-    setFixedSize(1000, 700);
+    setFixedSize(1200, 700);
 
     QWidget* centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
