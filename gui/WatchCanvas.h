@@ -2,27 +2,28 @@
 #define WATCHCANVAS_H
 
 #include <QWidget>
-#include <QPushButton>
-#include "StatsPanel.h"
+#include <QMouseEvent>
+#include <vector>
+#include "WatchComponent.h"
 
 class WatchCanvas : public QWidget
 {
     Q_OBJECT
-
 public:
-    explicit WatchCanvas(QWidget* parent = nullptr);
+    explicit WatchCanvas(QWidget *parent = nullptr);
+
+signals:
+    void componentHovered(WatchComponent* comp);
+    void componentLeft();
 
 protected:
-    void paintEvent(QPaintEvent* event) override;
-    void resizeEvent(QResizeEvent* event) override;
+    void paintEvent(QPaintEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
-    QPushButton* statsButton;
-    StatsPanel* statsPanel;
-    void updateButtonPosition();
-
-private slots:
-    void showStatsPanel();
+    std::vector<WatchComponent*> m_components;
+    WatchComponent* m_hovered = nullptr;
+    WatchComponent* getComponentAt(const QPoint& pos);
 };
 
 #endif

@@ -2,19 +2,21 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QPushButton>
+#include "WatchCanvas.h"
+#include "ComponentInspector.h"
 
-class QWidget;
-
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget* parent = nullptr);
-    ~MainWindow();
+    MainWindow(QWidget* parent = nullptr);
 
 private:
-    void setupUI();
+    QWidget* createControlPanel();
 };
 
-#endif
+#endif // MAINWINDOW_H
