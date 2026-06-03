@@ -111,14 +111,20 @@ void ParameterMutation::mutate(std::shared_ptr<Genome::Watch>& watch, double mut
         } 
         // Case B: Is this component actually a Gear? 
         else if (auto* gear = dynamic_cast<Gear*>(comp)) {
-            // Adjust the surface alignment precision 
+            // A. Mutate the surface alignment quality
             gear->setMeshingQuality(gear->getMeshingQuality() + nudgeDist(getRng()));
             
-            // Mutate physical tooth configurations discretely (add or subtract exactly 1 tooth)
+            // B. Mutate the physical tooth count (add or subtract 1 tooth)
             int teethChange = (nudgeDist(getRng()) > 0) ? 1 : -1;
-            // CRITICAL GUARD: Gears must have at least 8 teeth, or the setter crashes the application.
             if (static_cast<int>(gear->getToothCount()) + teethChange >= 8) {
                 gear->setToothCount(gear->getToothCount() + teethChange);
+            }
+
+            // C. NEW: Mutate the physical gear diameter size
+            double newDia = gear->getDiameter() + nudgeDist(getRng());
+            // Guard against Person A's 1.0mm minimum constraint to prevent runtime crashes
+            if (newDia >= 1.0) {
+                gear->setDiameter(newDia);
             }
         }
         // Case C: Is this component actually a Spring? 
