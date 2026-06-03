@@ -27,13 +27,11 @@ public:
     double getFriction() const;
     double getX() const;
     double getY() const;
-    double getRotation() const;
 
     // Setters with validation
     void setWeight(double weight);
     void setFriction(double friction);
     void setPosition(double x, double y);
-    void setRotation(double rotation);
 
     // Pure virtual methods
     virtual double calculateEfficiency() const = 0;

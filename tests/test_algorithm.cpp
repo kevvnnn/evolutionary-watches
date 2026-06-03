@@ -8,9 +8,21 @@
 #include <memory>
 #include <vector>
 #include <utility> // For std::pair
+#include <iomanip>
+
+#include "../algorithm/MutationStrategy.h" 
+#include "../genome/components/BalanceWheel.h"
+#include "../genome/components/Gear.h"
+#include "../genome/components/Hand.h"
+#include "../genome/components/Spring.h"
+#include "../genome/components/Jewel.h"
+#include <iomanip>
 
 using namespace WatchGA::Algorithm;
 using namespace WatchGA::Genome;
+
+// TODO: Overhaul this to include mutation once it's finished, and make it to show
+// some generations to show how the watch develop over time
 
 // ==============================================================================
 // 1. CORE ALGORITHM TESTS
@@ -142,24 +154,113 @@ void testCrossoverStrategies() {
 // ==============================================================================
 
 void displayPopulationSamples() {
-    std::cout << "\n==========================================\n";
-    std::cout << "   GENERATION 0 RANDOMIZATION SAMPLES\n";
-    std::cout << "==========================================\n";
+    std::cout << "\n============================================================\n";
+    std::cout << "   GENERATION 0 DEEP DIVE: PROVING GENETIC DIVERSITY\n";
+    std::cout << "============================================================\n\n";
     
     GeneticAlgorithm ga;
     ga.setPopulationSize(100);
-    ga.reset(); // Changed to lowercase
+    ga.reset(); // This automatically triggers population evaluation 
     
     auto pop = ga.getPopulation();
     std::vector<size_t> sampleIndices = {0, 49, 99};
     
     for (size_t idx : sampleIndices) {
         auto watch = pop[idx];
-        std::cout << watch->toString() << "\n";
-        int gearCount = watch->getComponentCount() - 5;
-        std::cout << "  -> Total Parts: " << watch->getComponentCount() 
-                  << " (5 Core + " << gearCount << " Random Gears)\n\n";
+        std::cout << ">>> WATCH #" << idx + 1 << " | Name: " << watch->getObjectName() << "\n";
+        
+        // =========================================================
+        // ADDED: EXPLICIT FITNESS SCORE DISPLAY
+        // =========================================================
+        std::cout << "    [FITNESS] Raw Evaluated Score: " << std::fixed << std::setprecision(6) 
+                  << watch->getFitnessScore() << "\n";
+        std::cout << "    Total Components: " << watch->getComponentCount() << "\n";
+        
+        int gearCount = 0;
+        
+        for (const auto& comp : watch->getAllComponents()) {
+            // 1. Inspect the Balance Wheel
+            if (auto* bw = dynamic_cast<const Components::BalanceWheel*>(comp.get())) {
+                std::cout << "    [-] Balance Wheel -> Isochronism: " << std::fixed << std::setprecision(2) << bw->getIsochronism()
+                          << " | Amplitude: " << bw->getAmplitude() << " deg\n";
+            }
+            // 2. Inspect the Springs
+            else if (auto* spring = dynamic_cast<const Components::Spring*>(comp.get())) {
+                std::string type = (spring->getType() == Components::Spring::SpringType::MAINSPRING) ? "Mainspring" : "Hairspring";
+                std::cout << "    [-] " << type << "  -> Elasticity: " << spring->getElasticity()
+                          << " | Fatigue Res: " << spring->getFatigueResistance() << "\n";
+            }
+            // 3. Inspect the Hands
+            else if (auto* hand = dynamic_cast<const Components::Hand*>(comp.get())) {
+                std::string type = (hand->getType() == Components::Hand::HandType::HOUR) ? "Hour Hand " : "Minute Hand";
+                std::cout << "    [-] " << type << "  -> Balance: " << hand->getBalance()
+                          << " | Length: " << hand->getLength() << "mm\n";
+            }
+            // 4. Inspect the Gears
+            else if (auto* gear = dynamic_cast<const Components::Gear*>(comp.get())) {
+                gearCount++;
+                if (gearCount == 1) {
+                    std::cout << "    [-] First Gear   -> Teeth: " << gear->getToothCount()
+                              << " | Quality: " << gear->getMeshingQuality() << "\n";
+                }
+            }
+        }
+        std::cout << "    [-] Total Gears  -> " << gearCount << "\n\n";
     }
+}
+
+void runEvolutionTimeLapse() {
+    std::cout << "\n============================================================\n";
+    std::cout << "   EVOLUTIONARY TIME-LAPSE (0 -> 50 GENERATIONS)\n";
+    std::cout << "============================================================\n";
+    
+    GeneticAlgorithm ga;
+    
+    // 1. Configure the GA for a successful evolution run
+    ga.setPopulationSize(200);      // Large population for genetic diversity
+    ga.setMutationRate(0.20);       // 20% mutation chance
+    ga.setCrossoverRate(0.85);      // 85% mating chance
+    ga.setElitismCount(5);          // Save the top 5 perfect watches from death
+
+    // 2. Inject your strategies
+    ga.setSelectionStrategy(std::make_unique<TournamentSelection>(5));
+    ga.setCrossoverStrategy(std::make_unique<UniformCrossover>());
+    ga.setMutationStrategy(std::make_unique<ParameterMutation>(0.15)); // 15% stat nudge
+    
+    ga.reset(); 
+
+    // Helper lambda to print a watch's stats beautifully
+    auto printAlphaWatch = [](const std::shared_ptr<Watch>& watch, int genNum) {
+        std::cout << "\n>>> GENERATION " << genNum << " ALPHA WATCH <<<\n";
+        std::cout << "    Fitness Score : " << std::fixed << std::setprecision(5) << watch->getFitnessScore() << "\n";
+        std::cout << "    Total Parts   : " << watch->getComponentCount() << "\n";
+        
+        for (const auto& comp : watch->getAllComponents()) {
+            if (auto* bw = dynamic_cast<const Components::BalanceWheel*>(comp.get())) {
+                std::cout << "    [CRITICAL] Balance Wheel -> Isochronism: " << bw->getIsochronism() 
+                          << " | Amplitude: " << bw->getAmplitude() << "\n";
+            }
+            else if (auto* spring = dynamic_cast<const Components::Spring*>(comp.get())) {
+                if(spring->getType() == Components::Spring::SpringType::HAIRSPRING) {
+                    std::cout << "    [CRITICAL] Hairspring    -> Elasticity : " << spring->getElasticity() << "\n";
+                }
+            }
+        }
+        std::cout << "------------------------------------------------------------\n";
+    };
+
+    // Print Gen 0 Alpha
+    printAlphaWatch(ga.getBestWatch(), ga.getCurrentGeneration());
+
+    // Evolve to Gen 25
+    std::cout << "\n[INFO] Evolving 25 Generations...\n";
+    for(int i = 0; i < 25; i++) ga.runGeneration();
+    printAlphaWatch(ga.getBestWatch(), ga.getCurrentGeneration());
+
+    // Evolve to Gen 50
+    std::cout << "\n[INFO] Evolving to 50 Generations...\n";
+    for(int i = 0; i < 25; i++) ga.runGeneration();
+    printAlphaWatch(ga.getBestWatch(), ga.getCurrentGeneration());
 }
 
 // ==============================================================================
@@ -171,18 +272,18 @@ int main() {
     std::cout << " STARTING GENETIC ALGORITHM TEST SUITE\n";
     std::cout << "==========================================\n\n";
 
+    // Run your standard unit tests first
     testDefaultConstructor();
     testConfigurationValidation();
     testPhysicalInitialization();
-    
-    // New Strategy Tests
     testSelectionStrategies();
     testCrossoverStrategies();
 
-    displayPopulationSamples();
+    // Run the grand finale
+    runEvolutionTimeLapse();
 
-    std::cout << "==========================================\n";
-    std::cout << " SUCCESS: ALL TESTS PASSED!\n";
+    std::cout << "\n==========================================\n";
+    std::cout << " SUCCESS: ALL TESTS AND EVOLUTION PASSED!\n";
     std::cout << "==========================================\n";
 
     return 0;

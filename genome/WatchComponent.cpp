@@ -4,8 +4,6 @@
 namespace WatchGA {
 namespace Genome {
 
-// TODO FIX: deal with rotation
-
 // Default constructor with safe default values
 WatchComponent::WatchComponent()
     : m_weight(1.0),

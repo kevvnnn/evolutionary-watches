@@ -1,5 +1,7 @@
 #include "GeneticAlgorithm.h"
 #include <iostream> // TODO: temporary maybe
+#include <random>
+#include <algorithm>
 
 // TODO FIX are keywords to check for skipped work to be done
 
@@ -161,6 +163,101 @@ void GeneticAlgorithm::setElitismCount(unsigned int count) {
     m_elitismCount = count;
 }
 
+void GeneticAlgorithm::updateStatistics() {
+    // Note: In the current evaluatePopulation() code, we are already calculating 
+    // the best, worst, and average fitness, as well as tracking the best watch.
+}
+
+void GeneticAlgorithm::performElitism(std::vector<std::shared_ptr<Genome::Watch>>& newPopulation) {
+    if (m_elitismCount == 0) return;
+
+    // Create a copy of the population to sort (so we don't mess up the original order)
+    std::vector<std::shared_ptr<Genome::Watch>> sortedPop = m_population;
+
+    // Sort descending (highest fitness score at index 0)
+    std::sort(sortedPop.begin(), sortedPop.end(),
+        [](const std::shared_ptr<Genome::Watch>& a, const std::shared_ptr<Genome::Watch>& b) {
+            return a->getFitnessScore() > b->getFitnessScore();
+        }
+    );
+
+    // Safely copy the elite watches
+    unsigned int actualElites = std::min(m_elitismCount, static_cast<unsigned int>(sortedPop.size()));
+    for (unsigned int i = 0; i < actualElites; ++i) {
+        // CRITICAL: We MUST clone the elite watches. 
+        // If we just pass the shared_ptr, it might accidentally get mutated later!
+        newPopulation.push_back(std::shared_ptr<Genome::Watch>(sortedPop[i]->clone()));
+    }
+}
+
+void GeneticAlgorithm::runGeneration() {
+    // Safety check
+    if (m_population.empty()) {
+        std::cout << "[ERROR] Cannot run generation: Population is empty. Did you call reset()?\n";
+        return;
+    }
+
+    // Prepare the next generation's container
+    std::vector<std::shared_ptr<Genome::Watch>> newPopulation;
+    newPopulation.reserve(m_populationSize);
+
+    // 1. Save the best watches from the current generation (Elitism)
+    performElitism(newPopulation);
+
+    // Setup RNG for crossover probability
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+
+    // 2. Fill the rest of the new population
+    while (newPopulation.size() < m_populationSize) {
+        
+        // A. Select 2 Parents
+        auto parents = m_selectionStrategy->select(m_population, m_fitnessScores, 2);
+        
+        std::shared_ptr<Genome::Watch> child1;
+        std::shared_ptr<Genome::Watch> child2;
+
+        // B. Crossover (based on crossover rate)
+        if (dist(gen) <= m_crossoverRate && parents.size() >= 2) {
+            auto children = m_crossoverStrategy->crossover(parents[0], parents[1]);
+            child1 = children.first;
+            child2 = children.second;
+        } else {
+            // If crossover fails, the children are just clones of the parents
+            child1 = std::shared_ptr<Genome::Watch>(parents[0]->clone());
+            if (parents.size() > 1) {
+                child2 = std::shared_ptr<Genome::Watch>(parents[1]->clone());
+            } else {
+                child2 = std::shared_ptr<Genome::Watch>(parents[0]->clone()); // Fallback
+            }
+        }
+
+        // C. Mutate Child 1 and add to population
+        m_mutationStrategy->mutate(child1, m_mutationRate);
+        newPopulation.push_back(child1);
+
+        // D. Mutate Child 2 and add to population (if we have space)
+        if (newPopulation.size() < m_populationSize) {
+            m_mutationStrategy->mutate(child2, m_mutationRate);
+            newPopulation.push_back(child2);
+        }
+    }
+
+    // 3. Overwrite the old generation with the newly evolved one
+    m_population = std::move(newPopulation);
+    m_currentGeneration++;
+
+    // 4. Score the new generation
+    evaluatePopulation();
+    updateStatistics();
+}
+
+void GeneticAlgorithm::runGenerations(unsigned int numGenerations) {
+    for (unsigned int i = 0; i < numGenerations; ++i) {
+        runGeneration();
+    }
+}
 
 // ---------------------------------------------------------
 // STATISTIC GETTERS

@@ -166,22 +166,54 @@ void Watch::randomize() {
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
-    using namespace Components; 
+    using namespace Components;
 
     // =========================================================
-    // 1. THE STATIC ENDPOINTS (Satisfying the Strict Signatures)
+    // THE CHAOS DISTRIBUTIONS (Making terrible watches)
+    // =========================================================
+    // We want the starting population to be genuinely bad so they can evolve.
+    
+    // Base properties (0.9 friction is basically sandpaper)
+    std::uniform_real_distribution<double> weightDist(0.1, 5.0);
+    std::uniform_real_distribution<double> frictionDist(0.01, 0.9); 
+    std::uniform_real_distribution<double> posDist(-20.0, 20.0);
+    
+    // Quality properties (0.1 is awful, 1.0 is perfect)
+    std::uniform_real_distribution<double> qualityDist(0.1, 1.0); 
+
+    // =========================================================
+    // 1. THE ESSENTIAL COMPONENTS (Now with randomized DNA)
     // =========================================================
     
-    // Hand: 8 arguments (string, double, double, double, double, HandType, double, double)
-    addComponent(std::make_unique<Hand>("HourHand", 0.5, 0.01, 0.0, 0.0, Hand::HandType::HOUR, 10.0, 0.9));
-    addComponent(std::make_unique<Hand>("MinuteHand", 0.3, 0.01, 0.0, 0.0, Hand::HandType::MINUTE, 15.0, 0.9));
+    // Hands: varying lengths and terrible balances
+    std::uniform_real_distribution<double> handLenDist(5.0, 25.0);
+    addComponent(std::make_unique<Hand>(
+        "HourHand", weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        Hand::HandType::HOUR, handLenDist(gen), qualityDist(gen)
+    ));
+    addComponent(std::make_unique<Hand>(
+        "MinuteHand", weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        Hand::HandType::MINUTE, handLenDist(gen), qualityDist(gen)
+    ));
 
-    // Spring: 9 arguments (string, double, double, double, double, SpringType, double, double, double)
-    addComponent(std::make_unique<Spring>("MainSpring", 2.0, 0.1, 0.0, 0.0, Spring::SpringType::MAINSPRING, 1.0, 1.0, 1.0));
-    addComponent(std::make_unique<Spring>("HairSpring", 0.1, 0.05, 0.0, 0.0, Spring::SpringType::HAIRSPRING, 1.0, 1.0, 1.0));
+    // Springs: varying elasticity and fatigue resistance
+    std::uniform_real_distribution<double> springLenDist(1.0, 50.0);
+    addComponent(std::make_unique<Spring>(
+        "MainSpring", weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        Spring::SpringType::MAINSPRING, qualityDist(gen), qualityDist(gen), springLenDist(gen)
+    ));
+    addComponent(std::make_unique<Spring>(
+        "HairSpring", weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        Spring::SpringType::HAIRSPRING, qualityDist(gen), qualityDist(gen), springLenDist(gen)
+    ));
 
-    // BalanceWheel: 8 arguments (string, double, double, double, double, double, double, double)
-    addComponent(std::make_unique<BalanceWheel>("BalWheel", 1.5, 0.1, 0.0, 0.0, 1.0, 1.0, 1.0));
+    // BalanceWheel: random Moment of Inertia and terrible starting amplitudes
+    std::uniform_real_distribution<double> moiDist(0.1, 10.0);
+    std::uniform_real_distribution<double> ampDist(90.0, 360.0); // 270 is optimal
+    addComponent(std::make_unique<BalanceWheel>(
+        "BalWheel", weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        moiDist(gen), qualityDist(gen), ampDist(gen)
+    ));
 
     // =========================================================
     // 2. THE MUTABLE MIDDLE (Random Gears)
@@ -190,27 +222,15 @@ void Watch::randomize() {
     std::uniform_int_distribution<unsigned int> gearCountDist(3, 15);
     unsigned int randomGears = gearCountDist(gen);
 
-    std::uniform_real_distribution<double> weightDist(0.1, 3.0);
-    std::uniform_real_distribution<double> frictionDist(0.01, 0.2);
-    
-    // The specific gear parameters Person A defined
     std::uniform_int_distribution<unsigned int> teethDist(8, 64);      
-    std::uniform_real_distribution<double> diameterDist(2.0, 20.0);    
-    std::uniform_real_distribution<double> qualityDist(0.5, 1.0);      
+    std::uniform_real_distribution<double> diameterDist(2.0, 20.0);     
 
     for (unsigned int i = 0; i < randomGears; ++i) {
         std::string name = "Gear_" + std::to_string(i + 1);
-        
-        // Gear: 8 arguments (string, double, double, double, double, unsigned int, double, double)
         addComponent(std::make_unique<Gear>(
-            name, 
-            weightDist(gen), 
-            frictionDist(gen), 
-            0.0, 0.0, 
-            teethDist(gen), 
-            diameterDist(gen), 
-            qualityDist(gen)
-        )); 
+            name, weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+            teethDist(gen), diameterDist(gen), qualityDist(gen)
+        ));
     }
 
     // =========================================================
@@ -220,19 +240,21 @@ void Watch::randomize() {
     unsigned int totalComps = getComponentCount();
     if (totalComps > 1) {
         std::uniform_int_distribution<unsigned int> targetDist(0, totalComps - 1);
-        
         for (unsigned int i = 0; i < totalComps; ++i) {
             std::uniform_int_distribution<unsigned int> connDist(1, 3);
             unsigned int numConnections = connDist(gen);
             
             for (unsigned int c = 0; c < numConnections; ++c) {
                 unsigned int target = targetDist(gen);
+                // Prevent connecting to self and prevent duplicate connections
                 if (i != target && !areConnected(i, target)) {
                     addConnection(i, target);
                 }
             }
         }
     }
+
+    m_isValid = true;
 }
 
 }

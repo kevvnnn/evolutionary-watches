@@ -82,6 +82,9 @@ OnePointCrossover::crossover(
         }
     }
 
+    child1->setValid(true);
+    child2->setValid(true);
+    
     // Return the two new watches packed in a std::pair
     return {child1, child2};
 }
@@ -143,6 +146,10 @@ UniformCrossover::crossover(
         }
     }
 
+    child1->setValid(true);
+    child2->setValid(true);
+    
+    // Return the two new watches packed in a std::pair
     return {child1, child2};
 }
 
