@@ -1,5 +1,6 @@
 #include "ControlPanel.h"
 #include "ui_ControlPanel.h"
+#include "../fileio/ConfigManager.h"
 #include <QDebug>
 
 namespace WatchGA {

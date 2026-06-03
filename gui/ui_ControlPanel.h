@@ -216,7 +216,7 @@ public:
 
         selectionCombo = new QComboBox(strategiesGroup);
         selectionCombo->setObjectName("selectionCombo");
-        selectionCombo->addItems({"Tournament", "Roulette Wheel", "Rank", "Steady State"});
+        selectionCombo->addItems({"Tournament", "Roulette Wheel"});
 
         horizontalLayout_7->addWidget(selectionCombo);
 
@@ -232,7 +232,7 @@ public:
 
         crossoverCombo = new QComboBox(strategiesGroup);
         crossoverCombo->setObjectName("crossoverCombo");
-        crossoverCombo->addItems({"Single Point", "Two Point", "Uniform", "Arithmetic"});
+        crossoverCombo->addItems({"Single Point", "Two Point", "Uniform"});
 
         horizontalLayout_8->addWidget(crossoverCombo);
 

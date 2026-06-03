@@ -224,16 +224,6 @@
             <string>Roulette Wheel</string>
            </property>
           </item>
-          <item>
-           <property name="text">
-            <string>Rank</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Steady State</string>
-           </property>
-          </item>
          </widget>
         </item>
        </layout>
@@ -262,11 +252,6 @@
           <item>
            <property name="text">
             <string>Uniform</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Arithmetic</string>
            </property>
           </item>
          </widget>
