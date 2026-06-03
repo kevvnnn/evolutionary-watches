@@ -11,7 +11,7 @@ WatchCanvas::WatchCanvas(QWidget *parent)
     setMouseTracking(true); // Critical for hover
     setStyleSheet("background-color: #121212;");
 
-    // FIXED positions (NO random placement)
+    //position of components
     m_components.emplace_back(new WatchComponent("Center Bearing", "Bearing", 30, QPoint(300, 300), 0.0));
     m_components.emplace_back(new WatchComponent("Mainspring", "Spring", 40, QPoint(220, 380), 0.0));
     m_components.emplace_back(new WatchComponent("Third Gear", "Gear", 25, QPoint(260, 240), 0.3));

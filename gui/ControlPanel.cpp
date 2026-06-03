@@ -23,7 +23,7 @@ ControlPanel::ControlPanel(QWidget* parent) :
     connect(ui->crossoverCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::onCrossoverStrategyChanged);
     connect(ui->mutationCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::onMutationStrategyChanged);
     
-    // Connect control buttons
+
     connect(ui->runBtn, &QPushButton::clicked, this, [this](){
         qDebug() << "Run button clicked";
         ui->runBtn->setEnabled(false);

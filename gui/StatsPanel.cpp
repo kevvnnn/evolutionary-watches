@@ -43,7 +43,3 @@ StatsPanel::~StatsPanel()
 {
 }
 
-// void StatsPanel::handleClose()
-// {
-//     close();
-// }
