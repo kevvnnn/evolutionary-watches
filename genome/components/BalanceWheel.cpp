@@ -40,7 +40,7 @@ void BalanceWheel::setMomentOfInertia(double moi) {
 
 void BalanceWheel::setIsochronism(double isochronism) {
     if (isochronism < 0.0) m_isochronism = 0.0;
-    else if (isochronism > 1.0) m_isochronism = 1.0;
+    else if (isochronism > 0.98) m_isochronism = 0.98;
     else m_isochronism = isochronism;
 }
 
