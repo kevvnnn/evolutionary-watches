@@ -1,5 +1,8 @@
 #include "GeneticAlgorithm.h"
-#include <iostream> // TODO: temporary maybe
+#include "SelectionStrategy.h"
+#include "CrossoverStrategy.h"
+#include "MutationStrategy.h"
+#include <iostream>
 #include <random>
 #include <algorithm>
 
@@ -20,7 +23,11 @@ GeneticAlgorithm::GeneticAlgorithm()
 	m_elitismCount(5)
 {
 	m_fitnessEvaluator = std::make_unique<Genome::FitnessEvaluator>();
-	// TODO: Incoming default selection/crossover/mutation here too! 
+
+    // the default strategies the GA uses
+    m_selectionStrategy = std::make_unique<TournamentSelection>(3);
+    m_crossoverStrategy = std::make_unique<UniformCrossover>();
+    m_mutationStrategy  = std::make_unique<ParameterMutation>(0.1);
 }
 
 // Constructor with parameters

@@ -217,15 +217,15 @@ void runEvolutionTimeLapse() {
     GeneticAlgorithm ga;
     
     // 1. Configure the GA for a successful evolution run
-    ga.setPopulationSize(200);      // Large population for genetic diversity
+    ga.setPopulationSize(125);      // Large population for genetic diversity
     ga.setMutationRate(0.20);       // 20% mutation chance
     ga.setCrossoverRate(0.85);      // 85% mating chance
     ga.setElitismCount(5);          // Save the top 5 perfect watches from death
 
     // 2. Inject your strategies
-    ga.setSelectionStrategy(std::make_unique<TournamentSelection>(5));
+    ga.setSelectionStrategy(std::make_unique<TournamentSelection>(2));
     ga.setCrossoverStrategy(std::make_unique<UniformCrossover>());
-    ga.setMutationStrategy(std::make_unique<ParameterMutation>(0.15)); // 15% stat nudge
+    ga.setMutationStrategy(std::make_unique<ParameterMutation>(0.30)); // 30% stat nudge
     
     ga.reset(); 
 
