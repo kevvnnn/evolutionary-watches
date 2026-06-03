@@ -16,7 +16,6 @@ private:
     double m_friction;
     double m_x;
     double m_y;
-    double m_rotation;
 
 public:
     WatchComponent();

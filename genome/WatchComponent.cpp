@@ -11,8 +11,7 @@ WatchComponent::WatchComponent()
     : m_weight(1.0),
       m_friction(0.0),
       m_x(0.0),
-      m_y(0.0),
-      m_rotation(0.0)
+      m_y(0.0)
 {
 }
 
@@ -22,8 +21,7 @@ WatchComponent::WatchComponent(const std::string& name, double weight, double fr
       m_weight(weight),
       m_friction(friction),
       m_x(x),
-      m_y(y),
-      m_rotation(0.0)
+      m_y(y)
 {
     setWeight(weight);
     setFriction(friction);
@@ -34,7 +32,6 @@ double WatchComponent::getWeight() const { return m_weight; }
 double WatchComponent::getFriction() const { return m_friction; }
 double WatchComponent::getX() const { return m_x; }
 double WatchComponent::getY() const { return m_y; }
-double WatchComponent::getRotation() const { return m_rotation; }
 
 // Weight must be positive
 void WatchComponent::setWeight(double weight) {
@@ -53,13 +50,6 @@ void WatchComponent::setFriction(double friction) {
 void WatchComponent::setPosition(double x, double y) {
     m_x = x;
     m_y = y;
-}
-
-// Normalize rotation to 0-360 degrees
-void WatchComponent::setRotation(double rotation) {
-    m_rotation = rotation;
-    while (m_rotation >= 360.0) m_rotation -= 360.0;
-    while (m_rotation < 0.0) m_rotation += 360.0;
 }
 
 // String output for debugging
