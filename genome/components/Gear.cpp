@@ -46,7 +46,8 @@ void Gear::setDiameter(double diameter) {
 
 void Gear::setMeshingQuality(double quality) {
     if (quality < 0.0) m_meshingQuality = 0.0;
-    else if (quality > 1.0) m_meshingQuality = 1.0;
+    else if (quality > 0.92) m_meshingQuality = 0.92;
+    // 0.92 NOT 1.0, so we can simulate the inevitable losses due to friction
     else m_meshingQuality = quality;
 }
 

@@ -2,20 +2,19 @@
 #include "../algorithm/SelectionStrategy.h"
 #include "../algorithm/CrossoverStrategy.h"
 #include "../genome/Watch.h"
-#include <iostream>
-#include <cassert>
-#include <cmath>
-#include <memory>
-#include <vector>
-#include <utility> // For std::pair
-#include <iomanip>
-
 #include "../algorithm/MutationStrategy.h" 
 #include "../genome/components/BalanceWheel.h"
 #include "../genome/components/Gear.h"
 #include "../genome/components/Hand.h"
 #include "../genome/components/Spring.h"
 #include "../genome/components/Jewel.h"
+#include <iostream>
+#include <cassert>
+#include <cmath>
+#include <memory>
+#include <vector>
+#include <utility> // For std::pair
+#include <algorithm>
 #include <iomanip>
 
 using namespace WatchGA::Algorithm;
@@ -209,58 +208,106 @@ void displayPopulationSamples() {
     }
 }
 
-void runEvolutionTimeLapse() {
+// =============================================================================
+// NEW HELPER: Print Complete DNA Breakdown for the Top 3 Watches
+// =============================================================================
+void printPodiumWatches(const std::vector<std::shared_ptr<Watch>>& population, int genNum) {
+    // 1. Create a local copy of the population so we can sort it safely without destroying the GA's order
+    std::vector<std::shared_ptr<Watch>> sortedPop = population;
+
+    // 2. Sort the watches descending by their fitness scores (highest fitness at index 0)
+    std::sort(sortedPop.begin(), sortedPop.end(), [](const std::shared_ptr<Watch>& a, const std::shared_ptr<Watch>& b) {
+        return a->getFitnessScore() > b->getFitnessScore();
+    });
+
     std::cout << "\n============================================================\n";
-    std::cout << "   EVOLUTIONARY TIME-LAPSE (0 -> 50 GENERATIONS)\n";
+    std::cout << "        👑 GENERATION " << genNum << " PODIUM FINISHERS BREAKDOWN 👑\n";
     std::cout << "============================================================\n";
-    
-    GeneticAlgorithm ga;
-    
-    // 1. Configure the GA for a successful evolution run
-    ga.setPopulationSize(125);      // Large population for genetic diversity
-    ga.setMutationRate(0.20);       // 20% mutation chance
-    ga.setCrossoverRate(0.85);      // 85% mating chance
-    ga.setElitismCount(5);          // Save the top 5 perfect watches from death
 
-    // 2. Inject your strategies
-    ga.setSelectionStrategy(std::make_unique<TournamentSelection>(2));
-    ga.setCrossoverStrategy(std::make_unique<UniformCrossover>());
-    ga.setMutationStrategy(std::make_unique<ParameterMutation>(0.30)); // 30% stat nudge
-    
-    ga.reset(); 
+    // 3. Loop through the top 3 podium slots
+    std::string titles[3] = {"🥇 GOLD MEDAL (Rank 1)", "🥈 SILVER MEDAL (Rank 2)", "🥉 BRONZE MEDAL (Rank 3)"};
+    size_t limit = std::min<size_t>(3, sortedPop.size());
 
-    // Helper lambda to print a watch's stats beautifully
-    auto printAlphaWatch = [](const std::shared_ptr<Watch>& watch, int genNum) {
-        std::cout << "\n>>> GENERATION " << genNum << " ALPHA WATCH <<<\n";
-        std::cout << "    Fitness Score : " << std::fixed << std::setprecision(5) << watch->getFitnessScore() << "\n";
-        std::cout << "    Total Parts   : " << watch->getComponentCount() << "\n";
-        
+    for (size_t r = 0; r < limit; ++r) {
+        auto watch = sortedPop[r];
+        std::cout << "\n--- " << titles[r] << " ---\n";
+        std::cout << "    Name         : " << watch->getObjectName() << "\n";
+        std::cout << "    Fitness Score: " << std::fixed << std::setprecision(6) << watch->getFitnessScore() << "\n";
+        std::cout << "    Total Parts  : " << watch->getComponentCount() << "\n";
+        std::cout << "    Assembly Manifest:\n";
+
+        // 4. Unroll every single component inside this watch blueprint
+        unsigned int partIndex = 0;
         for (const auto& comp : watch->getAllComponents()) {
+            std::cout << "      [" << partIndex++ << "] ";
+
+            // Detailed type inspections using RTTI
             if (auto* bw = dynamic_cast<const Components::BalanceWheel*>(comp.get())) {
-                std::cout << "    [CRITICAL] Balance Wheel -> Isochronism: " << bw->getIsochronism() 
-                          << " | Amplitude: " << bw->getAmplitude() << "\n";
+                std::cout << "BALANCE WHEEL | Isochronism: " << bw->getIsochronism() 
+                          << " | Amp: " << bw->getAmplitude() << " deg | MoI: " << bw->getMomentOfInertia() << "\n";
             }
             else if (auto* spring = dynamic_cast<const Components::Spring*>(comp.get())) {
-                if(spring->getType() == Components::Spring::SpringType::HAIRSPRING) {
-                    std::cout << "    [CRITICAL] Hairspring    -> Elasticity : " << spring->getElasticity() << "\n";
-                }
+                std::string typeStr = (spring->getType() == Components::Spring::SpringType::MAINSPRING) ? "MAINSPRING" : "HAIRSPRING";
+                std::cout << "SPRING        | Type: " << typeStr 
+                          << " | Elasticity: " << spring->getElasticity() << " | Fatigue Res: " << spring->getFatigueResistance() << "\n";
+            }
+            else if (auto* hand = dynamic_cast<const Components::Hand*>(comp.get())) {
+                std::string typeStr = "UNKNOWN";
+                if (hand->getType() == Components::Hand::HandType::HOUR) typeStr = "HOUR";
+                else if (hand->getType() == Components::Hand::HandType::MINUTE) typeStr = "MINUTE";
+                else if (hand->getType() == Components::Hand::HandType::SECOND) typeStr = "SECOND";
+
+                std::cout << "WATCH HAND    | Type: " << typeStr 
+                          << " | Balance: " << hand->getBalance() << " | Length: " << hand->getLength() << "mm\n";
+            }
+            else if (auto* gear = dynamic_cast<const Components::Gear*>(comp.get())) {
+                std::cout << "GEAR          | Teeth: " << gear->getToothCount() 
+                          << " | Meshing Quality: " << gear->getMeshingQuality() << " | Dia: " << gear->getDiameter() << "mm\n";
+            }
+            else if (auto* jewel = dynamic_cast<const Components::Jewel*>(comp.get())) {
+                std::cout << "JEWEL BEARING | Hardness: " << jewel->getHardness() 
+                          << " | Cap Jewel: " << (jewel->isCapJewel() ? "Yes" : "No") << "\n";
+            }
+            else {
+                // Fallback to basic string tracking if generic components exist
+                std::cout << "UNKNOWN PART  | " << comp->toString() << "\n";
             }
         }
         std::cout << "------------------------------------------------------------\n";
-    };
+    }
+}
 
-    // Print Gen 0 Alpha
-    printAlphaWatch(ga.getBestWatch(), ga.getCurrentGeneration());
+// =============================================================================
+// MAIN TIME-LAPSE EXECUTOR
+// =============================================================================
+void runEvolutionTimeLapse() {
+    GeneticAlgorithm ga;
+    
+    // Configure settings
+    ga.setPopulationSize(125);      
+    ga.setMutationRate(0.20);       
+    ga.setCrossoverRate(0.85);      
+    ga.setElitismCount(5);          
 
-    // Evolve to Gen 25
+    // Inject strategies
+    ga.setSelectionStrategy(std::make_unique<TournamentSelection>(3));
+    ga.setCrossoverStrategy(std::make_unique<UniformCrossover>());
+    ga.setMutationStrategy(std::make_unique<ParameterMutation>(0.15));
+    
+    ga.reset(); 
+
+    // Print Generation 0 Podium
+    printPodiumWatches(ga.getPopulation(), ga.getCurrentGeneration());
+
+    // Evolve to Gen 25 and check the top contenders
     std::cout << "\n[INFO] Evolving 25 Generations...\n";
     for(int i = 0; i < 25; i++) ga.runGeneration();
-    printAlphaWatch(ga.getBestWatch(), ga.getCurrentGeneration());
+    printPodiumWatches(ga.getPopulation(), ga.getCurrentGeneration());
 
-    // Evolve to Gen 50
+    // Evolve to Gen 50 for final evaluation
     std::cout << "\n[INFO] Evolving to 50 Generations...\n";
     for(int i = 0; i < 25; i++) ga.runGeneration();
-    printAlphaWatch(ga.getBestWatch(), ga.getCurrentGeneration());
+    printPodiumWatches(ga.getPopulation(), ga.getCurrentGeneration());
 }
 
 // ==============================================================================
