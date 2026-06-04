@@ -232,7 +232,7 @@ public:
 
         crossoverCombo = new QComboBox(strategiesGroup);
         crossoverCombo->setObjectName("crossoverCombo");
-        crossoverCombo->addItems({"Single Point", "Two Point", "Uniform"});
+        crossoverCombo->addItems({"One Point", "Uniform"});
 
         horizontalLayout_8->addWidget(crossoverCombo);
 
@@ -248,7 +248,7 @@ public:
 
         mutationCombo = new QComboBox(strategiesGroup);
         mutationCombo->setObjectName("mutationCombo");
-        mutationCombo->addItems({"Swap", "Gaussian", "Bit Flip", "Inversion"});
+        mutationCombo->addItems({"Swap", "Parameter", "AddRemove"});
 
         horizontalLayout_9->addWidget(mutationCombo);
 

@@ -241,12 +241,7 @@
          <widget class="QComboBox" name="crossoverCombo">
           <item>
            <property name="text">
-            <string>Single Point</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Two Point</string>
+            <string>One Point</string>
            </property>
           </item>
           <item>
@@ -276,17 +271,12 @@
           </item>
           <item>
            <property name="text">
-            <string>Gaussian</string>
+            <string>Parameter</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Bit Flip</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Inversion</string>
+            <string>AddRemove</string>
            </property>
           </item>
          </widget>
