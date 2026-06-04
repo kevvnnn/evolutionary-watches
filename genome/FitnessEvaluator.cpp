@@ -72,7 +72,7 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
     double raw = (accuracy * m_accuracyWeight) + (efficiency * m_efficiencyWeight) - penalty;
 
     // =========================================================================
-    // ADVANCED PHYSICAL FEASIBILITY CHECKS (Unified Loop)
+    // CONTINUOUS QUADRATIC PENALTIES (The "Smooth" Physics Guard)
     // =========================================================================
     double hourHandLength = 0.0;
     double minuteHandLength = 0.0;
@@ -80,22 +80,26 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
     using namespace Components;
     for (const auto& comp : watch.getAllComponents()) {
         
-        // A. Guard Against Balance Wheel Galloping/Knocking
+        // A. Guard Against Knocking (Smooth Penalty past 315 degrees)
         if (auto* bw = dynamic_cast<const BalanceWheel*>(comp.get())) {
-            if (bw->getAmplitude() > 315.0) {
-                raw -= 0.40; // Severe penalty for physical self-destruction
+            double amp = bw->getAmplitude();
+            if (amp > 315.0) {
+                double violation = amp - 315.0;
+                raw -= 0.001 * (violation * violation); 
             }
         }
         
-        // B. Guard Against Atom-Sized Gear Teeth (Minimum Module Guard)
+        // B. Guard Against Micro-Gears (Smooth Penalty below 0.08 module)
         else if (auto* gear = dynamic_cast<const Gear*>(comp.get())) {
             double module = gear->getDiameter() / static_cast<double>(gear->getToothCount());
             if (module < 0.08) {
-                raw -= 0.25; // Penalize unmachinable micro-gears
+                double violation = 0.08 - module;
+                // Multiplier is high (100.0) because module violations are tiny decimals
+                raw -= 100.0 * (violation * violation); 
             }
         }
 
-        // C. Extract Hand Lengths for Proportion Guard
+        // C. Extract Hand Lengths
         else if (auto* hand = dynamic_cast<const Hand*>(comp.get())) {
             if (hand->getType() == Hand::HandType::HOUR) {
                 hourHandLength = hand->getLength();
@@ -105,9 +109,34 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
         }
     }
 
-    // Apply the structural penalty if the hour hand outgrows the minute hand
-    if (hourHandLength >= minuteHandLength && minuteHandLength > 0.0) {
-        raw -= 0.35; 
+    // =========================================================================
+    // 36MM DIAL & LEGIBILITY (Continuous Scaling)
+    // =========================================================================
+    if (hourHandLength > 0.0 && minuteHandLength > 0.0) {
+        
+        // 1. Case Scraping: Smooth penalty for exceeding 18mm radius
+        if (hourHandLength > 18.0) {
+            double violation = hourHandLength - 18.0;
+            raw -= 0.02 * (violation * violation);
+        }
+        if (minuteHandLength > 18.0) {
+            double violation = minuteHandLength - 18.0;
+            raw -= 0.02 * (violation * violation);
+        }
+
+        // 2. Legibility Gap: Smooth penalty if difference is under 4.0mm
+        double gap = minuteHandLength - hourHandLength;
+        // If gap is negative (hour is longer), the penalty will naturally be massive
+        if (gap < 4.0) {
+            double violation = 4.0 - gap;
+            raw -= 0.02 * (violation * violation);
+        }
+
+        // 3. Dial Sweeping: Smooth penalty if minute hand is too short (< 15.0mm)
+        if (minuteHandLength < 15.0) {
+            double violation = 15.0 - minuteHandLength;
+            raw -= 0.02 * (violation * violation);
+        }
     }
     // =========================================================================
 
