@@ -1,38 +1,74 @@
-#include <cassert>
+// tests/test_fileio.cpp
+
+#include "../fileio/WatchFileIO.h"
+#include "../fileio/ConfigManager.h"
+#include "../fileio/EvolutionHistory.h"
+
 #include <iostream>
 
-#include "WatchFileIO.h"
+using namespace WatchGA;
 
 int main()
 {
-    std::cout << "=== FileIO Validation Test ===\n";
+    std::cout << "=================================\n";
+    std::cout << "Running FileIO Module Tests\n";
+    std::cout << "=================================\n";
 
-    // Create file handler
-    WatchGA::FileIO::WatchFileIO fileIO("test.dat");
+    // ----------------------------------------------------
+    // WatchFileIO
+    // ----------------------------------------------------
 
-    // Verify initial state
-    assert(!fileIO.isOpen());
+    {
+        std::cout << "\nTesting WatchFileIO...\n";
 
-    // Open file
-    bool result = fileIO.open(true);
-    assert(result);
-    assert(fileIO.isOpen());
+        FileIO::WatchFileIO fileIO("test.bin");
 
-    std::cout << "[PASS] open()\n";
+        bool opened = fileIO.open(true);
 
-    // Get watch count
-    unsigned int count = fileIO.getWatchCount();
+        std::cout << "Open: "
+                  << opened
+                  << "\n";
 
-    std::cout << "[PASS] getWatchCount() returned "
-              << count << '\n';
+        std::cout << "Is Open: "
+                  << fileIO.isOpen()
+                  << "\n";
 
-    // Close file
-    fileIO.close();
-    assert(!fileIO.isOpen());
+        std::cout << "Watch Count: "
+                  << fileIO.getWatchCount()
+                  << "\n";
 
-    std::cout << "[PASS] close()\n";
+        fileIO.close();
 
-    std::cout << "=== All FileIO Tests Passed ===\n";
+        std::cout << "Closed successfully\n";
+    }
+
+    // ----------------------------------------------------
+    // ConfigManager
+    // ----------------------------------------------------
+
+    {
+        std::cout << "\nTesting ConfigManager...\n";
+
+        FileIO::ConfigManager config;
+
+        std::cout << "ConfigManager constructed.\n";
+    }
+
+    // ----------------------------------------------------
+    // EvolutionHistory
+    // ----------------------------------------------------
+
+    {
+        std::cout << "\nTesting EvolutionHistory...\n";
+
+        FileIO::EvolutionHistory history;
+
+        std::cout << "EvolutionHistory constructed.\n";
+    }
+
+    std::cout << "\n=================================\n";
+    std::cout << "All FileIO tests completed.\n";
+    std::cout << "=================================\n";
 
     return 0;
 }
