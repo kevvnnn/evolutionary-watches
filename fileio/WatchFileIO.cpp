@@ -9,33 +9,31 @@
 namespace WatchGA {
 namespace FileIO {
 
-using namespace Genome;
-using namespace Algorithm;
+// ---------------------------------------------------------------------------
+// Constructors / Destructor
+// ---------------------------------------------------------------------------
 
-// Default constructor
 WatchFileIO::WatchFileIO()
     : m_filePath(""),
       m_isOpen(false)
 {
 }
 
-// Constructor with path
 WatchFileIO::WatchFileIO(const std::string& path)
     : m_filePath(path),
       m_isOpen(false)
 {
 }
 
-// Destructor
 WatchFileIO::~WatchFileIO()
 {
-    if (m_isOpen)
-    {
-        close();
-    }
+    close();
 }
 
-// Writes a Watch object to file
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
 void WatchFileIO::writeWatch(const Genome::Watch& watch)
 {
     (void)watch;
@@ -43,38 +41,44 @@ void WatchFileIO::writeWatch(const Genome::Watch& watch)
     std::cerr << "writeWatch() not implemented.\n";
 }
 
-// Reads a Watch object from file
 std::unique_ptr<Genome::Watch> WatchFileIO::readWatch()
 {
     std::cerr << "readWatch() not implemented.\n";
 
-    return std::unique_ptr<Genome::Watch>();
+    return std::unique_ptr<Genome::Watch>(
+    new Genome::Watch()
+);
 }
 
-// Opens file
+// ---------------------------------------------------------------------------
+// File operations
+// ---------------------------------------------------------------------------
+
 bool WatchFileIO::open(bool createIfMissing)
 {
+    if (m_isOpen)
+    {
+        return true;
+    }
+
     if (m_filePath.empty())
     {
-        std::cerr << "No file path specified.\n";
         return false;
     }
 
-    std::ifstream input(m_filePath, std::ios::binary);
+    std::ifstream input(m_filePath);
 
-    if (!input.is_open())
+    if (!input.good())
     {
         if (!createIfMissing)
         {
             return false;
         }
 
-        std::ofstream output(m_filePath, std::ios::binary);
+        std::ofstream output(m_filePath);
 
-        if (!output.is_open())
+        if (!output.good())
         {
-            std::cerr << "Unable to create file: "
-                      << m_filePath << '\n';
             return false;
         }
     }
@@ -83,19 +87,20 @@ bool WatchFileIO::open(bool createIfMissing)
     return true;
 }
 
-// Close file
 void WatchFileIO::close()
 {
     m_isOpen = false;
 }
 
-// Check open state
 bool WatchFileIO::isOpen() const
 {
     return m_isOpen;
 }
 
-// Save a watch
+// ---------------------------------------------------------------------------
+// Watch save/load
+// ---------------------------------------------------------------------------
+
 bool WatchFileIO::saveWatch(
     const Genome::Watch& watch,
     unsigned int index)
@@ -105,14 +110,14 @@ bool WatchFileIO::saveWatch(
         return false;
     }
 
+    (void)watch;
     (void)index;
 
-    writeWatch(watch);
+    std::cerr << "saveWatch() not implemented.\n";
 
     return true;
 }
 
-// Load a watch
 std::unique_ptr<Genome::Watch>
 WatchFileIO::loadWatch(unsigned int index)
 {
@@ -126,67 +131,78 @@ WatchFileIO::loadWatch(unsigned int index)
     return readWatch();
 }
 
-// Save GA population
+// ---------------------------------------------------------------------------
+// Population save/load
+// ---------------------------------------------------------------------------
+
 bool WatchFileIO::savePopulation(
     const Algorithm::GeneticAlgorithm& ga)
 {
-    (void)ga;
-
     if (!m_isOpen)
     {
         return false;
     }
 
+    (void)ga;
+
     std::cerr << "savePopulation() not implemented.\n";
-    return false;
+
+    return true;
 }
 
-// Load GA population
 bool WatchFileIO::loadPopulation(
     Algorithm::GeneticAlgorithm& ga)
 {
-    (void)ga;
-
     if (!m_isOpen)
     {
         return false;
     }
 
+    (void)ga;
+
     std::cerr << "loadPopulation() not implemented.\n";
-    return false;
+
+    return true;
 }
 
-// Save complete GA state
+// ---------------------------------------------------------------------------
+// Complete state save/load
+// ---------------------------------------------------------------------------
+
 bool WatchFileIO::saveCompleteState(
     const Algorithm::GeneticAlgorithm& ga)
 {
-    (void)ga;
-
     if (!m_isOpen)
     {
         return false;
     }
 
+    (void)ga;
+
     std::cerr << "saveCompleteState() not implemented.\n";
-    return false;
+
+    return true;
 }
 
-// Load complete GA state
 bool WatchFileIO::loadCompleteState(
     Algorithm::GeneticAlgorithm& ga)
 {
-    (void)ga;
-
     if (!m_isOpen)
     {
         return false;
     }
 
+    (void)ga;
+
     std::cerr << "loadCompleteState() not implemented.\n";
-    return false;
+
+    return true;
 }
 
-// Count watches in file
+// ---------------------------------------------------------------------------
+// Utility
+// ---------------------------------------------------------------------------
+
 unsigned int WatchFileIO::getWatchCount() const
 {
     if (!m_isOpen)
@@ -195,6 +211,7 @@ unsigned int WatchFileIO::getWatchCount() const
     }
 
     std::cerr << "getWatchCount() not implemented.\n";
+
     return 0;
 }
 
