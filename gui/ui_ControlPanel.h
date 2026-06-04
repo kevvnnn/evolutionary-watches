@@ -33,6 +33,7 @@ public:
     QPushButton *pauseBtn;
     QPushButton *resetBtn;
     QPushButton *stepBtn;
+    QPushButton *resetToDefaults;
     QGroupBox *paramsGroup;
     QVBoxLayout *verticalLayout_2;
     QHBoxLayout *horizontalLayout_2;
@@ -72,6 +73,7 @@ public:
     QHBoxLayout *horizontalLayout_12;
     QLabel *avgFitnessLabel;
     QLabel *avgFitnessValue;
+    QHBoxLayout *horizontalLayout_reset;
 
     void setupUi(QWidget *ControlPanel)
     {
@@ -105,6 +107,10 @@ public:
         stepBtn->setObjectName("stepBtn");
 
         horizontalLayout->addWidget(stepBtn);
+
+        resetToDefaults = new QPushButton(controlGroup);
+        resetToDefaults->setObjectName("resetToDefaults");
+        horizontalLayout->addWidget(resetToDefaults);
 
 
         verticalLayout->addWidget(controlGroup);
@@ -328,6 +334,7 @@ public:
         pauseBtn->setText(QCoreApplication::translate("ControlPanel", "Pause", nullptr));
         resetBtn->setText(QCoreApplication::translate("ControlPanel", "Reset", nullptr));
         stepBtn->setText(QCoreApplication::translate("ControlPanel", "Step", nullptr));
+        resetToDefaults->setText(QCoreApplication::translate("ControlPanel", "Reset to Defaults", nullptr));
         paramsGroup->setTitle(QCoreApplication::translate("ControlPanel", "Algorithm Parameters", nullptr));
         populationLabel->setText(QCoreApplication::translate("ControlPanel", "Population Size:", nullptr));
         mutationLabel->setText(QCoreApplication::translate("ControlPanel", "Mutation Rate:", nullptr));

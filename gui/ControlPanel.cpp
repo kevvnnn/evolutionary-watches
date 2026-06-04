@@ -57,6 +57,10 @@ ControlPanel::ControlPanel(QWidget* parent) :
     connect(ui->stepBtn, &QPushButton::clicked, this, [this](){
         qDebug() << "Step button clicked";
     });
+
+    connect(ui->resetToDefaults,&QPushButton::clicked, this, [this](){
+        qDebug() << "Reset to Default clicked";
+    });
 }
 
 ControlPanel::~ControlPanel()
