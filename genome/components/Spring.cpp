@@ -35,15 +35,32 @@ double Spring::getLength() const { return m_length; }
 void Spring::setType(SpringType type) { m_type = type; }
 
 void Spring::setElasticity(double elasticity) {
-    if (elasticity < 0.0) m_elasticity = 0.0;
-    else if (elasticity > 1.0) m_elasticity = 1.0;
-    else m_elasticity = elasticity;
+    if (elasticity < 0.0) {
+        m_elasticity = 0.0;
+    } 
+    // Enforce realistic physical ceilings based on horological metallurgy
+    else if (m_type == SpringType::MAINSPRING && elasticity > 0.95) {
+        m_elasticity = 0.95; // 5% energy loss to internal/barrel friction
+    } 
+    else if (m_type == SpringType::HAIRSPRING && elasticity > 0.98) {
+        m_elasticity = 0.98; // 2% energy loss to crystalline hysteresis
+    } 
+    else {
+        m_elasticity = elasticity;
+    }
 }
 
-void Spring::setFatigueResistance(double resistance) {
-    if (resistance < 0.0) m_fatigueResistance = 0.0;
-    else if (resistance > 1.0) m_fatigueResistance = 1.0;
-    else m_fatigueResistance = resistance;
+void Spring::setFatigueResistance(double fatigueResistance) {
+    if (fatigueResistance < 0.0) {
+        m_fatigueResistance = 0.0;
+    } 
+    // Clamp to high-grade engineering material limits (e.g., max 96-98% durability efficiency)
+    else if (fatigueResistance > 0.96) {
+        m_fatigueResistance = 0.96; 
+    } 
+    else {
+        m_fatigueResistance = fatigueResistance;
+    }
 }
 
 void Spring::setLength(double length) {
