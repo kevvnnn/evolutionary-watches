@@ -1,5 +1,6 @@
 #include "FitnessEvaluator.h"
 #include "components/BalanceWheel.h"
+#include "components/Gear.h"
 #include "components/Hand.h"
 #include <cmath>
 
@@ -70,14 +71,32 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
     // Calculate the raw base score
     double raw = (accuracy * m_accuracyWeight) + (efficiency * m_efficiencyWeight) - penalty;
 
-    // Watch-hand relationship check
+    // =========================================================================
+    // ADVANCED PHYSICAL FEASIBILITY CHECKS (Unified Loop)
+    // =========================================================================
     double hourHandLength = 0.0;
     double minuteHandLength = 0.0;
 
-    // Scan the assembly to find the dimensions of both hands
     using namespace Components;
     for (const auto& comp : watch.getAllComponents()) {
-        if (const auto* hand = dynamic_cast<const Hand*>(comp.get())) {
+        
+        // A. Guard Against Balance Wheel Galloping/Knocking
+        if (auto* bw = dynamic_cast<const BalanceWheel*>(comp.get())) {
+            if (bw->getAmplitude() > 315.0) {
+                raw -= 0.40; // Severe penalty for physical self-destruction
+            }
+        }
+        
+        // B. Guard Against Atom-Sized Gear Teeth (Minimum Module Guard)
+        else if (auto* gear = dynamic_cast<const Gear*>(comp.get())) {
+            double module = gear->getDiameter() / static_cast<double>(gear->getToothCount());
+            if (module < 0.08) {
+                raw -= 0.25; // Penalize unmachinable micro-gears
+            }
+        }
+
+        // C. Extract Hand Lengths for Proportion Guard
+        else if (auto* hand = dynamic_cast<const Hand*>(comp.get())) {
             if (hand->getType() == Hand::HandType::HOUR) {
                 hourHandLength = hand->getLength();
             } else if (hand->getType() == Hand::HandType::MINUTE) {
@@ -86,10 +105,9 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
         }
     }
 
-    // If the hour hand is realistically longer than or equal to the minute hand,
-    // apply a severe penalty to tank its survival chances in the tournament.
+    // Apply the structural penalty if the hour hand outgrows the minute hand
     if (hourHandLength >= minuteHandLength && minuteHandLength > 0.0) {
-        raw -= 0.35; // Harsh deduction
+        raw -= 0.35; 
     }
     // =========================================================================
 
@@ -98,6 +116,7 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
 
     return applyLogScaling(raw);
 }
+
 // Getters and setters
 double FitnessEvaluator::getAccuracyWeight() const { return m_accuracyWeight; }
 void FitnessEvaluator::setAccuracyWeight(double weight) { m_accuracyWeight = weight; }
