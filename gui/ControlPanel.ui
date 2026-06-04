@@ -170,7 +170,7 @@
         </item>
        </layout>
       </item>
-      <item>
+      <!-- <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
          <widget class="QLabel" name="maxComponentsLabel">
@@ -193,7 +193,7 @@
          </widget>
         </item>
        </layout>
-      </item>
+      </item> -->
      </layout>
     </widget>
    </item>

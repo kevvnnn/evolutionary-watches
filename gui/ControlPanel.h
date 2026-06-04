@@ -35,7 +35,7 @@ private slots:
     void onMutationRateChanged(double value);
     void onCrossoverRateChanged(double value);
     void onElitismCountChanged(int value);
-    void onMaxComponentsChanged(int value);
+    // void onMaxComponentsChanged(int value);
     void onSelectionStrategyChanged(int index);
     void onCrossoverStrategyChanged(int index);
     void onMutationStrategyChanged(int index);
@@ -47,7 +47,7 @@ signals:
     void mutationRateChanged(double rate);
     void crossoverRateChanged(double rate);
     void elitismCountChanged(unsigned int count);
-    void maxComponentsChanged(unsigned int max);
+    // void maxComponentsChanged(unsigned int max);
     void selectionStrategyChanged(const QString& strategyName);
     void crossoverStrategyChanged(const QString& strategyName);
     void mutationStrategyChanged(const QString& strategyName);
@@ -61,7 +61,7 @@ public:
     double getMutationRate() const;
     double getCrossoverRate() const;
     unsigned int getElitismCount() const;
-    unsigned int getMaxComponents() const;
+    // unsigned int getMaxComponents() const;
     QString getSelectionStrategy() const;
     QString getCrossoverStrategy() const;
     QString getMutationStrategy() const;
@@ -71,7 +71,7 @@ public:
     void setMutationRate(double rate);
     void setCrossoverRate(double rate);
     void setElitismCount(unsigned int count);
-    void setMaxComponents(unsigned int max);
+    // void setMaxComponents(unsigned int max);
     void setSelectionStrategy(const QString& strategyName);
     void setCrossoverStrategy(const QString& strategyName);
     void setMutationStrategy(const QString& strategyName);

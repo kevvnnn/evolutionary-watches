@@ -48,8 +48,8 @@ public:
     QLabel *elitismLabel;
     QSpinBox *elitismSpin;
     QHBoxLayout *horizontalLayout_6;
-    QLabel *maxComponentsLabel;
-    QSpinBox *maxComponentsSpin;
+    // QLabel *maxComponentsLabel;
+    // QSpinBox *maxComponentsSpin;
     QGroupBox *strategiesGroup;
     QVBoxLayout *verticalLayout_3;
     QHBoxLayout *horizontalLayout_7;
@@ -183,22 +183,22 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_5);
 
-        horizontalLayout_6 = new QHBoxLayout();
-        horizontalLayout_6->setObjectName("horizontalLayout_6");
-        maxComponentsLabel = new QLabel(paramsGroup);
-        maxComponentsLabel->setObjectName("maxComponentsLabel");
+        // horizontalLayout_6 = new QHBoxLayout();
+        // horizontalLayout_6->setObjectName("horizontalLayout_6");
+        // maxComponentsLabel = new QLabel(paramsGroup);
+        // maxComponentsLabel->setObjectName("maxComponentsLabel");
 
-        horizontalLayout_6->addWidget(maxComponentsLabel);
+        // horizontalLayout_6->addWidget(maxComponentsLabel);
 
-        maxComponentsSpin = new QSpinBox(paramsGroup);
-        maxComponentsSpin->setObjectName("maxComponentsSpin");
-        maxComponentsSpin->setRange(1, 20);
-        maxComponentsSpin->setValue(8);
+        // maxComponentsSpin = new QSpinBox(paramsGroup);
+        // maxComponentsSpin->setObjectName("maxComponentsSpin");
+        // maxComponentsSpin->setRange(1, 20);
+        // maxComponentsSpin->setValue(8);
 
-        horizontalLayout_6->addWidget(maxComponentsSpin);
+        // horizontalLayout_6->addWidget(maxComponentsSpin);
 
 
-        verticalLayout_2->addLayout(horizontalLayout_6);
+        // verticalLayout_2->addLayout(horizontalLayout_6);
 
 
         verticalLayout->addWidget(paramsGroup);
@@ -333,7 +333,7 @@ public:
         mutationLabel->setText(QCoreApplication::translate("ControlPanel", "Mutation Rate:", nullptr));
         crossoverLabel->setText(QCoreApplication::translate("ControlPanel", "Crossover Rate:", nullptr));
         elitismLabel->setText(QCoreApplication::translate("ControlPanel", "Elitism Count:", nullptr));
-        maxComponentsLabel->setText(QCoreApplication::translate("ControlPanel", "Max Components:", nullptr));
+        // maxComponentsLabel->setText(QCoreApplication::translate("ControlPanel", "Max Components:", nullptr));
         strategiesGroup->setTitle(QCoreApplication::translate("ControlPanel", "Algorithm Strategies", nullptr));
         selectionLabel->setText(QCoreApplication::translate("ControlPanel", "Selection:", nullptr));
         crossoverLabel2->setText(QCoreApplication::translate("ControlPanel", "Crossover:", nullptr));
