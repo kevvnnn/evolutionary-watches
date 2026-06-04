@@ -2,9 +2,16 @@
 #define WATCHCANVAS_H
 
 #include <QWidget>
-#include <QMouseEvent>
+#include <QTimer>
 #include <vector>
-#include "WatchComponent.h"
+#include <memory>
+#include <chrono>
+
+namespace WatchGA {
+namespace Genome {
+    class WatchComponent;
+} // namespace Genome
+} // namespace WatchGA
 
 class WatchCanvas : public QWidget
 {
@@ -12,18 +19,15 @@ class WatchCanvas : public QWidget
 public:
     explicit WatchCanvas(QWidget *parent = nullptr);
 
-signals:
-    void componentHovered(WatchComponent* comp);
-    void componentLeft();
-
 protected:
     void paintEvent(QPaintEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
-    std::vector<WatchComponent*> m_components;
-    WatchComponent* m_hovered = nullptr;
-    WatchComponent* getComponentAt(const QPoint& pos);
+    std::vector<std::unique_ptr<WatchGA::Genome::WatchComponent>> m_components;
+    WatchGA::Genome::WatchComponent* m_hovered = nullptr;
+    std::chrono::steady_clock::time_point m_startTime;
+    QTimer* m_animationTimer;
 };
 
-#endif
+#endif // WATCHCANVAS_H

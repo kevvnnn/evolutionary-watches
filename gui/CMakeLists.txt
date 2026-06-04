@@ -1,10 +1,10 @@
 # Look for modern Qt6 installation, fall back to stable Qt5 if necessary
-find_package(Qt6 COMPONENTS Widgets REQUIRED QUIET)
+find_package(Qt6 COMPONENTS Widgets Charts REQUIRED QUIET)
 if(NOT Qt6_FOUND)
-    find_package(Qt5 COMPONENTS Widgets REQUIRED)
-    set(QT_LIBRARIES Qt5::Widgets)
+    find_package(Qt5 COMPONENTS Widgets Charts REQUIRED)
+    set(QT_LIBRARIES Qt5::Widgets Qt5::Charts)
 else()
-    set(QT_LIBRARIES Qt6::Widgets)
+    set(QT_LIBRARIES Qt6::Widgets Qt6::Charts)
 endif()
 
 add_library(watch_gui STATIC

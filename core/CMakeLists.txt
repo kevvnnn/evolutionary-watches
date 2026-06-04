@@ -1,4 +1,5 @@
-add_library(watch_core INTERFACE)
+add_library(watch_core STATIC
+    SystemObject.cpp
+)
 
-# Expose headers cleanly to any target that links this
-target_include_directories(watch_core INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(watch_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

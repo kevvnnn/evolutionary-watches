@@ -1,26 +1,46 @@
-#ifndef WATCHCOMPONENT_H
-#define WATCHCOMPONENT_H
+#ifndef WATCH_GA_GENOME_WATCHCOMPONENT_H
+#define WATCH_GA_GENOME_WATCHCOMPONENT_H
 
-#include <QString>
-#include <QPoint>
+#include <string>
+#include <memory>
 
-class WatchComponent {
+namespace WatchGA {
+namespace Genome {
+
+class WatchComponent
+{
+protected:
+    // NOW DEFINED - fixes the "m_name not declared" error
+    std::string m_name;
+    double m_weight;
+    double m_friction;
+    double m_x;
+    double m_y;
+
 public:
-    WatchComponent(const QString& name, const QString& type, int size, const QPoint& pos, double gearRatio = 0.0)
-        : m_name(name), m_type(type), m_size(size), m_pos(pos), m_gearRatio(gearRatio) {}
+    WatchComponent();
+    WatchComponent(const std::string& name, double weight, double friction, double x, double y);
+    virtual ~WatchComponent() = default;
 
-    QString getName() const { return m_name; }
-    QString getType() const { return m_type; }
-    int getSize() const { return m_size; }
-    QPoint getPosition() const { return m_pos; }
-    double getGearRatio() const { return m_gearRatio; }
+    // Getters
+    std::string getName() const;
+    double getWeight() const;
+    double getFriction() const;
+    double getX() const;
+    double getY() const;
 
-private:
-    QString m_name;
-    QString m_type;
-    int m_size;
-    QPoint m_pos;
-    double m_gearRatio;
+    // Setters
+    void setWeight(double weight);
+    void setFriction(double friction);
+    void setPosition(double x, double y);
+
+    // Virtual methods
+    virtual double calculateEfficiency() const = 0;
+    virtual std::unique_ptr<WatchComponent> clone() const = 0;
+    virtual std::string toString() const;
 };
 
-#endif // WATCHCOMPONENT_H
+} // namespace Genome
+} // namespace WatchGA
+
+#endif

@@ -1,15 +1,15 @@
 #include "MainWindow.h"
 #include "WatchCanvas.h"
-// #include "ComponentInspector.h"
 #include "ControlPanel.h"
+#include "StatsPanel.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowTitle("WatchGA");
-    setFixedSize(1200, 700);
+    setWindowTitle("WatchGA - Component Inspector");
+    setFixedSize(1000, 700);
 
     QWidget* centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
@@ -17,27 +17,25 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout->setContentsMargins(20, 20, 20, 20);
     mainLayout->setSpacing(15);
 
-    // LEFT: Watch Canvas 
+    // LEFT: Watch Canvas (original look preserved)
     WatchCanvas* canvas = new WatchCanvas;
     mainLayout->addWidget(canvas);
 
-    // RIGHT: ControlPanel + Component Inspector
+    // RIGHT: Control Panel + Component Inspector
     QVBoxLayout* rightLayout = new QVBoxLayout;
-
     WatchGA::GUI::ControlPanel* controlPanel = new WatchGA::GUI::ControlPanel;
     rightLayout->addWidget(controlPanel);
 
-    // Component Inspector panel
-    // ComponentInspector* inspector = new ComponentInspector;
-    // rightLayout->addWidget(inspector);
+    statsPanel = new StatsPanel(this);
+    statsPanel->setWindowFlags(Qt::Widget);  // Embed in main window
+    rightLayout->addWidget(statsPanel); 
 
-    rightLayout->addStretch();
+
+
+
+    // rightLayout->addStretch();
 
     mainLayout->addLayout(rightLayout);
 
-    // Connect hover signals 
-    // connect(canvas, &WatchCanvas::componentHovered, &ComponentInspector::showComponentData);
-    // connect(canvas, &WatchCanvas::componentLeft, &ComponentInspector::clearInspector);
 
-    //most of the comments here are for the data bars on the right side of the window
 }

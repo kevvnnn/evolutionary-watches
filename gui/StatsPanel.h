@@ -3,9 +3,14 @@
 
 #include <QDialog>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <QHBoxLayout>
+#include <QChart>
+#include <QLineSeries>
+#include <QValueAxis>
+#include <QChartView>
+#include <vector>
 
 class StatsPanel : public QDialog
 {
@@ -13,17 +18,26 @@ class StatsPanel : public QDialog
 
 public:
     explicit StatsPanel(QWidget *parent = nullptr);
-    ~StatsPanel();
+    ~StatsPanel() override;
+
+    void updateAverageFitness(int generation, double avgFitness);
 
 private:
-    QVBoxLayout* mainLayout;
-    QHBoxLayout* headerLayout;
-    QLabel* titleLabel;
-    // QPushButton* closeButton;
-    QLabel* placeholderLabel;
+    void setupUI();
+    void setupChart();
 
-// private slots:
-//     void handleClose();
+    QVBoxLayout *mainLayout;
+    QHBoxLayout *headerLayout;
+    QLabel *titleLabel;
+    QPushButton *closeButton;
+
+    QChart *fitnessChart;
+    QChartView *chartView;
+    QLineSeries *avgFitnessSeries;
+    QValueAxis *axisX;
+    QValueAxis *axisY;
+
+    std::vector<std::pair<int, double>> fitnessData;
 };
 
-#endif // STATSPANEL_H
+#endif

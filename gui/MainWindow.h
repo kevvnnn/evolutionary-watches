@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include "WatchCanvas.h"
 #include "ComponentInspector.h"
+#include "StatsPanel.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -17,6 +18,7 @@ public:
 
 private:
     QWidget* createControlPanel();
+    StatsPanel *statsPanel;
 };
 
 #endif // MAINWINDOW_H
