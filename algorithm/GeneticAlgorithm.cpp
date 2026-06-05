@@ -118,6 +118,10 @@ void GeneticAlgorithm::evaluatePopulation() {
     }
 
 	m_averageFitness = totalFitness / m_populationSize;
+
+    if (m_callback) { // call bakc for the main window
+    m_callback(m_currentGeneration, m_averageFitness);
+}
     
     std::cout << "Evaluation complete. Best Fitness: " << m_bestFitness 
               << " | Avg Fitness: " << m_averageFitness << "\n";

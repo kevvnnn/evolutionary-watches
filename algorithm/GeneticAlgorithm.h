@@ -1,6 +1,7 @@
 #ifndef WATCH_GA_ALGORITHM_GENETICALGORITHM_H
 #define WATCH_GA_ALGORITHM_GENETICALGORITHM_H
 
+#include <functional>
 #include "../core/ISelectionStrategy.h"
 #include "../core/ICrossoverStrategy.h"
 #include "../core/IMutationStrategy.h"
@@ -9,6 +10,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+
 
 namespace WatchGA {
 namespace Algorithm {
@@ -37,6 +39,7 @@ private:
     double m_mutationRate;            // Probability of mutation (0.0 to 1.0)
     double m_crossoverRate;           // Probability of crossover (0.0 to 1.0)
     unsigned int m_elitismCount;      // Number of best watches to keep each generation
+   
 
     // ------------------------------
     // POPULATION
@@ -89,12 +92,16 @@ private:
      */
     void performElitism(std::vector<std::shared_ptr<Genome::Watch>>& newPopulation);
 
+
 public:
     /**
      * @brief Default constructor
      * Uses default parameters and strategies
      */
     GeneticAlgorithm();
+
+    using StatsCallback = std::function<void(int generation, double avgFitness)>;
+    void setStatsCallback(StatsCallback cb) { m_callback = std::move(cb); }
     
     /**
      * @brief Constructor with custom parameters and strategies
@@ -121,6 +128,7 @@ public:
     void setCrossoverRate(double rate);
     unsigned int getElitismCount() const;
     void setElitismCount(unsigned int count);
+    StatsCallback m_callback;
 
     // ------------------------------
     // STRATEGY SETTERS

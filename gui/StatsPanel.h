@@ -1,7 +1,7 @@
 #ifndef STATSPANEL_H
 #define STATSPANEL_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -12,7 +12,7 @@
 #include <QChartView>
 #include <vector>
 
-class StatsPanel : public QDialog
+class StatsPanel : public QWidget
 {
     Q_OBJECT
 

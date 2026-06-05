@@ -71,6 +71,8 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
     // Calculate the raw base score
     double raw = (accuracy * m_accuracyWeight) + (efficiency * m_efficiencyWeight) - penalty;
 
+   
+
     // =========================================================================
     // CONTINUOUS QUADRATIC PENALTIES (The "Smooth" Physics Guard)
     // =========================================================================

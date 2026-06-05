@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <random>
 
+
 namespace WatchGA {
 namespace Genome {
 
@@ -255,6 +256,10 @@ void Watch::randomize() {
     }
 
     m_isValid = true;
+
+
+
+
 }
 
 }

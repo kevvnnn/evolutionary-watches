@@ -51,6 +51,8 @@ public:
 
     // Fill an empty watch for Generation 0 of the Genetic Algorithm
     void randomize();
+
+    void sendGenerationUpdate(int generation, double averageFitness);
 };
 
 } // namespace Genome
