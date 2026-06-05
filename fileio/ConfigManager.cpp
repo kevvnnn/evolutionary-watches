@@ -8,7 +8,7 @@ namespace FileIO {
 
 // Create an empty configuration manager.
 ConfigManager::ConfigManager()
-    : m_configFilePath("")
+    : m_configFilePath("config.txt")
 {
 }
 

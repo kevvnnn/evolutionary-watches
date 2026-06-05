@@ -8,6 +8,8 @@ namespace GUI {
 
 // Static config manager
 static FileIO::ConfigManager s_config;
+// to update ui [ is this even correct???????]
+// static Ui::ControlPanel ui_controlpanel;
 
 ControlPanel::ControlPanel(QWidget* parent) : 
     QWidget(parent),
@@ -60,6 +62,15 @@ ControlPanel::ControlPanel(QWidget* parent) :
 
     connect(ui->resetToDefaults,&QPushButton::clicked, this, [this](){
         qDebug() << "Reset to Default clicked";
+        s_config.setInt("populationSize", 100);
+        s_config.setDouble("mutationRate", 0.1);
+        s_config.setDouble("crossoverRate", 0.8);
+        s_config.setInt("elitismCount", 2);
+        s_config.setString("selectionStrategy", "Tournament");
+        s_config.setString("crossoverStrategy", "One Point");
+        s_config.setString("mutationStrategy", "Swap");
+        s_config.saveConfig();
+        // ui_controlpanel->populationSpin->setValue(100);HOW TO UPDATE UI VALUES??
     });
 }
 
@@ -80,7 +91,7 @@ void ControlPanel::onPopulationSizeChanged(int value)
 void ControlPanel::onMutationRateChanged(double value)
 {
     qDebug() << "Mutation rate changed to:" << value;
-    s_config.setInt("mutationRate", value);
+    s_config.setDouble("mutationRate", value);
     s_config.saveConfig();
     emit mutationRateChanged(value);
 }
@@ -88,7 +99,7 @@ void ControlPanel::onMutationRateChanged(double value)
 void ControlPanel::onCrossoverRateChanged(double value)
 {
     qDebug() << "Crossover rate changed to:" << value;
-    s_config.setInt("crossoverRate", value);
+    s_config.setDouble("crossoverRate", value);
     s_config.saveConfig();
     emit crossoverRateChanged(value);
 }
