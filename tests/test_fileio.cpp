@@ -21,7 +21,7 @@ int main()
     {
         std::cout << "\nTesting WatchFileIO...\n";
 
-        FileIO::WatchFileIO fileIO("test.bin");
+        FileIO::WatchFileIO fileIO("test.txt");
 
         bool opened = fileIO.open(true);
 
@@ -51,7 +51,23 @@ int main()
 
         FileIO::ConfigManager config;
 
-        std::cout << "ConfigManager constructed.\n";
+        std::cout << "ConfigManager constructed with default path.\n";
+
+        std::cout << "Loaded new Config: " << std::boolalpha << config.loadConfig() << "\n";
+        
+        config.setInt("int1", 22);
+        config.setBool("bool1", true);
+        config.setDouble("double1", 1.12);
+        config.setString("string1", "Hello2");
+        config.saveConfig();
+        std::cout << "Set example values and saved\n\n";
+        // std::cout << "Loaded new Config: " << std::boolalpha << config.loadConfig() << "\n";
+        std::cout << "int value: " << config.getInt("int1") << "\n";
+        std::cout << "bool value: " << config.getBool("bool1") << "\n";
+        std::cout << "double value: " << config.getDouble("double1") << "\n";
+        std::cout << "string value: " << config.getString("string1") << "\n";
+        
+
     }
 
     // ----------------------------------------------------
@@ -59,7 +75,7 @@ int main()
     // ----------------------------------------------------
 
     {
-        std::cout << "\nTesting EvolutionHistory...\n";
+        std::cout << "\n\nTesting EvolutionHistory...\n";
 
         FileIO::EvolutionHistory history;
 
