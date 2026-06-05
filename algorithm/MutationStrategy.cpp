@@ -5,6 +5,7 @@
 #include "../genome/components/Hand.h"
 #include "../genome/components/Spring.h"
 #include "../genome/components/Jewel.h"
+#include <memory>
 #include <random>
 #include <algorithm>
 
@@ -120,11 +121,51 @@ void ParameterMutation::mutate(std::shared_ptr<Genome::Watch>& watch, double mut
                 gear->setToothCount(gear->getToothCount() + teethChange);
             }
 
-            // C. NEW: Mutate the physical gear diameter size
+            // C. Mutate the physical gear diameter size
             double newDia = gear->getDiameter() + nudgeDist(getRng());
             // Guard against Person A's 1.0mm minimum constraint to prevent runtime crashes
             if (newDia >= 1.0) {
                 gear->setDiameter(newDia);
+            }
+
+            // =========================================================
+            // D. THE NESTED JEWEL MUTATION
+            // =========================================================
+            // Do a secondary coin flip to see if the jewel DNA mutates during this pass
+            std::uniform_int_distribution<int> coinFlip(0, 1);
+            if (coinFlip(getRng()) == 0) {
+                
+                if (gear->hasJewel()) {
+                    // SCENARIO 1: The gear already has a jewel.
+                    // 50% chance to mutate properties, 50% chance to destroy it entirely.
+                    if (coinFlip(getRng()) == 0) {
+                        gear->setJewel(nullptr); // Genetic Pruning (Deletes the jewel to save weight!)
+                    } else {
+                        const auto* oldJewel = gear->getJewel();
+                        
+                        // Slightly polish the hardness
+                        double mutatedHardness = oldJewel->getHardness() + nudgeDist(getRng());
+                        if (mutatedHardness > 10.0) mutatedHardness = 10.0; // Diamond cap limit
+                        
+                        // 1-in-10 chance to flip Cap Jewel status
+                        std::uniform_int_distribution<int> capFlip(0, 9);
+                        bool flippedCap = (capFlip(getRng()) == 0) ? !oldJewel->isCapJewel() : oldJewel->isCapJewel();
+
+                        auto mutatedJewel = std::make_unique<Jewel>(
+                            "Mutated_Jewel", 0.01, 0.005, 0.0, 0.0, mutatedHardness, flippedCap
+                        );
+                        gear->setJewel(std::move(mutatedJewel));
+                    }
+                } else {
+                    // SCENARIO 2: The gear currently has NO jewel.
+                    // Spontaneous Generation! The gear suddenly grows a new jewel.
+                    std::uniform_real_distribution<double> hardDist(8.5, 9.5);
+                    
+                    auto newJewel = std::make_unique<Jewel>(
+                        "Spontaneous_Jewel", 0.01, 0.005, 0.0, 0.0, hardDist(getRng()), static_cast<bool>(coinFlip(getRng()))
+                    );
+                    gear->setJewel(std::move(newJewel));
+                }
             }
         }
         // Case C: Is this component actually a Spring? 

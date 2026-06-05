@@ -3,6 +3,7 @@
 #include "components/Gear.h"
 #include "components/Hand.h"
 #include "components/Spring.h"
+#include "components/Jewel.h"
 #include <algorithm>
 #include <random>
 
@@ -215,22 +216,41 @@ void Watch::randomize() {
         moiDist(gen), qualityDist(gen), ampDist(gen)
     ));
 
+// =========================================================
+    // 2. THE MUTABLE MIDDLE (Gears containing Jewels)
     // =========================================================
-    // 2. THE MUTABLE MIDDLE (Random Gears)
-    // =========================================================
-    
-    std::uniform_int_distribution<unsigned int> gearCountDist(3, 15);
+    std::uniform_int_distribution<unsigned int> gearCountDist(3, 9); // Strict 9-gear cap
     unsigned int randomGears = gearCountDist(gen);
 
     std::uniform_int_distribution<unsigned int> teethDist(8, 64);      
-    std::uniform_real_distribution<double> diameterDist(2.0, 20.0);     
+    std::uniform_real_distribution<double> diameterDist(2.0, 20.0);
+    
+    // Distributions for the Jewels
+    std::uniform_real_distribution<double> hardnessDist(8.5, 9.5);
+    std::uniform_int_distribution<int> boolDist(0, 1); 
 
     for (unsigned int i = 0; i < randomGears; ++i) {
-        std::string name = "Gear_" + std::to_string(i + 1);
-        addComponent(std::make_unique<Gear>(
-            name, weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        // A. Create the Gear
+        std::string gearName = "Gear_" + std::to_string(i + 1);
+        auto newGear = std::make_unique<WatchGA::Genome::Components::Gear>(
+            gearName, weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
             teethDist(gen), diameterDist(gen), qualityDist(gen)
-        ));
+        );
+
+        // B. 50% chance to forge a Jewel INSIDE this specific gear right at birth
+        if (boolDist(gen) == 1) {
+            std::string jewelName = "Jewel_For_" + gearName;
+            auto newJewel = std::make_unique<WatchGA::Genome::Components::Jewel>(
+                jewelName, 0.01, 0.005, posDist(gen), posDist(gen), 
+                hardnessDist(gen), static_cast<bool>(boolDist(gen))
+            );
+            
+            // Hand the jewel ownership to the gear
+            newGear->setJewel(std::move(newJewel)); 
+        }
+
+        // C. Add the completed Gear (which now carries its jewel) to the watch
+        addComponent(std::move(newGear));
     }
 
     // =========================================================
