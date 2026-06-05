@@ -6,18 +6,27 @@
 namespace WatchGA {
 namespace GUI {
 
+// Static config manager
+static FileIO::ConfigManager s_config;
+
 ControlPanel::ControlPanel(QWidget* parent) : 
     QWidget(parent),
     ui(new Ui::ControlPanel)
 {
     ui->setupUi(this);
     
+    //Load config on startup
+    s_config = FileIO::ConfigManager("config.txt");
+    s_config.loadConfig();
+    s_config.clear();
+    s_config.saveConfig();
+
     // Connect signals from UI elements to our private slots
     connect(ui->populationSpin, &QSpinBox::valueChanged, this, &ControlPanel::onPopulationSizeChanged);
     connect(ui->mutationSpin, &QDoubleSpinBox::valueChanged, this, &ControlPanel::onMutationRateChanged);
     connect(ui->crossoverSpin, &QDoubleSpinBox::valueChanged, this, &ControlPanel::onCrossoverRateChanged);
     connect(ui->elitismSpin, &QSpinBox::valueChanged, this, &ControlPanel::onElitismCountChanged);
-    connect(ui->maxComponentsSpin, &QSpinBox::valueChanged, this, &ControlPanel::onMaxComponentsChanged);
+    // connect(ui->maxComponentsSpin, &QSpinBox::valueChanged, this, &ControlPanel::onMaxComponentsChanged);
     
     connect(ui->selectionCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::onSelectionStrategyChanged);
     connect(ui->crossoverCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::onCrossoverStrategyChanged);
@@ -48,6 +57,10 @@ ControlPanel::ControlPanel(QWidget* parent) :
     connect(ui->stepBtn, &QPushButton::clicked, this, [this](){
         qDebug() << "Step button clicked";
     });
+
+    connect(ui->resetToDefaults,&QPushButton::clicked, this, [this](){
+        qDebug() << "Reset to Default clicked";
+    });
 }
 
 ControlPanel::~ControlPanel()
@@ -59,37 +72,49 @@ ControlPanel::~ControlPanel()
 void ControlPanel::onPopulationSizeChanged(int value)
 {
     qDebug() << "Population size changed to:" << value;
+    s_config.setInt("populationSize", value);
+    s_config.saveConfig();
     emit populationSizeChanged(static_cast<unsigned int>(value));
 }
 
 void ControlPanel::onMutationRateChanged(double value)
 {
     qDebug() << "Mutation rate changed to:" << value;
+    s_config.setInt("mutationRate", value);
+    s_config.saveConfig();
     emit mutationRateChanged(value);
 }
 
 void ControlPanel::onCrossoverRateChanged(double value)
 {
     qDebug() << "Crossover rate changed to:" << value;
+    s_config.setInt("crossoverRate", value);
+    s_config.saveConfig();
     emit crossoverRateChanged(value);
 }
 
 void ControlPanel::onElitismCountChanged(int value)
 {
     qDebug() << "Elitism count changed to:" << value;
+    s_config.setInt("elitismCount", value);
+    s_config.saveConfig();
     emit elitismCountChanged(static_cast<unsigned int>(value));
 }
 
-void ControlPanel::onMaxComponentsChanged(int value)
-{
-    qDebug() << "Max components changed to:" << value;
-    emit maxComponentsChanged(static_cast<unsigned int>(value));
-}
+// void ControlPanel::onMaxComponentsChanged(int value)
+// {
+//     qDebug() << "Max components changed to:" << value;
+//     s_config.setInt("maxComponents", value);
+//     s_config.saveConfig();
+//     emit maxComponentsChanged(static_cast<unsigned int>(value));
+// }
 
 void ControlPanel::onSelectionStrategyChanged(int index)
 {
     QString strategy = ui->selectionCombo->itemText(index);
     qDebug() << "Selection strategy changed to:" << strategy;
+    s_config.setString("selectionStrategy", strategy.toStdString());
+    s_config.saveConfig();
     emit selectionStrategyChanged(strategy);
 }
 
@@ -97,6 +122,8 @@ void ControlPanel::onCrossoverStrategyChanged(int index)
 {
     QString strategy = ui->crossoverCombo->itemText(index);
     qDebug() << "Crossover strategy changed to:" << strategy;
+    s_config.setString("crossoverStrategy", strategy.toStdString());
+    s_config.saveConfig();
     emit crossoverStrategyChanged(strategy);
 }
 
@@ -104,6 +131,8 @@ void ControlPanel::onMutationStrategyChanged(int index)
 {
     QString strategy = ui->mutationCombo->itemText(index);
     qDebug() << "Mutation strategy changed to:" << strategy;
+    s_config.setString("mutationStrategy", strategy.toStdString());
+    s_config.saveConfig();
     emit mutationStrategyChanged(strategy);
 }
 
@@ -128,10 +157,10 @@ unsigned int ControlPanel::getElitismCount() const
     return static_cast<unsigned int>(ui->elitismSpin->value());
 }
 
-unsigned int ControlPanel::getMaxComponents() const
-{
-    return static_cast<unsigned int>(ui->maxComponentsSpin->value());
-}
+// unsigned int ControlPanel::getMaxComponents() const
+// {
+//     return static_cast<unsigned int>(ui->maxComponentsSpin->value());
+// }
 
 QString ControlPanel::getSelectionStrategy() const
 {
@@ -169,10 +198,10 @@ void ControlPanel::setElitismCount(unsigned int count)
     ui->elitismSpin->setValue(static_cast<int>(count));
 }
 
-void ControlPanel::setMaxComponents(unsigned int max)
-{
-    ui->maxComponentsSpin->setValue(static_cast<int>(max));
-}
+// void ControlPanel::setMaxComponents(unsigned int max)
+// {
+//     ui->maxComponentsSpin->setValue(static_cast<int>(max));
+// }
 
 void ControlPanel::setSelectionStrategy(const QString& strategyName)
 {

@@ -33,6 +33,7 @@ public:
     QPushButton *pauseBtn;
     QPushButton *resetBtn;
     QPushButton *stepBtn;
+    QPushButton *resetToDefaults;
     QGroupBox *paramsGroup;
     QVBoxLayout *verticalLayout_2;
     QHBoxLayout *horizontalLayout_2;
@@ -48,8 +49,8 @@ public:
     QLabel *elitismLabel;
     QSpinBox *elitismSpin;
     QHBoxLayout *horizontalLayout_6;
-    QLabel *maxComponentsLabel;
-    QSpinBox *maxComponentsSpin;
+    // QLabel *maxComponentsLabel;
+    // QSpinBox *maxComponentsSpin;
     QGroupBox *strategiesGroup;
     QVBoxLayout *verticalLayout_3;
     QHBoxLayout *horizontalLayout_7;
@@ -72,6 +73,7 @@ public:
     QHBoxLayout *horizontalLayout_12;
     QLabel *avgFitnessLabel;
     QLabel *avgFitnessValue;
+    QHBoxLayout *horizontalLayout_reset;
 
     void setupUi(QWidget *ControlPanel)
     {
@@ -105,6 +107,10 @@ public:
         stepBtn->setObjectName("stepBtn");
 
         horizontalLayout->addWidget(stepBtn);
+
+        resetToDefaults = new QPushButton(controlGroup);
+        resetToDefaults->setObjectName("resetToDefaults");
+        horizontalLayout->addWidget(resetToDefaults);
 
 
         verticalLayout->addWidget(controlGroup);
@@ -183,22 +189,22 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_5);
 
-        horizontalLayout_6 = new QHBoxLayout();
-        horizontalLayout_6->setObjectName("horizontalLayout_6");
-        maxComponentsLabel = new QLabel(paramsGroup);
-        maxComponentsLabel->setObjectName("maxComponentsLabel");
+        // horizontalLayout_6 = new QHBoxLayout();
+        // horizontalLayout_6->setObjectName("horizontalLayout_6");
+        // maxComponentsLabel = new QLabel(paramsGroup);
+        // maxComponentsLabel->setObjectName("maxComponentsLabel");
 
-        horizontalLayout_6->addWidget(maxComponentsLabel);
+        // horizontalLayout_6->addWidget(maxComponentsLabel);
 
-        maxComponentsSpin = new QSpinBox(paramsGroup);
-        maxComponentsSpin->setObjectName("maxComponentsSpin");
-        maxComponentsSpin->setRange(1, 20);
-        maxComponentsSpin->setValue(8);
+        // maxComponentsSpin = new QSpinBox(paramsGroup);
+        // maxComponentsSpin->setObjectName("maxComponentsSpin");
+        // maxComponentsSpin->setRange(1, 20);
+        // maxComponentsSpin->setValue(8);
 
-        horizontalLayout_6->addWidget(maxComponentsSpin);
+        // horizontalLayout_6->addWidget(maxComponentsSpin);
 
 
-        verticalLayout_2->addLayout(horizontalLayout_6);
+        // verticalLayout_2->addLayout(horizontalLayout_6);
 
 
         verticalLayout->addWidget(paramsGroup);
@@ -232,7 +238,7 @@ public:
 
         crossoverCombo = new QComboBox(strategiesGroup);
         crossoverCombo->setObjectName("crossoverCombo");
-        crossoverCombo->addItems({"Single Point", "Two Point", "Uniform"});
+        crossoverCombo->addItems({"One Point", "Uniform"});
 
         horizontalLayout_8->addWidget(crossoverCombo);
 
@@ -248,7 +254,7 @@ public:
 
         mutationCombo = new QComboBox(strategiesGroup);
         mutationCombo->setObjectName("mutationCombo");
-        mutationCombo->addItems({"Swap", "Gaussian", "Bit Flip", "Inversion"});
+        mutationCombo->addItems({"Swap", "Parameter", "AddRemove"});
 
         horizontalLayout_9->addWidget(mutationCombo);
 
@@ -328,12 +334,13 @@ public:
         pauseBtn->setText(QCoreApplication::translate("ControlPanel", "Pause", nullptr));
         resetBtn->setText(QCoreApplication::translate("ControlPanel", "Reset", nullptr));
         stepBtn->setText(QCoreApplication::translate("ControlPanel", "Step", nullptr));
+        resetToDefaults->setText(QCoreApplication::translate("ControlPanel", "Reset to Defaults", nullptr));
         paramsGroup->setTitle(QCoreApplication::translate("ControlPanel", "Algorithm Parameters", nullptr));
         populationLabel->setText(QCoreApplication::translate("ControlPanel", "Population Size:", nullptr));
         mutationLabel->setText(QCoreApplication::translate("ControlPanel", "Mutation Rate:", nullptr));
         crossoverLabel->setText(QCoreApplication::translate("ControlPanel", "Crossover Rate:", nullptr));
         elitismLabel->setText(QCoreApplication::translate("ControlPanel", "Elitism Count:", nullptr));
-        maxComponentsLabel->setText(QCoreApplication::translate("ControlPanel", "Max Components:", nullptr));
+        // maxComponentsLabel->setText(QCoreApplication::translate("ControlPanel", "Max Components:", nullptr));
         strategiesGroup->setTitle(QCoreApplication::translate("ControlPanel", "Algorithm Strategies", nullptr));
         selectionLabel->setText(QCoreApplication::translate("ControlPanel", "Selection:", nullptr));
         crossoverLabel2->setText(QCoreApplication::translate("ControlPanel", "Crossover:", nullptr));
