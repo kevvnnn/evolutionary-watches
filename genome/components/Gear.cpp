@@ -19,7 +19,7 @@ Gear::Gear(const std::string& name, double weight, double friction, double x, do
     : WatchComponent(name, weight, friction, x, y),
       m_toothCount(toothCount),
       m_diameter(diameter),
-      m_meshingQuality(meshingQuality)
+      m_meshingQuality(meshingQuality) 
 {
     setToothCount(toothCount);
     setDiameter(diameter);

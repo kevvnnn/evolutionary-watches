@@ -8,6 +8,8 @@
 #include <QSizePolicy>
 #include <functional>           // Added
 
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -42,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget* rightContainer = new QWidget;
     QVBoxLayout* rightLayout = new QVBoxLayout(rightContainer);
     rightLayout->setSpacing(15);
-    rightLayout->setContentsMargins(0, 0, 0, 0);
+    rightLayout->setContentsMargins(0, 0, 0, 0); 
 
     WatchGA::GUI::ControlPanel* controlPanel = new WatchGA::GUI::ControlPanel;
     rightLayout->addWidget(controlPanel);
@@ -61,5 +63,5 @@ MainWindow::MainWindow(QWidget *parent)
     // ---------------------------------------------------------------------
 
     rightLayout->addStretch();
-    mainLayout->addWidget(rightContainer);
-}
+    mainLayout->addWidget(rightContainer); 
+} 

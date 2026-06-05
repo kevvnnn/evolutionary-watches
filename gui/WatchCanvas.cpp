@@ -5,17 +5,17 @@
 #include <QLineF>
 #include <QMouseEvent>
 
-// YOUR ACTUAL COMPONENTS (CORRECT NAMESPACES)
+
 #include "../genome/WatchComponent.h"
 #include "../genome/components/BalanceWheel.h"
 #include "../genome/components/Gear.h"
 #include "../genome/components/Hand.h"
-#include "../genome/components/Jewel.h"
+#include "../genome/components/Jewel.h" 
 #include "../genome/components/Spring.h"
 
-// FULL CORRECT NAMESPACE
+
 using namespace WatchGA::Genome;
-using namespace WatchGA::Genome::Components;
+using namespace WatchGA::Genome::Components; 
 
 WatchCanvas::WatchCanvas(QWidget *parent)
     : QWidget(parent),
@@ -40,10 +40,10 @@ WatchCanvas::WatchCanvas(QWidget *parent)
     // ANIMATION TIMER
     m_animationTimer = new QTimer(this);
     connect(m_animationTimer, &QTimer::timeout, this, QOverload<>::of(&QWidget::update));
-    m_animationTimer->start(50);
+    m_animationTimer->start(50); 
 }
 
-void WatchCanvas::paintEvent(QPaintEvent *event)
+void WatchCanvas::paintEvent(QPaintEvent *event) 
 {
     Q_UNUSED(event);
     QPainter p(this);
@@ -78,7 +78,7 @@ void WatchCanvas::paintEvent(QPaintEvent *event)
             color = QColor(90, 160, 240);
         else if (dynamic_cast<Spring*>(comp.get()))
             color = QColor(255, 180, 0);
-        else if (dynamic_cast<BalanceWheel*>(comp.get()))
+        else if (dynamic_cast<BalanceWheel*>(comp.get())) 
             color = QColor(220, 50, 50);
         else if (dynamic_cast<Jewel*>(comp.get()))
             color = QColor(190, 190, 220);
@@ -104,7 +104,7 @@ void WatchCanvas::paintEvent(QPaintEvent *event)
                 p.setPen(QPen(color, 3));
             }
             else if (hand->getType() == Hand::HandType::SECOND) {
-                angle += (elapsed % 60) * (2 * M_PI / 60.0);
+                angle += (elapsed % 60) * (100000 * M_PI / 60.0);
                 p.setPen(QPen(Qt::red, 2));
             }
 
@@ -142,4 +142,4 @@ void WatchCanvas::mouseMoveEvent(QMouseEvent *event)
             QToolTip::hideText();
         update();
     }
-}
+}  
