@@ -1,165 +1,180 @@
-/**
- * @file EvolutionHistory.cpp
- * @brief Implementation for EvolutionHistory class
- * @ownership Person C
- */
-
 #include "EvolutionHistory.h"
+#include "../genome/Watch.h"
 #include <fstream>
 #include <stdexcept>
 
 namespace WatchGA {
 namespace FileIO {
 
-/**
- * @brief Default constructor
- * Initializes an empty evolution history with no experiment name
- */
+// ------------------------------------------------------------
+// ✅ MISSING CONSTRUCTOR FIX (THIS WAS YOUR ERROR)
+// ------------------------------------------------------------
 EvolutionHistory::EvolutionHistory()
     : m_experimentName("")
 {
 }
 
-/**
- * @brief Constructor with experiment name
- * @param name Name of the evolutionary experiment
- */
+// Existing constructor
 EvolutionHistory::EvolutionHistory(const std::string& name)
     : m_experimentName(name)
 {
 }
 
-/**
- * @brief Add a new generation record to the history
- * @param record Generation data to store
- */
+// ------------------------------------------------------------
+// Core functions
+// ------------------------------------------------------------
+
 void EvolutionHistory::addRecord(const GenerationRecord& record)
 {
     m_records.push_back(record);
 }
 
-/**
- * @brief Get all stored generation records (read-only)
- * @return Constant reference to the record vector
- */
-const std::vector<EvolutionHistory::GenerationRecord>& EvolutionHistory::getAllRecords() const
+const std::vector<EvolutionHistory::GenerationRecord>&
+EvolutionHistory::getAllRecords() const
 {
     return m_records;
 }
 
-/**
- * @brief Get a single record by generation number
- * @param gen Target generation number
- * @return Matching generation record
- * @throws std::out_of_range if generation not found
- */
-const EvolutionHistory::GenerationRecord& EvolutionHistory::getRecord(unsigned int gen) const
+const EvolutionHistory::GenerationRecord&
+EvolutionHistory::getRecord(unsigned int gen) const
 {
-    for (const auto& record : m_records)
-    {
-        if (record.generationNumber == gen)
-        {
-            return record;
-        }
+    if (gen >= m_records.size()) {
+        throw std::out_of_range("Generation index out of range");
     }
-
-    throw std::out_of_range("Generation not found in evolution history.");
+    return m_records[gen];
 }
 
-/**
- * @brief Get total number of stored records
- * @return Count of generation records
- */
 unsigned int EvolutionHistory::getRecordCount() const
 {
     return static_cast<unsigned int>(m_records.size());
 }
 
-/**
- * @brief Get the experiment name
- * @return Constant reference to experiment name
- */
 const std::string& EvolutionHistory::getExperimentName() const
 {
     return m_experimentName;
 }
 
-/**
- * @brief Set the experiment name
- * @param name New experiment name
- */
 void EvolutionHistory::setExperimentName(const std::string& name)
 {
     m_experimentName = name;
 }
 
-/**
- * @brief Clear all stored generation records
- */
 void EvolutionHistory::clear()
 {
     m_records.clear();
+    m_experimentName.clear();
 }
 
-/**
- * @brief Save evolution history to a file
- * @param path File path to save
- * @return True on success, false on failure
- */
+// ------------------------------------------------------------
+// Save
+// ------------------------------------------------------------
+
 bool EvolutionHistory::saveToFile(const std::string& path) const
 {
-    std::ofstream file(path);
-    if (!file.is_open())
+    std::ofstream file(path, std::ios::binary);
+    if (!file.is_open()) {
         return false;
-
-    // Save experiment metadata
-    file << m_experimentName << '\n';
-    file << m_records.size() << '\n';
-
-    // Save each generation's statistics
-    for (const auto& rec : m_records)
-    {
-        file << rec.generationNumber << ' '
-             << rec.bestFitness << ' '
-             << rec.averageFitness << ' '
-             << rec.worstFitness << '\n';
     }
 
-    file.close();
+    size_t nameLength = m_experimentName.size();
+    file.write(reinterpret_cast<const char*>(&nameLength), sizeof(nameLength));
+    file.write(m_experimentName.data(), nameLength);
+
+    unsigned int recordCount = getRecordCount();
+    file.write(reinterpret_cast<const char*>(&recordCount), sizeof(recordCount));
+
+    for (const auto& record : m_records) {
+
+        file.write(reinterpret_cast<const char*>(&record.generationNumber),
+                   sizeof(record.generationNumber));
+
+        file.write(reinterpret_cast<const char*>(&record.bestFitness),
+                   sizeof(record.bestFitness));
+
+        file.write(reinterpret_cast<const char*>(&record.averageFitness),
+                   sizeof(record.averageFitness));
+
+        file.write(reinterpret_cast<const char*>(&record.worstFitness),
+                   sizeof(record.worstFitness));
+
+        if (record.bestWatch) {
+
+            int watchId = record.bestWatch->getId();
+            double watchFitness = record.bestWatch->getFitness();
+            std::string watchName = record.bestWatch->getName();
+
+            file.write(reinterpret_cast<const char*>(&watchId), sizeof(watchId));
+            file.write(reinterpret_cast<const char*>(&watchFitness), sizeof(watchFitness));
+
+            size_t watchNameLen = watchName.size();
+            file.write(reinterpret_cast<const char*>(&watchNameLen), sizeof(watchNameLen));
+            file.write(watchName.data(), watchNameLen);
+        }
+    }
+
     return true;
 }
 
-/**
- * @brief Load evolution history from a file
- * @param path File path to load
- * @return True on success, false on failure
- */
+// ------------------------------------------------------------
+// Load
+// ------------------------------------------------------------
+
 bool EvolutionHistory::loadFromFile(const std::string& path)
 {
-    std::ifstream file(path);
-    if (!file.is_open())
+    std::ifstream file(path, std::ios::binary);
+    if (!file.is_open()) {
         return false;
+    }
 
     clear();
 
-    // Load metadata
-    size_t recordCount = 0;
-    std::getline(file, m_experimentName);
-    file >> recordCount;
+    size_t nameLength;
+    file.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));
 
-    // Load generation records
-    GenerationRecord rec;
-    for (size_t i = 0; i < recordCount; ++i)
-    {
-        file >> rec.generationNumber
-             >> rec.bestFitness
-             >> rec.averageFitness
-             >> rec.worstFitness;
-        rec.bestWatch = nullptr; // Watch object not serialized in basic implementation
-        m_records.push_back(rec);
+    m_experimentName.resize(nameLength);
+    file.read(&m_experimentName[0], nameLength);
+
+    unsigned int recordCount;
+    file.read(reinterpret_cast<char*>(&recordCount), sizeof(recordCount));
+
+    for (unsigned int i = 0; i < recordCount; ++i) {
+
+        GenerationRecord record;
+
+        file.read(reinterpret_cast<char*>(&record.generationNumber),
+                  sizeof(record.generationNumber));
+
+        file.read(reinterpret_cast<char*>(&record.bestFitness),
+                  sizeof(record.bestFitness));
+
+        file.read(reinterpret_cast<char*>(&record.averageFitness),
+                  sizeof(record.averageFitness));
+
+        file.read(reinterpret_cast<char*>(&record.worstFitness),
+                  sizeof(record.worstFitness));
+
+        int watchId;
+        double watchFitness;
+        size_t watchNameLen;
+
+        file.read(reinterpret_cast<char*>(&watchId), sizeof(watchId));
+        file.read(reinterpret_cast<char*>(&watchFitness), sizeof(watchFitness));
+        file.read(reinterpret_cast<char*>(&watchNameLen), sizeof(watchNameLen));
+
+        std::string watchName;
+        watchName.resize(watchNameLen);
+        file.read(&watchName[0], watchNameLen);
+
+        auto watch = std::make_shared<Genome::Watch>();
+        watch->setId(watchId);
+        watch->setFitness(watchFitness);
+        watch->setName(watchName);
+
+        record.bestWatch = watch;
+
+        m_records.push_back(record);
     }
 
-    file.close();
     return true;
 }
 
