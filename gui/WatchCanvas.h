@@ -18,7 +18,7 @@ public:
     explicit WatchCanvas(QWidget *parent = nullptr);
     ~WatchCanvas() override = default;
 
-    // Add a setter to inject the real Watch from your algorithm
+    // Add a setter to inject the real Watch from algorithm
     void setWatch(WatchGA::Genome::Watch* watch);
 
 protected:

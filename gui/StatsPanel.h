@@ -8,8 +8,6 @@
 #include <QPushButton>
 #include <vector>
 #include <utility>
-
-// ✅ Correct Qt6 Charts includes (NO NAMESPACE MACROS!)
 #include <QChart>
 #include <QLineSeries>
 #include <QValueAxis>
@@ -34,8 +32,6 @@ private:
     QHBoxLayout *headerLayout;
     QLabel *titleLabel;
     QPushButton *closeButton;
-
-    // ✅ Qt6 — NO QtCharts:: NAMESPACE!
     QChart*          fitnessChart;
     QChartView*      chartView;
     QLineSeries*     avgFitnessSeries;

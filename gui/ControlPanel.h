@@ -51,6 +51,10 @@ signals:
     void selectionStrategyChanged(const QString& strategyName);
     void crossoverStrategyChanged(const QString& strategyName);
     void mutationStrategyChanged(const QString& strategyName);
+    void runClicked();
+    void pauseClicked();
+    void stepClicked();
+    
 
 public:
     explicit ControlPanel(QWidget* parent = nullptr);

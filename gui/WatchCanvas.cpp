@@ -34,7 +34,7 @@ static QPainterPath createGearPath(const Gear* gear, qreal cx, qreal cy)
     if (teeth < 6) teeth = 6;
     if (teeth > 24) teeth = 24;
 
-    // ✅ DIRECTLY SCALE diameter TO PIXEL SIZE (PROPORTIONAL!)
+    // DIRECTLY SCALE diameter TO PIXEL SIZE (PROPORTIONAL!)
     // Formula: baseRadius = (diameter * scaleFactor) + minSize
     // This ensures:
     // - smallest diameter = smallest gear
@@ -151,7 +151,7 @@ void WatchCanvas::paintEvent(QPaintEvent *event)
         double y = comp->getY() + centerY;
 
         // ------------------------------
-        // Draw Hands (unchanged)
+        // Draw Hands
         // ------------------------------
         if (const Hand* hand = dynamic_cast<const Hand*>(comp.get())) {
             double angle = 3 * M_PI / 2;
@@ -184,7 +184,7 @@ void WatchCanvas::paintEvent(QPaintEvent *event)
         p.setPen(Qt::black);
 
         // ------------------------------
-        // ✅ DRAW REAL GEAR FROM DATA
+        // DRAW REAL GEAR FROM DATA
         // ------------------------------
         if (const Gear* gear = dynamic_cast<const Gear*>(comp.get())) {
             QPainterPath gearPath = createGearPath(gear, x, y);

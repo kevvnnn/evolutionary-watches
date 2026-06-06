@@ -3,11 +3,12 @@
 #include "ControlPanel.h"
 #include "StatsPanel.h"
 #include "GeneticAlgorithm.h"
-#include "../genome/Watch.h"  // ✅ Required
+#include "../genome/Watch.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSizePolicy>
 #include <functional>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -48,6 +49,24 @@ MainWindow::MainWindow(QWidget *parent)
     statsPanel->setFixedSize(450, 260);
     rightLayout->addWidget(statsPanel);
 
+    m_currentGeneration = 0;
+    m_evolutionHistory.setExperimentName("WatchGA Test");
+
+    connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
+        qDebug() << "MainWindow handling step...";
+
+        // Generate ONE NEW GENERATION
+        m_evolutionHistory.generateDummyData(m_currentGeneration + 1);
+
+        // Get the new record
+        const auto& record = m_evolutionHistory.getRecord(m_currentGeneration);
+
+        // Update the graph
+        statsPanel->updateAverageFitness(record.generationNumber, record.averageFitness);
+
+        m_currentGeneration++;
+    });
+
     // GA Callback
     WatchGA::Algorithm::GeneticAlgorithm ga;
     ga.setStatsCallback([this](int generation, double avgFitness) {
@@ -58,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout->addWidget(rightContainer);
 
     // =========================================================
-    // ✅ CREATE WATCH + PASS REAL FITNESS TO STATS PANEL
+    // CREATE WATCH + PASS REAL FITNESS TO STATS PANEL
     // =========================================================
     WatchGA::Genome::Watch* watch = new WatchGA::Genome::Watch();
     watch->randomize();
@@ -66,12 +85,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Send Watch to canvas
     canvas->setWatch(watch);
 
-    // ✅ Send REAL WATCH FITNESS to StatsPanel (Generation 0)
+    // Send REAL WATCH FITNESS to StatsPanel (Generation 0)
     double realWatchFitness = watch->getFitnessScore();
     statsPanel->setFirstGenerationWatchFitness(realWatchFitness);
 
     //dummy value to see if the graph can actually show lines
-    statsPanel->updateAverageFitness(0, 0.2);
-    statsPanel->updateAverageFitness(1, 0.5);
-    statsPanel->updateAverageFitness(2, 0.8);
+    // statsPanel->updateAverageFitness(0, 0.2);
+    // statsPanel->updateAverageFitness(1, 0.5);
+    // statsPanel->updateAverageFitness(2, 0.8);
 }
