@@ -12,7 +12,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowTitle("WatchGA - Component Inspector");
+    setWindowTitle("WatchGA - Evolution Viewer");
     setFixedSize(1166, 760);
 
     QWidget* centralWidget = new QWidget(this);
@@ -24,22 +24,16 @@ MainWindow::MainWindow(QWidget *parent)
     // LEFT: Watch Canvas
     QWidget* leftContainer = new QWidget;
     QHBoxLayout* leftLayout = new QHBoxLayout(leftContainer);
-    leftLayout->setContentsMargins(0, 0, 0, 0);
     leftLayout->setAlignment(Qt::AlignCenter);
-    leftLayout->addStretch();
 
     watchCanvas = new WatchCanvas;
     watchCanvas->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     leftLayout->addWidget(watchCanvas);
-
-    leftLayout->addStretch();
     mainLayout->addWidget(leftContainer);
 
     // RIGHT: Panels
     QWidget* rightContainer = new QWidget;
     QVBoxLayout* rightLayout = new QVBoxLayout(rightContainer);
-    rightLayout->setSpacing(15);
-    rightLayout->setContentsMargins(0, 0, 0, 0);
 
     WatchGA::GUI::ControlPanel* controlPanel = new WatchGA::GUI::ControlPanel;
     rightLayout->addWidget(controlPanel);
@@ -48,38 +42,43 @@ MainWindow::MainWindow(QWidget *parent)
     statsPanel->setFixedSize(450, 260);
     rightLayout->addWidget(statsPanel);
 
-    m_currentGeneration = 0;
-    m_evolutionHistory.setExperimentName("WatchGA Test");
-
-    connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
-        int newGen = m_currentGeneration + 1;
-        qDebug() << "Step to generation:" << newGen;
-
-        // graph update
-        statsPanel->updateAverageFitness(newGen, 0.2 + (newGen * 0.1));
-
-        // watch update 
-        WatchGA::Genome::Watch* newWatch = new WatchGA::Genome::Watch();
-        newWatch->randomize();
-        watchCanvas->setWatch(newWatch);
-
-        m_currentGeneration++;
-    });
-
-    // GA Callback
-    WatchGA::Algorithm::GeneticAlgorithm ga;
-    ga.setStatsCallback([this](int generation, double avgFitness) {
-        statsPanel->updateAverageFitness(generation, avgFitness);
-    });
-
     rightLayout->addStretch();
     mainLayout->addWidget(rightContainer);
 
-    // Initial watch
-    WatchGA::Genome::Watch* watch = new WatchGA::Genome::Watch();
-    watch->randomize();
-    watchCanvas->setWatch(watch);
+    // =========================================================
+    // ✅ INITIALIZE REAL GENETIC ALGORITHM
+    // =========================================================
+    m_currentGeneration = 0;
+    m_ga.reset(); // Starts population + evaluates generation 0
 
-    double realWatchFitness = watch->getFitnessScore();
-    statsPanel->setFirstGenerationWatchFitness(realWatchFitness);
+    // Show BEST WATCH of GENERATION 0
+    watchCanvas->setWatch(m_ga.getBestWatch().get());
+    statsPanel->updateAverageFitness(0, m_ga.getAverageFitness());
+
+    // =========================================================
+    // ✅ STEP BUTTON — EVOLVE + SHOW BEST WATCH (REAL SYSTEM)
+    // =========================================================
+    connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
+        qDebug() << "Step: Evolving Generation" << m_currentGeneration + 1;
+
+        // 1. RUN 1 FULL EVOLUTIONARY GENERATION
+        m_ga.runGeneration();
+
+        // 2. GET THE BEST WATCH OF THE NEW GENERATION
+        auto bestWatch = m_ga.getBestWatch();
+
+        // 3. DISPLAY BEST WATCH ON CANVAS
+        if (bestWatch) {
+            watchCanvas->setWatch(bestWatch.get());
+        }
+
+        // 4. UPDATE GRAPH WITH REAL FITNESS
+        m_currentGeneration++;
+        statsPanel->updateAverageFitness(m_currentGeneration, m_ga.getAverageFitness());
+    });
+
+    // Connect GA callback to graph
+    m_ga.setStatsCallback([this](int gen, double avg) {
+        statsPanel->updateAverageFitness(gen, avg);
+    });
 }

@@ -2,28 +2,25 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QLabel>
-#include <QPushButton>
 #include "WatchCanvas.h"
-#include "ComponentInspector.h"
 #include "StatsPanel.h"
 #include "../fileio/EvolutionHistory.h"
+#include "../algorithm/GeneticAlgorithm.h" // ✅ ADD THIS
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     MainWindow(QWidget* parent = nullptr);
-     void setWatchCanvas(WatchCanvas* canvas) { watchCanvas = canvas; }
 
 private:
-    // QWidget* createControlPanel(); WHERE IS THIS USED?
-    StatsPanel *statsPanel;
+    // UI
+    WatchCanvas* watchCanvas;
+    StatsPanel* statsPanel;
+
+    // Logic
     WatchGA::FileIO::EvolutionHistory m_evolutionHistory;
+    WatchGA::Algorithm::GeneticAlgorithm m_ga;
     int m_currentGeneration;
-     WatchCanvas* watchCanvas;
 };
 
 #endif // MAINWINDOW_H
