@@ -4,6 +4,10 @@
 #include <QColor>
 #include <QPainter>
 
+// namespace WatchGA{
+// namespace GUI{
+
+
 StatsPanel::StatsPanel(QWidget *parent)
     : QWidget(parent)
 {
@@ -110,3 +114,5 @@ void StatsPanel::updateAverageFitness(int generation, double avgFitness)
     fitnessChart->update();
     chartView->repaint();
 }
+// } //namespace GUI
+// } // namespace WatchGA

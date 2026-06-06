@@ -13,7 +13,8 @@ WatchComponent::WatchComponent()
 }
 
 WatchComponent::WatchComponent(const std::string& name, double weight, double friction, double x, double y)
-    : m_name(name),
+    : SystemObject(name), 
+      m_name(name),
       m_weight(weight),
       m_friction(friction),
       m_x(x),

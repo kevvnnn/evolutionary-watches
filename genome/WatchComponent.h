@@ -1,16 +1,16 @@
 #ifndef WATCH_GA_GENOME_WATCHCOMPONENT_H
 #define WATCH_GA_GENOME_WATCHCOMPONENT_H
 
+#include "../core/SystemObject.h"
 #include <string>
 #include <memory>
 
 namespace WatchGA {
 namespace Genome {
 
-class WatchComponent
+class WatchComponent: public Core::SystemObject
 {
 protected:
-    // NOW DEFINED - fixes the "m_name not declared" error
     std::string m_name;
     double m_weight;
     double m_friction;
