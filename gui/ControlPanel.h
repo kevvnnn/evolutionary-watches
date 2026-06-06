@@ -51,9 +51,10 @@ signals:
     void selectionStrategyChanged(const QString& strategyName);
     void crossoverStrategyChanged(const QString& strategyName);
     void mutationStrategyChanged(const QString& strategyName);
-    void runClicked();
-    void pauseClicked();
-    void stepClicked();
+    void runClicked(); //Run CLicked
+    void pauseClicked(); //Pause Clicked
+    void stepClicked(); // Step Clicked
+    void resetClicked(); //Reset clicked
     
 
 public:
@@ -79,6 +80,9 @@ public:
     void setSelectionStrategy(const QString& strategyName);
     void setCrossoverStrategy(const QString& strategyName);
     void setMutationStrategy(const QString& strategyName);
+
+    // Disable changes of parameters
+    void controlParameter(bool);
 };
 
 } // namespace GUI
