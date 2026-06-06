@@ -15,9 +15,8 @@ ControlPanel::ControlPanel(QWidget* parent) :
 {
     ui->setupUi(this);
     
-    //Load and reset config on startup
+    //Create and reset config on startup
     s_config = FileIO::ConfigManager("config.txt");
-    s_config.loadConfig();
     s_config.clear();
     s_config.saveConfig();
 
@@ -40,25 +39,33 @@ ControlPanel::ControlPanel(QWidget* parent) :
         qDebug() << "Run button clicked";
         ui->runBtn->setEnabled(false);
         ui->pauseBtn->setEnabled(true);
+        ui->stepBtn->setEnabled(false);
+        controlParameter(false);
+        emit runClicked();
     });
     
     connect(ui->pauseBtn, &QPushButton::clicked, this, [this](){
         qDebug() << "Pause button clicked";
         ui->pauseBtn->setEnabled(false);
         ui->runBtn->setEnabled(true);
+        emit pauseClicked();
     });
     
     connect(ui->resetBtn, &QPushButton::clicked, this, [this](){
         qDebug() << "Reset button clicked";
         ui->runBtn->setEnabled(true);
         ui->pauseBtn->setEnabled(false);
+        ui->stepBtn->setEnabled(true);
         ui->generationValue->setText("0");
         ui->bestFitnessValue->setText("0.0");
         ui->avgFitnessValue->setText("0.0");
+        controlParameter(true);
+        emit resetClicked();
     });
     
     connect(ui->stepBtn, &QPushButton::clicked, this, [this](){
         qDebug() << "Step button clicked";
+        controlParameter(false);
         emit stepClicked();
     });
 
@@ -247,6 +254,16 @@ void ControlPanel::setMutationStrategy(const QString& strategyName)
     if (index != -1) {
         ui->mutationCombo->setCurrentIndex(index);
     }
+}
+
+void ControlPanel::controlParameter(bool control){
+    ui->populationSpin->setEnabled(control);
+    ui->mutationSpin->setEnabled(control);
+    ui->crossoverSpin->setEnabled(control);
+    ui->elitismSpin->setEnabled(control);
+    ui->selectionCombo->setEnabled(control);
+    ui->crossoverCombo->setEnabled(control);
+    ui->mutationCombo->setEnabled(control);
 }
 
 } // namespace GUI
