@@ -177,7 +177,14 @@ void Watch::randomize() {
     // Base properties (0.9 friction is basically sandpaper)
     std::uniform_real_distribution<double> weightDist(0.1, 5.0);
     std::uniform_real_distribution<double> frictionDist(0.01, 0.9); 
-    std::uniform_real_distribution<double> posDist(-20.0, 20.0);
+
+// ╔═══════════════════════════════════════════════════════
+// ║ 👉 ONLY CHANGE IS HERE: REPLACE THIS LINE
+// ╚═══════════════════════════════════════════════════════
+    // OLD: std::uniform_real_distribution<double> posDist(-20.0, 20.0);
+    // NEW: SPREAD ACROSS THE CANVAS
+    std::uniform_real_distribution<double> posDist(-120.0, 120.0);
+
     
     // Quality properties (0.1 is awful, 1.0 is perfect)
     std::uniform_real_distribution<double> qualityDist(0.1, 1.0); 

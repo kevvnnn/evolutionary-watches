@@ -7,24 +7,20 @@
 StatsPanel::StatsPanel(QWidget *parent)
     : QWidget(parent)
 {
-
-    // setWindowTitle("Average Fitness");
-    // setFixedSize(400, 260); // More compact size
     setupUI();
     setupChart();
-
     setWindowFlags(Qt::Widget | Qt::FramelessWindowHint);
 }
 
-StatsPanel::~StatsPanel() = default;
+StatsPanel::~StatsPanel()
+{}
 
 void StatsPanel::setupUI()
 {
     mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(10, 10, 10, 10); // Clean, balanced margins
+    mainLayout->setContentsMargins(10, 10, 10, 10);
     mainLayout->setSpacing(8);
 
-    // Header Bar (matches your app's clean look)
     headerLayout = new QHBoxLayout();
     headerLayout->setSpacing(8);
 
@@ -33,10 +29,10 @@ void StatsPanel::setupUI()
     font.setBold(true);
     font.setPointSize(10);
     titleLabel->setFont(font);
-    titleLabel->setStyleSheet("color: #222;"); // Dark text for readability
+    titleLabel->setStyleSheet("color: #222;");
 
     headerLayout->addWidget(titleLabel);
-    headerLayout->addStretch(); // Push close button to right
+    headerLayout->addStretch();
 
     closeButton = new QPushButton("Close", this);
     closeButton->setStyleSheet(R"(
@@ -48,12 +44,8 @@ void StatsPanel::setupUI()
             font-size: 9pt;
             color: #212529;
         }
-        QPushButton:hover {
-            background-color: #dee2e6;
-        }
-        QPushButton:pressed {
-            background-color: #ced4da;
-        }
+        QPushButton:hover { background-color: #dee2e6; }
+        QPushButton:pressed { background-color: #ced4da; }
     )");
     headerLayout->addWidget(closeButton);
     connect(closeButton, &QPushButton::clicked, this, &StatsPanel::close);
@@ -68,36 +60,24 @@ void StatsPanel::setupChart()
     fitnessChart->setTitleFont(QFont("Arial", 9));
     fitnessChart->legend()->setVisible(true);
     fitnessChart->legend()->setAlignment(Qt::AlignBottom);
-    fitnessChart->legend()->setFont(QFont("Arial", 8));
-    fitnessChart->setBackgroundBrush(QColor("#ffffff")); // Pure white background
-    fitnessChart->setPlotAreaBackgroundBrush(QColor("#ffffff"));
-    fitnessChart->setMargins(QMargins(5, 5, 5, 5)); // Tight chart margins
+    fitnessChart->setBackgroundBrush(QColor("#ffffff"));
 
     avgFitnessSeries = new QLineSeries();
     avgFitnessSeries->setName("Avg Fitness");
-    avgFitnessSeries->setPen(QPen(QColor(0, 120, 212), 2)); // Professional blue (matches your app's button blue)
-
+    avgFitnessSeries->setPen(QPen(QColor(0, 120, 212), 2));
     fitnessChart->addSeries(avgFitnessSeries);
 
-    // X Axis (Generation)
     axisX = new QValueAxis();
     axisX->setTitleText("Generation");
-    axisX->setTitleFont(QFont("Arial", 7));
     axisX->setLabelFormat("%d");
     axisX->setRange(0, 10);
-    axisX->setLabelsFont(QFont("Arial", 7));
-    axisX->setGridLineColor(QColor("#e9ecef")); // Light gray grid lines
-    axisX->setLinePenColor(QColor("#adb5bd"));
+    axisX->setGridLineColor(QColor("#e9ecef"));
 
-    // Y Axis (Average Fitness)
     axisY = new QValueAxis();
     axisY->setTitleText("Average Fitness");
-    axisY->setTitleFont(QFont("Arial", 7));
     axisY->setLabelFormat("%.2f");
     axisY->setRange(0, 1.0);
-    axisY->setLabelsFont(QFont("Arial", 7));
-    axisY->setGridLineColor(QColor("#e9ecef")); // Light gray grid lines
-    axisY->setLinePenColor(QColor("#adb5bd"));
+    axisY->setGridLineColor(QColor("#e9ecef"));
 
     fitnessChart->addAxis(axisX, Qt::AlignBottom);
     fitnessChart->addAxis(axisY, Qt::AlignLeft);
@@ -106,8 +86,14 @@ void StatsPanel::setupChart()
 
     chartView = new QChartView(fitnessChart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setFixedSize(360, 160); // Remove any default border
     mainLayout->addWidget(chartView);
+}
+
+void StatsPanel::setFirstGenerationWatchFitness(double fitness)
+{
+    avgFitnessSeries->clear();
+    fitnessData.clear();
+    updateAverageFitness(0, fitness);
 }
 
 void StatsPanel::updateAverageFitness(int generation, double avgFitness)
@@ -115,14 +101,12 @@ void StatsPanel::updateAverageFitness(int generation, double avgFitness)
     fitnessData.emplace_back(generation, avgFitness);
     avgFitnessSeries->append(generation, avgFitness);
 
-    // Auto-scale axes
     if (generation > axisX->max())
         axisX->setMax(generation + 1);
 
     if (avgFitness > axisY->max())
         axisY->setMax(avgFitness * 1.1);
-    if (avgFitness < axisY->min())
-        axisY->setMin(avgFitness * 0.9);
 
     fitnessChart->update();
+    chartView->repaint();
 }

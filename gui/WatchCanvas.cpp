@@ -1,20 +1,80 @@
 #include "WatchCanvas.h"
+#include "../genome/Watch.h"
+#include "../genome/WatchComponent.h"
+#include "../genome/components/Hand.h"
+#include "../genome/components/Gear.h"
+#include "../genome/components/Spring.h"
+#include "../genome/components/BalanceWheel.h"
+#include "../genome/components/Jewel.h"
+
 #include <QPainter>
 #include <cmath>
 #include <QToolTip>
 #include <QLineF>
 #include <QMouseEvent>
-
-
-#include "../genome/WatchComponent.h"
-#include "../genome/components/BalanceWheel.h"
-#include "../genome/components/Gear.h"
-#include "../genome/components/Hand.h"
-#include "../genome/components/Jewel.h" 
-#include "../genome/components/Spring.h" 
+#include <QTimer>
+#include <QPainterPath>
 
 using namespace WatchGA::Genome;
-using namespace WatchGA::Genome::Components; 
+using namespace WatchGA::Genome::Components;
+
+// -----------------------------------------------------------------------------
+// Helper: Draw a REAL gear from YOUR GENOME DATA (tooth count, diameter, quality)
+// -----------------------------------------------------------------------------
+static QPainterPath createGearPath(const Gear* gear, qreal cx, qreal cy)
+{
+    QPainterPath path;
+
+    int    teeth    = gear->getToothCount();
+    double diameter = gear->getDiameter();
+    double quality  = gear->getMeshingQuality();
+    (void)quality; // Suppress unused variable warning
+
+    // Safe limits for tooth count
+    if (teeth < 6) teeth = 6;
+    if (teeth > 24) teeth = 24;
+
+    // ✅ DIRECTLY SCALE diameter TO PIXEL SIZE (PROPORTIONAL!)
+    // Formula: baseRadius = (diameter * scaleFactor) + minSize
+    // This ensures:
+    // - smallest diameter = smallest gear
+    // - largest diameter = largest gear
+    // - no arbitrary hard caps breaking proportionality
+    const qreal scaleFactor = 45.0;  // Adjust this to change overall gear size
+    const qreal minBaseRadius = 5.0;  // Minimum size for tiny gears
+    qreal baseRadius = minBaseRadius + (diameter * scaleFactor);
+
+    // ✅ Teeth are ALWAYS 22% of base radius (PROPORTIONAL!)
+    qreal toothHeight = baseRadius * 0.22;
+    qreal outerRadius = baseRadius + toothHeight;
+
+    // Optional: Soft upper limit (only to prevent extreme overflow)
+    const qreal maxOuterRadius = 35.0;
+    if (outerRadius > maxOuterRadius) {
+        outerRadius = maxOuterRadius;
+        baseRadius = outerRadius / (1 + 0.22); // Keep tooth ratio intact
+    }
+
+    qreal step = (2 * M_PI) / teeth;
+    qreal angle = -M_PI / 2; // Start at 12 o'clock
+
+    // Draw gear teeth
+    path.moveTo(cx + outerRadius * qCos(angle), cy + outerRadius * qSin(angle));
+
+    for (int i = 0; i < teeth; ++i)
+    {
+        // Tooth tip
+        path.lineTo(cx + outerRadius * qCos(angle), cy + outerRadius * qSin(angle));
+        angle += step * 0.4;
+
+        // Tooth valley
+        path.lineTo(cx + baseRadius * qCos(angle), cy + baseRadius * qSin(angle));
+        angle += step * 0.6;
+    }
+
+    path.closeSubpath();
+    return path;
+}
 
 WatchCanvas::WatchCanvas(QWidget *parent)
     : QWidget(parent),
@@ -24,111 +84,132 @@ WatchCanvas::WatchCanvas(QWidget *parent)
     setMouseTracking(true);
     setStyleSheet("background-color: #121118;");
 
-    // DUMMY COMPONENTS FROM YOUR ALGORITHM
-    m_components.emplace_back(std::make_unique<Jewel>("Center Jewel", 0.1, 0.02, 300, 300, 9.0, true));
-    m_components.emplace_back(std::make_unique<Spring>("Mainspring", 1.8, 0.08, 220, 380, Spring::SpringType::MAINSPRING, 0.92, 0.9, 12.0));
-    m_components.emplace_back(std::make_unique<Gear>("Third Gear", 0.7, 0.05, 260, 240, 12, 4.5, 0.88));
-    m_components.emplace_back(std::make_unique<Gear>("Second Gear", 0.9, 0.06, 380, 360, 16, 6.0, 0.9));
-    m_components.emplace_back(std::make_unique<BalanceWheel>("Balance Wheel", 1.4, 0.12, 360, 220, 2.2, 0.92, 270.0));
-
-
-    // REAL HANDS — NO DUMMY DRAWING
-    m_components.emplace_back(std::make_unique<Hand>("Hour Hand", 0.5, 0.03, 300, 300, Hand::HandType::HOUR, 110.0, 0.95));
-    m_components.emplace_back(std::make_unique<Hand>("Minute Hand", 0.4, 0.02, 300, 300, Hand::HandType::MINUTE, 150.0, 0.96));
-    m_components.emplace_back(std::make_unique<Hand>("Second Hand", 0.3, 0.02, 300, 300, Hand::HandType::SECOND, 180.0, 0.98));
-
-    // ANIMATION TIMER
     m_animationTimer = new QTimer(this);
-    connect(m_animationTimer, &QTimer::timeout, this, QOverload<>::of(&QWidget::update));
-    m_animationTimer->start(50); 
+    connect(m_animationTimer, &QTimer::timeout, this, &WatchCanvas::updateAnimation);
+    m_animationTimer->start(50);
 }
 
-void WatchCanvas::paintEvent(QPaintEvent *event) 
+void WatchCanvas::setWatch(Watch* watch) {
+    m_watch = watch;
+    update();
+}
+
+void WatchCanvas::updateAnimation()
+{
+    update();
+}
+
+void WatchCanvas::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    // BACKGROUND
     p.fillRect(rect(), QColor(20, 20, 20));
 
-    // WATCH FACE
+    const int centerX = 300;
+    const int centerY = 300;
+    const int dialRadius = 250;
+
+    // Watch dial
     p.setPen(QPen(Qt::white, 2));
     p.drawEllipse(50, 50, 500, 500);
 
-    // HOUR MARKERS
+    // Hour marks
     for (int i = 0; i < 12; ++i) {
-        double ang = i * M_PI/6 - M_PI/2;
-        int x1 = 300 + 230 * cos(ang);
-        int y1 = 300 + 230 * sin(ang);
-        int x2 = 300 + 250 * cos(ang);
-        int y2 = 300 + 250 * sin(ang);
+        double ang = i * M_PI / 6 - M_PI / 2;
+        int x1 = centerX + 230 * cos(ang);
+        int y1 = centerY + 230 * sin(ang);
+        int x2 = centerX + 250 * cos(ang);
+        int y2 = centerY + 250 * sin(ang);
         p.drawLine(x1, y1, x2, y2);
     }
 
-    // DRAW COMPONENTS
-    for (const auto& comp : m_components) {
+    if (!m_watch) return;
+
+    const auto& components = m_watch->getAllComponents();
+    for (const auto& comp : components) {
         bool hovered = (comp.get() == m_hovered);
         QColor color;
 
-        // COLORS
         if (hovered)
             color = QColor(255, 210, 0);
-        else if (dynamic_cast<Gear*>(comp.get()))
+        else if (dynamic_cast<const Gear*>(comp.get()))
             color = QColor(90, 160, 240);
-        else if (dynamic_cast<Spring*>(comp.get()))
+        else if (dynamic_cast<const Spring*>(comp.get()))
             color = QColor(255, 180, 0);
-        else if (dynamic_cast<BalanceWheel*>(comp.get())) 
+        else if (dynamic_cast<const BalanceWheel*>(comp.get()))
             color = QColor(220, 50, 50);
-        else if (dynamic_cast<Jewel*>(comp.get()))
+        else if (dynamic_cast<const Jewel*>(comp.get()))
             color = QColor(190, 190, 220);
-        else if (dynamic_cast<Hand*>(comp.get()))
+        else if (dynamic_cast<const Hand*>(comp.get()))
             color = QColor(240, 240, 240);
         else
             color = QColor(160, 160, 160);
 
-        // DRAW HANDS AS REAL LINES (NOT CIRCLES)
-        if (Hand* hand = dynamic_cast<Hand*>(comp.get())) {
-            double angle = 3 * M_PI / 2;
+        double x = comp->getX() + centerX;
+        double y = comp->getY() + centerY;
 
-            // REAL TICKING TIME
+        // ------------------------------
+        // Draw Hands (unchanged)
+        // ------------------------------
+        if (const Hand* hand = dynamic_cast<const Hand*>(comp.get())) {
+            double angle = 3 * M_PI / 2;
             auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
                 std::chrono::steady_clock::now() - m_startTime).count();
 
+            qreal scale;
             if (hand->getType() == Hand::HandType::HOUR) {
                 angle += (elapsed % 43200) * (2 * M_PI / 43200.0);
                 p.setPen(QPen(color, 5));
-            }
-            else if (hand->getType() == Hand::HandType::MINUTE) {
+                scale = 0.65;
+            } else if (hand->getType() == Hand::HandType::MINUTE) {
                 angle += (elapsed % 3600) * (2 * M_PI / 3600.0);
                 p.setPen(QPen(color, 3));
-            }
-            else if (hand->getType() == Hand::HandType::SECOND) {
-                angle += (elapsed % 60) * (100000 * M_PI / 60.0);
+                scale = 0.80;
+            } else {
+                angle += (elapsed % 60) * (2 * M_PI / 60.0);
                 p.setPen(QPen(Qt::red, 2));
+                scale = 0.85;
             }
 
-            double len = hand->getLength();
-            int ex = 300 + len * cos(angle);
-            int ey = 300 + len * sin(angle);
-            p.drawLine(300, 300, ex, ey);
+            qreal len = dialRadius * scale;
+            int ex = centerX + (int)(len * cos(angle));
+            int ey = centerY + (int)(len * sin(angle));
+            p.drawLine(centerX, centerY, ex, ey);
             continue;
         }
 
-        // DRAW OTHER COMPONENTS AS CIRCLES
         p.setBrush(color);
         p.setPen(Qt::black);
-        p.drawEllipse(QPointF(comp->getX(), comp->getY()), 26, 26);
+
+        // ------------------------------
+        // ✅ DRAW REAL GEAR FROM DATA
+        // ------------------------------
+        if (const Gear* gear = dynamic_cast<const Gear*>(comp.get())) {
+            QPainterPath gearPath = createGearPath(gear, x, y);
+            p.drawPath(gearPath);
+        }
+        // ------------------------------
+        // All other parts = circles
+        // ------------------------------
+        else {
+            p.drawEllipse(QPointF(x, y), 24, 24);
+        }
     }
 }
 
 void WatchCanvas::mouseMoveEvent(QMouseEvent *event)
 {
-    WatchComponent* found = nullptr;
+    if (!m_watch) return;
 
-    for (const auto& comp : m_components) {
-        QPointF pos(comp->getX(), comp->getY());
-        if (QLineF(event->pos(), pos).length() <= 30) {
+    WatchComponent* found = nullptr;
+    const auto& components = m_watch->getAllComponents();
+
+    for (const auto& comp : components) {
+        double x = comp->getX() + 300;
+        double y = comp->getY() + 300;
+        if (QLineF(event->pos(), QPointF(x, y)).length() <= 28) {
             found = comp.get();
             break;
         }
@@ -136,10 +217,14 @@ void WatchCanvas::mouseMoveEvent(QMouseEvent *event)
 
     if (found != m_hovered) {
         m_hovered = found;
-        if (found)
-            QToolTip::showText(event->globalPosition().toPoint(), QString::fromStdString(found->toString()));
-        else
+        if (found) {
+            QString tip = QString::fromStdString(found->toString());
+            QToolTip::showText(event->globalPosition().toPoint(), tip);
+        } else {
             QToolTip::hideText();
+        }
         update();
     }
-}  
+
+    
+}

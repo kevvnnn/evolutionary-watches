@@ -149,4 +149,4 @@ std::string Gear::toString() const {
 
 } // namespace Components
 } // namespace Genome
-} // namespace WatchGA 
+} // namespace WatchGA

@@ -2,32 +2,37 @@
 #define WATCHCANVAS_H
 
 #include <QWidget>
-#include <QTimer>
-#include <vector>
-#include <memory>
 #include <chrono>
+#include <QTimer>
 
-namespace WatchGA {
-namespace Genome {
+// Forward declarations ONLY (no full class definition needed)
+namespace WatchGA::Genome {
+    class Watch;
     class WatchComponent;
-} // namespace Genome
-} // namespace WatchGA
+}
 
 class WatchCanvas : public QWidget
 {
     Q_OBJECT
 public:
     explicit WatchCanvas(QWidget *parent = nullptr);
+    ~WatchCanvas() override = default;
+
+    // Add a setter to inject the real Watch from your algorithm
+    void setWatch(WatchGA::Genome::Watch* watch);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
+private slots:
+    void updateAnimation();
+
 private:
-    std::vector<std::unique_ptr<WatchGA::Genome::WatchComponent>> m_components;
+    WatchGA::Genome::Watch* m_watch = nullptr; // Non-owning raw pointer
     WatchGA::Genome::WatchComponent* m_hovered = nullptr;
     std::chrono::steady_clock::time_point m_startTime;
-    QTimer* m_animationTimer;
+    QTimer* m_animationTimer = nullptr;
 };
 
 #endif // WATCHCANVAS_H
