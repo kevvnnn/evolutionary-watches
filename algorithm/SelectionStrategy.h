@@ -16,7 +16,6 @@ namespace Algorithm {
  * Pros: Simple to implement
  * Cons: Can lead to premature convergence if one watch is much better than others
  * 
- * OWNER: Kevin
  */
 class RouletteWheelSelection : public Core::ISelectionStrategy {
 public:
@@ -38,7 +37,6 @@ public:
  * Pros: More robust than roulette wheel, less likely to converge prematurely
  * Cons: Slightly more complex
  * 
- * OWNER: Kevin
  */
 class TournamentSelection : public Core::ISelectionStrategy {
 private:

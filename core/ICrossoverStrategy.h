@@ -16,7 +16,6 @@ namespace Core {
  * crossover is how we combine the genes of two parents to create offspring.
  * Different crossover strategies mix the genes in different ways.
  * 
- * OWNER: Person B (Algorithm module)
  */
 class ICrossoverStrategy {
 public:

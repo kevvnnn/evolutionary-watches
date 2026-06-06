@@ -8,7 +8,6 @@ namespace Algorithm {
 
 /**
  * @class SwapMutation
- * @ownership Person B
  */
 class SwapMutation : public Core::IMutationStrategy
 {
@@ -19,7 +18,6 @@ public:
 
 /**
  * @class ParameterMutation
- * @ownership Person B
  */
 class ParameterMutation : public Core::IMutationStrategy
 {
@@ -38,7 +36,6 @@ public:
 
 /**
  * @class AddRemoveMutation
- * @ownership Person B
  */
 class AddRemoveMutation : public Core::IMutationStrategy
 {

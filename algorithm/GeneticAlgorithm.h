@@ -27,7 +27,6 @@ namespace Algorithm {
  * 6. Replaces the old population with the new one
  * 7. Repeats for many generations
  * 
- * OWNER: Person B
  */
 class GeneticAlgorithm {
 private:
