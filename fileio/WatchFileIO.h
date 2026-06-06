@@ -14,7 +14,6 @@ namespace FileIO {
 /**
  * @class WatchFileIO
  * @brief Binary watch/population save/load
- * @ownership Person C
  */
 class WatchFileIO
 {

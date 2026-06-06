@@ -1,7 +1,6 @@
 /**
  * @file EvolutionHistory.cpp
  * @brief Implementation for EvolutionHistory class
- * @ownership Person C
  */
 
 #include "EvolutionHistory.h"

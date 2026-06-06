@@ -21,7 +21,6 @@ namespace GUI {
  * - Maximum components per watch
  * - Which algorithms to use (selection, crossover, mutation)
  * 
- * OWNER: Person D
  */
 class ControlPanel : public QWidget {
     Q_OBJECT

@@ -16,7 +16,6 @@ namespace Core {
  * This prevents the algorithm from getting stuck in "local optima"
  * (good but not great solutions).
  * 
- * OWNER: Person B (Algorithm module)
  */
 class IMutationStrategy {
 public:
