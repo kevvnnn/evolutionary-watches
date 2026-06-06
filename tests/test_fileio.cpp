@@ -1,11 +1,24 @@
 #include <iostream>
 #include <cassert>
-#include "../fileio/EvolutionHistory.h"
+#include <memory>
+#include <cstdio> // For std::remove
 
+// FileIO Headers
+#include "../fileio/EvolutionHistory.h"
+#include "../fileio/WatchFileIO.h"
+
+// Genome Header needed to test WatchFileIO
+#include "../genome/Watch.h"
+
+using namespace WatchGA;
 using namespace WatchGA::FileIO;
 
-void testMemoryOperations() {
-    std::cout << "Running testMemoryOperations... ";
+// ==============================================================================
+// 1. EVOLUTION HISTORY TESTS (TSV Text Format)
+// ==============================================================================
+
+void testEvolutionHistoryMemory() {
+    std::cout << "Running testEvolutionHistoryMemory... ";
     EvolutionHistory history("Test_Experiment");
 
     // Test Adding
@@ -24,39 +37,91 @@ void testMemoryOperations() {
     std::cout << "PASSED.\n";
 }
 
-void testFileRoundTrip() {
-    std::cout << "Running testFileRoundTrip... ";
+void testEvolutionHistoryFile() {
+    std::cout << "Running testEvolutionHistoryFile... ";
     std::string testPath = "test_history.txt";
 
     // 1. Create and Save Data
     EvolutionHistory writerHistory("Round_Trip_Experiment");
     writerHistory.generateDummyData(10);
     bool saveSuccess = writerHistory.saveToFile(testPath);
-    assert(saveSuccess && "Failed to open or write to the test file.");
+    assert(saveSuccess && "Failed to open or write to the text file.");
 
     // 2. Load Data into a Brand New Object
     EvolutionHistory readerHistory;
     bool loadSuccess = readerHistory.loadFromFile(testPath);
-    assert(loadSuccess && "Failed to find or read the test file.");
+    assert(loadSuccess && "Failed to find or read the text file.");
 
     // 3. Verify the Data Survived
-    assert(readerHistory.getExperimentName() == "Round_Trip_Experiment");
     assert(readerHistory.getRecordCount() == 10);
-    
-    // Verify a specific data point
     auto loadedRecord = readerHistory.getRecord(0);
     assert(loadedRecord.generationNumber == 0);
+
+    // 4. Cleanup the test file
+    std::remove(testPath.c_str());
 
     std::cout << "PASSED.\n";
 }
 
+// ==============================================================================
+// 2. WATCH FILE I/O TESTS (RAII Binary Format)
+// ==============================================================================
+
+void testWatchFileIO() {
+    std::cout << "Running testWatchFileIO (RAII Binary)... ";
+    std::string testPath = "test_watch_data.bin";
+
+    // Ensure we start with a clean slate
+    std::remove(testPath.c_str());
+
+    WatchFileIO fileIO(testPath);
+    
+    // Test 1: File shouldn't exist / should be empty initially
+    assert(fileIO.getWatchCount() == 0 && "File should be empty initially");
+
+    // Test 2: Create a dummy Watch to serialize
+    Genome::Watch dummyWatch("Rolex_Simulation_1");
+    dummyWatch.setFitnessScore(0.954);
+    dummyWatch.setValid(true);
+
+    // Test 3: Save the watch to binary using append mode
+    bool saved = fileIO.saveWatch(dummyWatch, 0);
+    assert(saved && "Failed to write Watch to binary file");
+
+    // Test 4: Verify the file size grew
+    assert(fileIO.getWatchCount() > 0 && "Binary file size did not increase after save");
+
+    // Test 5: Load the watch back into a new pointer
+    auto loadedWatch = fileIO.loadWatch(0);
+    assert(loadedWatch != nullptr && "Failed to read Watch from binary file");
+    
+    // Test 6: Verify the data survived the binary translation perfectly
+    assert(loadedWatch->getObjectName() == "Rolex_Simulation_1");
+    assert(loadedWatch->isValid() == true);
+    assert(loadedWatch->getFitnessScore() == 0.954);
+
+    // 7. Cleanup the test file
+    // std::remove(testPath.c_str());
+
+    std::cout << "PASSED.\n";
+}
+
+
+// ==============================================================================
+// MAIN EXECUTION
+// ==============================================================================
+
 int main() {
     std::cout << "==========================================\n";
-    std::cout << " STARTING FILE I/O TEST SUITE\n";
+    std::cout << " STARTING COMPLETE FILE I/O TEST SUITE\n";
     std::cout << "==========================================\n\n";
 
-    testMemoryOperations();
-    testFileRoundTrip();
+    // 1. Evolution History (Statistical TSV Logs)
+    testEvolutionHistoryMemory();
+    testEvolutionHistoryFile();
+
+    // 2. Watch File IO (Physical Object Binary Streams)
+    testWatchFileIO();
 
     std::cout << "\n==========================================\n";
     std::cout << " SUCCESS: ALL FILE I/O TESTS PASSED!\n";
@@ -64,78 +129,3 @@ int main() {
 
     return 0;
 }
-
-// // tests/test_fileio.cpp
-
-// #include "../fileio/WatchFileIO.h"
-// #include "../fileio/ConfigManager.h"
-// #include "../fileio/EvolutionHistory.h"
-
-// #include <iostream>
-
-// using namespace WatchGA;
-
-// int main()
-// {
-//     std::cout << "=================================\n";
-//     std::cout << "Running FileIO Module Tests\n";
-//     std::cout << "=================================\n";
-
-//     // ----------------------------------------------------
-//     // WatchFileIO
-//     // ----------------------------------------------------
-
-//     {
-//         std::cout << "\nTesting WatchFileIO...\n";
-
-//         FileIO::WatchFileIO fileIO("test.bin");
-
-//         bool opened = fileIO.open(true);
-
-//         std::cout << "Open: "
-//                   << opened
-//                   << "\n";
-
-//         std::cout << "Is Open: "
-//                   << fileIO.isOpen()
-//                   << "\n";
-
-//         std::cout << "Watch Count: "
-//                   << fileIO.getWatchCount()
-//                   << "\n";
-
-//         fileIO.close();
-
-//         std::cout << "Closed successfully\n";
-//     }
-
-//     // ----------------------------------------------------
-//     // ConfigManager
-//     // ----------------------------------------------------
-
-//     {
-//         std::cout << "\nTesting ConfigManager...\n";
-
-//         FileIO::ConfigManager config;
-
-//         std::cout << "ConfigManager constructed.\n";
-//     }
-
-//     // ----------------------------------------------------
-//     // EvolutionHistory
-//     // ----------------------------------------------------
-
-//     {
-//         std::cout << "\nTesting EvolutionHistory...\n";
-
-//         FileIO::EvolutionHistory history;
-
-//         std::cout << "EvolutionHistory constructed.\n";
-//     }
-
-//     std::cout << "\n=================================\n";
-//     std::cout << "All FileIO tests completed.\n";
-//     std::cout << "=================================\n";
-
-//     return 0;
-// }

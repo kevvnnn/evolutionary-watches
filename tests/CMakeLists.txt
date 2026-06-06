@@ -18,5 +18,5 @@ add_test(NAME AlgorithmValidation COMMAND test_algorithm)
 # Test Binary for Person C (Serialization / File IO)
 # ----------------------------------------------------
 add_executable(test_fileio test_fileio.cpp) 
-target_link_libraries(test_fileio PRIVATE watch_fileio) 
+target_link_libraries(test_fileio PRIVATE watch_fileio watch_algorithm) 
 add_test(NAME FileIOValidation COMMAND test_fileio)
