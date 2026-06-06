@@ -175,8 +175,15 @@ void GeneticAlgorithm::setElitismCount(unsigned int count) {
 }
 
 void GeneticAlgorithm::updateStatistics() {
-    // Note: In the current evaluatePopulation() code, we are already calculating 
-    // the best, worst, and average fitness, as well as tracking the best watch.
+    // Pack the data from this generation and save it to the history log in memory
+    FileIO::EvolutionHistory::GenerationRecord rec;
+    rec.generationNumber = m_currentGeneration;
+    rec.bestFitness = m_bestFitness;
+    rec.averageFitness = m_averageFitness;
+    rec.worstFitness = m_worstFitness;
+    rec.bestWatch = m_bestWatch; 
+    
+    m_history.addRecord(rec);
 }
 
 void GeneticAlgorithm::performElitism(std::vector<std::shared_ptr<Genome::Watch>>& newPopulation) {
@@ -336,6 +343,10 @@ void GeneticAlgorithm::reset() {
     // 1. reset generation counter
     m_currentGeneration = 0;
     
+    // Wipe the log for the new run
+    m_history.clear();
+    m_history.setExperimentName("Watch_Evolution_GUI_Run");
+
     // 2. Safely call the private helper methods in the exact required order
     initializePopulation();
     evaluatePopulation();

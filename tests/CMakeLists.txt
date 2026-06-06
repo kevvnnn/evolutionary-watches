@@ -11,7 +11,7 @@ add_test(NAME GenomeValidation COMMAND test_genome)
 # Test Binary for Person B (GA Logic & Optimization)
 # ----------------------------------------------------
 add_executable(test_algorithm test_algorithm.cpp)
-target_link_libraries(test_algorithm PRIVATE watch_algorithm)
+target_link_libraries(test_algorithm PRIVATE watch_algorithm watch_fileio)
 add_test(NAME AlgorithmValidation COMMAND test_algorithm)
 
 # ----------------------------------------------------

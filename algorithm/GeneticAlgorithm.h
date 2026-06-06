@@ -7,6 +7,7 @@
 #include "../core/IMutationStrategy.h"
 #include "../genome/FitnessEvaluator.h"
 #include "../genome/Watch.h"
+#include "../fileio/EvolutionHistory.h"
 #include <vector>
 #include <memory>
 #include <string>
@@ -38,6 +39,7 @@ private:
     double m_mutationRate;            // Probability of mutation (0.0 to 1.0)
     double m_crossoverRate;           // Probability of crossover (0.0 to 1.0)
     unsigned int m_elitismCount;      // Number of best watches to keep each generation
+    FileIO::EvolutionHistory m_history; // History tracker
    
 
     // ------------------------------
@@ -145,7 +147,7 @@ public:
     void setFitnessEvaluator(std::unique_ptr<Genome::FitnessEvaluator> evaluator);
 
     // ------------------------------
-    // STATISTICS GETTERS
+    // STATISTICS & HISTORY GETTERS
     // ------------------------------
     
     double getBestFitness() const;
@@ -153,6 +155,7 @@ public:
     double getWorstFitness() const;
     const std::shared_ptr<Genome::Watch>& getBestWatch() const;
     const std::vector<std::shared_ptr<Genome::Watch>>& getPopulation() const;
+    const FileIO::EvolutionHistory& getHistory() const { return m_history; }
 
     // ------------------------------
     // MAIN EVOLUTION METHODS
