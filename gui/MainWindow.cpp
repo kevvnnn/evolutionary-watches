@@ -9,7 +9,6 @@
 #include <QSizePolicy>
 #include <functional>
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -29,9 +28,9 @@ MainWindow::MainWindow(QWidget *parent)
     leftLayout->setAlignment(Qt::AlignCenter);
     leftLayout->addStretch();
 
-    WatchCanvas* canvas = new WatchCanvas;
-    canvas->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    leftLayout->addWidget(canvas);
+    watchCanvas = new WatchCanvas;
+    watchCanvas->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    leftLayout->addWidget(watchCanvas);
 
     leftLayout->addStretch();
     mainLayout->addWidget(leftContainer);
@@ -53,16 +52,16 @@ MainWindow::MainWindow(QWidget *parent)
     m_evolutionHistory.setExperimentName("WatchGA Test");
 
     connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
-        qDebug() << "MainWindow handling step...";
+        int newGen = m_currentGeneration + 1;
+        qDebug() << "Step to generation:" << newGen;
 
-        // Generate ONE NEW GENERATION
-        m_evolutionHistory.generateDummyData(m_currentGeneration + 1);
+        // graph update
+        statsPanel->updateAverageFitness(newGen, 0.2 + (newGen * 0.1));
 
-        // Get the new record
-        const auto& record = m_evolutionHistory.getRecord(m_currentGeneration);
-
-        // Update the graph
-        statsPanel->updateAverageFitness(record.generationNumber, record.averageFitness);
+        // watch update 
+        WatchGA::Genome::Watch* newWatch = new WatchGA::Genome::Watch();
+        newWatch->randomize();
+        watchCanvas->setWatch(newWatch);
 
         m_currentGeneration++;
     });
@@ -76,21 +75,11 @@ MainWindow::MainWindow(QWidget *parent)
     rightLayout->addStretch();
     mainLayout->addWidget(rightContainer);
 
-    // =========================================================
-    // CREATE WATCH + PASS REAL FITNESS TO STATS PANEL
-    // =========================================================
+    // Initial watch
     WatchGA::Genome::Watch* watch = new WatchGA::Genome::Watch();
     watch->randomize();
+    watchCanvas->setWatch(watch);
 
-    // Send Watch to canvas
-    canvas->setWatch(watch);
-
-    // Send REAL WATCH FITNESS to StatsPanel (Generation 0)
     double realWatchFitness = watch->getFitnessScore();
     statsPanel->setFirstGenerationWatchFitness(realWatchFitness);
-
-    //dummy value to see if the graph can actually show lines
-    // statsPanel->updateAverageFitness(0, 0.2);
-    // statsPanel->updateAverageFitness(1, 0.5);
-    // statsPanel->updateAverageFitness(2, 0.8);
 }
