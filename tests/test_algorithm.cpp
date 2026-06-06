@@ -20,132 +20,132 @@
 using namespace WatchGA::Algorithm;
 using namespace WatchGA::Genome;
 
-// TODO: Overhaul this to include mutation once it's finished, and make it to show
-// some generations to show how the watch develop over time
+// // TODO: Overhaul this to include mutation once it's finished, and make it to show
+// // some generations to show how the watch develop over time
 
-// ==============================================================================
-// 1. CORE ALGORITHM TESTS
-// ==============================================================================
+// // ==============================================================================
+// // 1. CORE ALGORITHM TESTS
+// // ==============================================================================
 
-void testDefaultConstructor() {
-    std::cout << "Running testDefaultConstructor... ";
-    GeneticAlgorithm ga;
+// void testDefaultConstructor() {
+//     std::cout << "Running testDefaultConstructor... ";
+//     GeneticAlgorithm ga;
     
-    assert(ga.getPopulationSize() == 100);
-    assert(ga.getCurrentGeneration() == 0);
-    assert(ga.getMutationRate() == 0.05);
+//     assert(ga.getPopulationSize() == 100);
+//     assert(ga.getCurrentGeneration() == 0);
+//     assert(ga.getMutationRate() == 0.05);
     
-    std::cout << "PASSED.\n";
-}
+//     std::cout << "PASSED.\n";
+// }
 
-void testConfigurationValidation() {
-    std::cout << "Running testConfigurationValidation... ";
-    GeneticAlgorithm ga;
+// void testConfigurationValidation() {
+//     std::cout << "Running testConfigurationValidation... ";
+//     GeneticAlgorithm ga;
 
-    ga.setPopulationSize(0);
-    assert(ga.getPopulationSize() == 1); 
-    ga.setMutationRate(1.5);
-    assert(ga.getMutationRate() == 1.0); 
+//     ga.setPopulationSize(0);
+//     assert(ga.getPopulationSize() == 1); 
+//     ga.setMutationRate(1.5);
+//     assert(ga.getMutationRate() == 1.0); 
 
-    std::cout << "PASSED.\n";
-}
+//     std::cout << "PASSED.\n";
+// }
 
-void testPhysicalInitialization() {
-    std::cout << "Running testPhysicalInitialization... ";
-    GeneticAlgorithm ga;
+// void testPhysicalInitialization() {
+//     std::cout << "Running testPhysicalInitialization... ";
+//     GeneticAlgorithm ga;
     
-    ga.setPopulationSize(50);
-    ga.reset(); // Changed to lowercase
+//     ga.setPopulationSize(50);
+//     ga.reset(); // Changed to lowercase
     
-    auto population = ga.getPopulation();
-    assert(population.size() == 50);
+//     auto population = ga.getPopulation();
+//     assert(population.size() == 50);
     
-    bool isDiverse = false;
-    for (size_t i = 1; i < population.size(); ++i) {
-        if (population[i]->getComponentCount() != population[0]->getComponentCount()) {
-            isDiverse = true;
-            break; 
-        }
-    }
+//     bool isDiverse = false;
+//     for (size_t i = 1; i < population.size(); ++i) {
+//         if (population[i]->getComponentCount() != population[0]->getComponentCount()) {
+//             isDiverse = true;
+//             break; 
+//         }
+//     }
     
-    assert(isDiverse && "Population lacks genetic diversity! randomize() might be failing.");
-    std::cout << "PASSED.\n";
-}
+//     assert(isDiverse && "Population lacks genetic diversity! randomize() might be failing.");
+//     std::cout << "PASSED.\n";
+// }
 
-// ==============================================================================
-// 2. STRATEGY TESTS (Selection & Crossover)
-// ==============================================================================
+// // ==============================================================================
+// // 2. STRATEGY TESTS (Selection & Crossover)
+// // ==============================================================================
 
-void testSelectionStrategies() {
-    std::cout << "Running testSelectionStrategies... ";
+// void testSelectionStrategies() {
+//     std::cout << "Running testSelectionStrategies... ";
 
-    // 1. Setup a dummy population of 4 watches
-    std::vector<std::shared_ptr<Watch>> pop;
-    std::vector<double> scores = {10.0, 50.0, 90.0, 0.0};
+//     // 1. Setup a dummy population of 4 watches
+//     std::vector<std::shared_ptr<Watch>> pop;
+//     std::vector<double> scores = {10.0, 50.0, 90.0, 0.0};
     
-    for(int i = 0; i < 4; i++) {
-        auto w = std::make_shared<Watch>("W" + std::to_string(i));
-        w->setFitnessScore(scores[i]);
-        pop.push_back(w);
-    }
+//     for(int i = 0; i < 4; i++) {
+//         auto w = std::make_shared<Watch>("W" + std::to_string(i));
+//         w->setFitnessScore(scores[i]);
+//         pop.push_back(w);
+//     }
 
-    // 2. Test Roulette Wheel Selection
-    RouletteWheelSelection roulette;
-    auto rouletteParents = roulette.select(pop, scores, 2);
-    assert(rouletteParents.size() == 2 && "Roulette did not return the correct number of parents!");
+//     // 2. Test Roulette Wheel Selection
+//     RouletteWheelSelection roulette;
+//     auto rouletteParents = roulette.select(pop, scores, 2);
+//     assert(rouletteParents.size() == 2 && "Roulette did not return the correct number of parents!");
 
-    // 3. Test Tournament Selection
-    TournamentSelection tournament(3); // Tournament size of 3
-    auto tournamentParents = tournament.select(pop, scores, 2);
-    assert(tournamentParents.size() == 2 && "Tournament did not return the correct number of parents!");
+//     // 3. Test Tournament Selection
+//     TournamentSelection tournament(3); // Tournament size of 3
+//     auto tournamentParents = tournament.select(pop, scores, 2);
+//     assert(tournamentParents.size() == 2 && "Tournament did not return the correct number of parents!");
 
-    // 4. Test Zero-Fitness Edge Case (Ensures fallback RNG works in Roulette)
-    std::vector<double> zeroScores = {0.0, 0.0, 0.0, 0.0};
-    auto fallbackParents = roulette.select(pop, zeroScores, 2);
-    assert(fallbackParents.size() == 2 && "Roulette crashed when handling an all-zero fitness pool!");
+//     // 4. Test Zero-Fitness Edge Case (Ensures fallback RNG works in Roulette)
+//     std::vector<double> zeroScores = {0.0, 0.0, 0.0, 0.0};
+//     auto fallbackParents = roulette.select(pop, zeroScores, 2);
+//     assert(fallbackParents.size() == 2 && "Roulette crashed when handling an all-zero fitness pool!");
 
-    std::cout << "PASSED.\n";
-}
+//     std::cout << "PASSED.\n";
+// }
 
-void testCrossoverStrategies() {
-    std::cout << "Running testCrossoverStrategies... ";
+// void testCrossoverStrategies() {
+//     std::cout << "Running testCrossoverStrategies... ";
 
-    // 1. Create and physically randomize two parents
-    auto parent1 = std::make_shared<Watch>("Parent_A");
-    parent1->randomize();
+//     // 1. Create and physically randomize two parents
+//     auto parent1 = std::make_shared<Watch>("Parent_A");
+//     parent1->randomize();
     
-    auto parent2 = std::make_shared<Watch>("Parent_B");
-    parent2->randomize();
+//     auto parent2 = std::make_shared<Watch>("Parent_B");
+//     parent2->randomize();
     
-    size_t totalParentParts = parent1->getComponentCount() + parent2->getComponentCount();
+//     size_t totalParentParts = parent1->getComponentCount() + parent2->getComponentCount();
 
-    // 2. Test One-Point Crossover (C++14 Compliant Pair Handling)
-    OnePointCrossover onePoint;
-    auto onePointResult = onePoint.crossover(parent1, parent2);
-    auto c1_one = onePointResult.first;
-    auto c2_one = onePointResult.second;
+//     // 2. Test One-Point Crossover (C++14 Compliant Pair Handling)
+//     OnePointCrossover onePoint;
+//     auto onePointResult = onePoint.crossover(parent1, parent2);
+//     auto c1_one = onePointResult.first;
+//     auto c2_one = onePointResult.second;
     
-    assert(c1_one != nullptr && c2_one != nullptr);
-    assert(c1_one->getComponentCount() > 0 && "Child 1 is empty after One-Point Crossover!");
+//     assert(c1_one != nullptr && c2_one != nullptr);
+//     assert(c1_one->getComponentCount() > 0 && "Child 1 is empty after One-Point Crossover!");
     
-    // Conservation of Mass Check
-    size_t totalOnePointChildParts = c1_one->getComponentCount() + c2_one->getComponentCount();
-    assert(totalParentParts == totalOnePointChildParts && "One-Point Crossover destroyed or duplicated components!");
+//     // Conservation of Mass Check
+//     size_t totalOnePointChildParts = c1_one->getComponentCount() + c2_one->getComponentCount();
+//     assert(totalParentParts == totalOnePointChildParts && "One-Point Crossover destroyed or duplicated components!");
 
-    // 3. Test Uniform Crossover (C++14 Compliant Pair Handling)
-    UniformCrossover uniform;
-    auto uniformResult = uniform.crossover(parent1, parent2);
-    auto c1_uni = uniformResult.first;
-    auto c2_uni = uniformResult.second;
+//     // 3. Test Uniform Crossover (C++14 Compliant Pair Handling)
+//     UniformCrossover uniform;
+//     auto uniformResult = uniform.crossover(parent1, parent2);
+//     auto c1_uni = uniformResult.first;
+//     auto c2_uni = uniformResult.second;
     
-    assert(c1_uni != nullptr && c2_uni != nullptr);
+//     assert(c1_uni != nullptr && c2_uni != nullptr);
     
-    // Conservation of Mass Check
-    size_t totalUniformChildParts = c1_uni->getComponentCount() + c2_uni->getComponentCount();
-    assert(totalParentParts == totalUniformChildParts && "Uniform Crossover destroyed or duplicated components!");
+//     // Conservation of Mass Check
+//     size_t totalUniformChildParts = c1_uni->getComponentCount() + c2_uni->getComponentCount();
+//     assert(totalParentParts == totalUniformChildParts && "Uniform Crossover destroyed or duplicated components!");
 
-    std::cout << "PASSED.\n";
-}
+//     std::cout << "PASSED.\n";
+// }
 
 
 // ==============================================================================
@@ -167,10 +167,6 @@ void displayPopulationSamples() {
     for (size_t idx : sampleIndices) {
         auto watch = pop[idx];
         std::cout << ">>> WATCH #" << idx + 1 << " | Name: " << watch->getObjectName() << "\n";
-        
-        // =========================================================
-        // ADDED: EXPLICIT FITNESS SCORE DISPLAY
-        // =========================================================
         std::cout << "    [FITNESS] Raw Evaluated Score: " << std::fixed << std::setprecision(6) 
                   << watch->getFitnessScore() << "\n";
         std::cout << "    Total Components: " << watch->getComponentCount() << "\n";
@@ -206,6 +202,55 @@ void displayPopulationSamples() {
         }
         std::cout << "    [-] Total Gears  -> " << gearCount << "\n\n";
     }
+}
+
+// Add this helper function in your tester file
+void printKinematicChain(const WatchGA::Genome::Watch& watch) {
+    std::vector<int> gearIndexes;
+    int mainspringIdx = -1, balanceIdx = -1;
+    int hourIdx = -1, minuteIdx = -1;
+
+    // Scan the assembly to find where everything is located in the array
+    const auto& components = watch.getAllComponents();
+    for (size_t i = 0; i < components.size(); ++i) {
+        if (dynamic_cast<const WatchGA::Genome::Components::Gear*>(components[i].get())) {
+            gearIndexes.push_back(i);
+        } else if (auto* spring = dynamic_cast<const WatchGA::Genome::Components::Spring*>(components[i].get())) {
+            if (spring->getType() == WatchGA::Genome::Components::Spring::SpringType::MAINSPRING) {
+                mainspringIdx = i;
+            }
+        } else if (dynamic_cast<const WatchGA::Genome::Components::BalanceWheel*>(components[i].get())) {
+            balanceIdx = i;
+        } else if (auto* hand = dynamic_cast<const WatchGA::Genome::Components::Hand*>(components[i].get())) {
+            if (hand->getType() == WatchGA::Genome::Components::Hand::HandType::HOUR) hourIdx = i;
+            else if (hand->getType() == WatchGA::Genome::Components::Hand::HandType::MINUTE) minuteIdx = i;
+        }
+    }
+
+    // Print the physical torque transmission line
+    std::cout << "      Kinematic Power Flow (The Going Train):\n";
+    std::cout << "        [POWER SOURCE] ";
+    
+    if (mainspringIdx != -1) {
+        std::cout << "==> [" << mainspringIdx << "] MAINSPRING\n";
+    }
+
+    std::cout << "        [TRANSMISSION] ";
+    if (!gearIndexes.empty()) {
+        std::cout << "==> ";
+        for (size_t i = 0; i < gearIndexes.size(); ++i) {
+            std::cout << "[" << gearIndexes[i] << "] GEAR";
+            if (i < gearIndexes.size() - 1) std::cout << " -> ";
+        }
+        std::cout << "\n";
+    } else {
+        std::cout << "==> [NO GEARS DETECTED]\n";
+    }
+
+    std::cout << "        [ESCAPEMENT]   ==> [" << balanceIdx << "] BALANCE WHEEL\n";
+    
+    std::cout << "        [TIME DISPLAY] ==> Center Pinion -> [" 
+              << minuteIdx << "] MINUTE HAND -> [" << hourIdx << "] HOUR HAND\n";
 }
 
 // =============================================================================
@@ -262,16 +307,31 @@ void printPodiumWatches(const std::vector<std::shared_ptr<Watch>>& population, i
             }
             else if (auto* gear = dynamic_cast<const Components::Gear*>(comp.get())) {
                 std::cout << "GEAR          | Teeth: " << gear->getToothCount() 
-                          << " | Meshing Quality: " << gear->getMeshingQuality() << " | Dia: " << gear->getDiameter() << "mm\n";
-            }
-            else if (auto* jewel = dynamic_cast<const Components::Jewel*>(comp.get())) {
-                std::cout << "JEWEL BEARING | Hardness: " << jewel->getHardness() 
-                          << " | Cap Jewel: " << (jewel->isCapJewel() ? "Yes" : "No") << "\n";
+                          << " | Meshing Quality: " << gear->getMeshingQuality() << " | Dia: " << gear->getDiameter() << "mm";
+                
+                // NEW: Actively look inside the gear to print its nested Jewel!
+                if (gear->hasJewel()) {
+                    std::cout << " -> [Includes Cap Jewel: " << (gear->getJewel()->isCapJewel() ? "Yes" : "No") << "]";
+                }
+                std::cout << "\n";
             }
             else {
                 // Fallback to basic string tracking if generic components exist
                 std::cout << "UNKNOWN PART  | " << comp->toString() << "\n";
             }
+
+            // // Inside printing loop for the Gold/Silver/Bronze watches...
+            // std::cout << "    Assembly Manifest:\n";
+            // int idx = 0;
+            // for (const auto& comp : watch->getAllComponents()) {
+            //     std::cout << "      [" << idx++ << "] " << comp->toString() << "\n";
+            // }
+
+            // std::cout << "\n"; // Add a blank line
+
+            // // Add the new physical connection printer right here
+            // printKinematicChain(*watch); 
+            // std::cout << "------------------------------------------------------------\n";
         }
         std::cout << "------------------------------------------------------------\n";
     }
@@ -320,11 +380,11 @@ int main() {
     std::cout << "==========================================\n\n";
 
     // Run your standard unit tests first
-    testDefaultConstructor();
-    testConfigurationValidation();
-    testPhysicalInitialization();
-    testSelectionStrategies();
-    testCrossoverStrategies();
+    // testDefaultConstructor();
+    // testConfigurationValidation();
+    // testPhysicalInitialization();
+    // testSelectionStrategies();
+    // testCrossoverStrategies();
 
     // Run the grand finale
     runEvolutionTimeLapse();

@@ -13,7 +13,6 @@
 #include "../genome/components/Jewel.h" 
 #include "../genome/components/Spring.h" 
 
-
 using namespace WatchGA::Genome;
 using namespace WatchGA::Genome::Components; 
 
@@ -25,12 +24,13 @@ WatchCanvas::WatchCanvas(QWidget *parent)
     setMouseTracking(true);
     setStyleSheet("background-color: #121118;");
 
-    // REAL COMPONENTS FROM YOUR ALGORITHM
+    // DUMMY COMPONENTS FROM YOUR ALGORITHM
     m_components.emplace_back(std::make_unique<Jewel>("Center Jewel", 0.1, 0.02, 300, 300, 9.0, true));
     m_components.emplace_back(std::make_unique<Spring>("Mainspring", 1.8, 0.08, 220, 380, Spring::SpringType::MAINSPRING, 0.92, 0.9, 12.0));
     m_components.emplace_back(std::make_unique<Gear>("Third Gear", 0.7, 0.05, 260, 240, 12, 4.5, 0.88));
     m_components.emplace_back(std::make_unique<Gear>("Second Gear", 0.9, 0.06, 380, 360, 16, 6.0, 0.9));
     m_components.emplace_back(std::make_unique<BalanceWheel>("Balance Wheel", 1.4, 0.12, 360, 220, 2.2, 0.92, 270.0));
+
 
     // REAL HANDS — NO DUMMY DRAWING
     m_components.emplace_back(std::make_unique<Hand>("Hour Hand", 0.5, 0.03, 300, 300, Hand::HandType::HOUR, 110.0, 0.95));
