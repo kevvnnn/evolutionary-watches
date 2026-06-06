@@ -8,8 +8,6 @@ namespace GUI {
 
 // Static config manager
 static FileIO::ConfigManager s_config;
-// to update ui [ is this even correct???????]
-// static Ui::ControlPanel ui_controlpanel;
 
 ControlPanel::ControlPanel(QWidget* parent) : 
     QWidget(parent),
@@ -17,12 +15,15 @@ ControlPanel::ControlPanel(QWidget* parent) :
 {
     ui->setupUi(this);
     
-    //Load config on startup
+    //Load and reset config on startup
     s_config = FileIO::ConfigManager("config.txt");
     s_config.loadConfig();
     s_config.clear();
     s_config.saveConfig();
 
+    // Set the pause button to disabled at start
+    ui->pauseBtn->setEnabled(false);
+    
     // Connect signals from UI elements to our private slots
     connect(ui->populationSpin, &QSpinBox::valueChanged, this, &ControlPanel::onPopulationSizeChanged);
     connect(ui->mutationSpin, &QDoubleSpinBox::valueChanged, this, &ControlPanel::onMutationRateChanged);
@@ -62,6 +63,16 @@ ControlPanel::ControlPanel(QWidget* parent) :
 
     connect(ui->resetToDefaults,&QPushButton::clicked, this, [this](){
         qDebug() << "Reset to Default clicked";
+
+        // Use the Existing ui (controlpanel ui pointer) to update it
+        ui->populationSpin->setValue(100);
+        ui->mutationSpin->setValue(0.1);
+        ui->crossoverSpin->setValue(0.8);
+        ui->elitismSpin->setValue(2);
+        ui->selectionCombo->setCurrentText("Tournament");
+        ui->crossoverCombo->setCurrentText("One Point");
+        ui->mutationCombo->setCurrentText("Swap");
+        // Reset the config file too
         s_config.setInt("populationSize", 100);
         s_config.setDouble("mutationRate", 0.1);
         s_config.setDouble("crossoverRate", 0.8);
@@ -70,7 +81,6 @@ ControlPanel::ControlPanel(QWidget* parent) :
         s_config.setString("crossoverStrategy", "One Point");
         s_config.setString("mutationStrategy", "Swap");
         s_config.saveConfig();
-        // ui_controlpanel->populationSpin->setValue(100);HOW TO UPDATE UI VALUES??
     });
 }
 
