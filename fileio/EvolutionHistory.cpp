@@ -6,6 +6,7 @@
 #include "EvolutionHistory.h"
 #include <fstream>
 #include <stdexcept>
+#include <iomanip>
 
 namespace WatchGA {
 namespace FileIO {
@@ -37,6 +38,7 @@ void EvolutionHistory::addRecord(const GenerationRecord& record)
     m_records.push_back(record);
 }
 
+// Dummy data just for early GUI testing
 void EvolutionHistory::generateDummyData(unsigned int numGenerations)
 {
     clear();
@@ -131,13 +133,28 @@ bool EvolutionHistory::saveToFile(const std::string& path) const
     file << m_experimentName << '\n';
     file << m_records.size() << '\n';
 
+    // Define column widths for perfectly aligned text
+    const int genWidth = 12;
+    const int dataWidth = 18;
+
+    // Write Headers using iomanip (left-aligned, fixed widths)
+    file << std::left 
+         << std::setw(genWidth) << "Generation"
+         << std::setw(dataWidth) << "BestFitness"
+         << std::setw(dataWidth) << "AverageFitness"
+         << std::setw(dataWidth) << "WorstFitness" << '\n';
+
+    // Lock the float formatting to always show 6 decimal places (e.g., 0.450000)
+    file << std::fixed << std::setprecision(6);
+
     // Save each generation's statistics
     for (const auto& rec : m_records)
     {
-        file << rec.generationNumber << ' '
-             << rec.bestFitness << ' '
-             << rec.averageFitness << ' '
-             << rec.worstFitness << '\n';
+        file << std::left
+             << std::setw(genWidth) << rec.generationNumber
+             << std::setw(dataWidth) << rec.bestFitness
+             << std::setw(dataWidth) << rec.averageFitness
+             << std::setw(dataWidth) << rec.worstFitness << '\n';
     }
 
     file.close();
