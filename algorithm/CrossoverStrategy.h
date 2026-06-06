@@ -13,7 +13,6 @@ namespace Algorithm {
  * Child 1 gets the first part from parent 1 and the second part from parent 2.
  * Child 2 gets the first part from parent 2 and the second part from parent 1.
  * 
- * OWNER: Kevin
  */
 class OnePointCrossover : public Core::ICrossoverStrategy {
 public:
@@ -31,7 +30,6 @@ public:
  * For each component, randomly choose whether to take it from parent 1 or parent 2.
  * Each component has a 50% chance to come from either parent.
  * 
- * OWNER: Kevin
  */
 class UniformCrossover : public Core::ICrossoverStrategy {
 public:

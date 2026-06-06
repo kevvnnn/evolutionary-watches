@@ -20,7 +20,6 @@ namespace Core {
  * This allows us to easily swap out different selection algorithms
  * without changing any other code in the genetic algorithm.
  * 
- * OWNER: Person B (Algorithm module)
  */
 class ISelectionStrategy {
 public:

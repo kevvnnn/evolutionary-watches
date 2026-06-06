@@ -10,7 +10,6 @@ namespace FileIO {
 /**
  * @class ConfigManager
  * @brief JSON config loader/saver
- * @ownership Person C
  */
 class ConfigManager
 {

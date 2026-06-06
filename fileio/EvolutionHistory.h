@@ -13,7 +13,6 @@ namespace FileIO {
 /**
  * @class EvolutionHistory
  * @brief Saves generation stats & best watches
- * @ownership Person C
  */
 class EvolutionHistory
 {
