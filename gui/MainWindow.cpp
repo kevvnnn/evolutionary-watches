@@ -59,7 +59,7 @@ std::unique_ptr<WatchGA::Core::IMutationStrategy> createMutationStrategy(const s
         return std::make_unique<WatchGA::Algorithm::AddRemoveMutation>(50);
     }
     // Default
-    return std::make_unique<WatchGA::Algorithm::SwapMutation>();
+    return std::make_unique<WatchGA::Algorithm::ParameterMutation>(0.1);
 }
 
 MainWindow::MainWindow(QWidget *parent)

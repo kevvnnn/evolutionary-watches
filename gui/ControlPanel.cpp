@@ -14,16 +14,20 @@ ControlPanel::ControlPanel(QWidget* parent) :
     ui(new Ui::ControlPanel)
 {
     ui->setupUi(this);
-    
-    //Create and reset config on startup
+
+    ui->mutationCombo->clear();
+    ui->mutationCombo->addItems({"Parameter", "Swap", "AddRemove"});
+
+    // Create and reset config on startup
     s_config = FileIO::ConfigManager("config.txt");
+    
     s_config.setInt("populationSize", 100);
     s_config.setDouble("mutationRate", 0.1);
     s_config.setDouble("crossoverRate", 0.8);
     s_config.setInt("elitismCount", 2);
     s_config.setString("selectionStrategy", "Tournament");
     s_config.setString("crossoverStrategy", "One Point");
-    s_config.setString("mutationStrategy", "Swap");
+    s_config.setString("mutationStrategy", "Parameter");
     s_config.saveConfig();
 
     // Set the pause button to disabled at start
@@ -86,7 +90,7 @@ ControlPanel::ControlPanel(QWidget* parent) :
         ui->elitismSpin->setValue(2);
         ui->selectionCombo->setCurrentText("Tournament");
         ui->crossoverCombo->setCurrentText("One Point");
-        ui->mutationCombo->setCurrentText("Swap");
+        ui->mutationCombo->setCurrentText("Parameter");
         // Reset the config file too
         s_config.setInt("populationSize", 100);
         s_config.setDouble("mutationRate", 0.1);
@@ -94,7 +98,7 @@ ControlPanel::ControlPanel(QWidget* parent) :
         s_config.setInt("elitismCount", 2);
         s_config.setString("selectionStrategy", "Tournament");
         s_config.setString("crossoverStrategy", "One Point");
-        s_config.setString("mutationStrategy", "Swap");
+        s_config.setString("mutationStrategy", "Parameter");
         s_config.saveConfig();
     });
 }
