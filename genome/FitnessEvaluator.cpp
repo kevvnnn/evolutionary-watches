@@ -71,8 +71,6 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
     // Calculate the raw base score
     double raw = (accuracy * m_accuracyWeight) + (efficiency * m_efficiencyWeight) - penalty;
 
-   
-
     // =========================================================================
     // CONTINUOUS QUADRATIC PENALTIES (The "Smooth" Physics Guard)
     // =========================================================================
@@ -140,7 +138,23 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
             raw -= 0.02 * (violation * violation);
         }
     }
-    // =========================================================================
+    
+    // // =========================================================================
+    // // LIMIT HAIRSPRING & MAINSPRING
+    // // =========================================================================
+
+    // int hairspringCount = 0;
+    // int mainspringCount = 0;
+
+    // // Apply the executioner penalties after the loop
+    // if (hairspringCount > 1) {
+    //     double violation = hairspringCount - 1.0;
+    //     raw -= 5.0 * (violation * violation); // Massive penalty for hoarding
+    // }
+    // if (mainspringCount > 1) {
+    //     double violation = mainspringCount - 1.0;
+    //     raw -= 5.0 * (violation * violation); // Massive penalty for hoarding
+    // }
 
     // Floor the raw score to 0.0 so negative penalties don't break the log math
     if (raw < 0.0) raw = 0.0;

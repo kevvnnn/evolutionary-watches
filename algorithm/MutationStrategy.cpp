@@ -231,17 +231,15 @@ void AddRemoveMutation::mutate(std::shared_ptr<Genome::Watch>& watch, double mut
         }
     } 
     // ACTION 2: Deleting a Component (Destructive Filtering)
-    else if (!addPart && watch->getComponentCount() > 5) {
-        // CRITICAL GUARD FOR NATURAL SELECTION: A watch requires exactly 5 core parts to tick. 
-        // If our component count is 5, we completely abort deletion. 
-        // If it is above 5, we can drop a gear without instantly failing structural validity checks.
+    // We require 5 core organs + at least 1 gear, so we only delete if count > 6
+    else if (!addPart && watch->getComponentCount() > 6) { 
         
-        std::uniform_int_distribution<unsigned int> targetDist(0, watch->getComponentCount() - 1);
+        // THE FIX: Protect the Core DNA! 
+        // Indices 0-4 are the vital organs. Gears start at index 5.
+        // We force the deletion target to ONLY pick from the gear indices.
+        std::uniform_int_distribution<unsigned int> targetDist(5, watch->getComponentCount() - 1);
         unsigned int targetIndex = targetDist(getRng());
         
-        // EVOLUTION NOTE: We do not check if the selected part is essential here. 
-        // If the algorithm rolls a dice and deletes the vital Balance Wheel, the watch 
-        // will get an automatic fitness score of 0.0 on the next pass and die out naturally.
         watch->removeComponent(targetIndex);
     }
 }

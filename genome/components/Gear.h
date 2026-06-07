@@ -17,7 +17,7 @@ private:
     double m_diameter;
     double m_meshingQuality;
     
-    // THE STRUCTURAL FIX: The Gear now owns its Jewel (Composition)
+    // The Gear owns its Jewel (Composition)
     std::unique_ptr<Jewel> m_jewel;
 
 public:
