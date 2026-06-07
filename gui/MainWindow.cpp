@@ -67,6 +67,12 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("WatchGA - Evolution Viewer");
     setFixedSize(1166, 760);
 
+    // Timer Initialization
+    m_runTimer = new QTimer(this);
+    m_runTimer->setInterval(300); // 0.3 seconds delay
+    connect(m_runTimer, &QTimer::timeout, this, &MainWindow::runOneGeneration);
+    m_isRunning = false;
+
     QWidget* centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
     QHBoxLayout* mainLayout = new QHBoxLayout(centralWidget);
@@ -113,48 +119,23 @@ MainWindow::MainWindow(QWidget *parent)
     // =========================================================
     connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
         // Start Population if at gen 0, DO THE SAME FOR RUN 
-        if (m_currentGeneration == 0) {
-            initializeGeneticAlgorithmFirstRun();
-        } 
+        runOneGeneration();
+    });
 
-        qDebug() << "Step: Evolving Generation" << m_currentGeneration + 1;
-        int nextGen = m_currentGeneration + 1;
-
-        // Set up a tooltip popup
-        QString suffix;
-        if (nextGen % 10 == 1 && nextGen % 100 != 11) suffix = "st";
-        else if (nextGen % 10 == 2 && nextGen % 100 != 12) suffix = "nd";
-        else if (nextGen % 10 == 3 && nextGen % 100 != 13) suffix = "rd";
-        else suffix = "th";
-
-        // Show the popup
-        QPoint topCenter = mapToGlobal(QPoint(width() / 2 - 100, 40));
-        QToolTip::showText(topCenter, QString("Generating %1%2 generation...").arg(nextGen).arg(suffix), nullptr,QRect(), 1500);
-
-        
-
-        // 1. RUN 1 FULL EVOLUTIONARY GENERATION
-        m_ga.runGeneration();
-        WatchGA::FileIO::EvolutionHistory::GenerationRecord record; //following the struct
-        record.generationNumber = m_currentGeneration + 1;
-        record.bestFitness    = m_ga.getBestFitness();
-        record.averageFitness = m_ga.getAverageFitness();
-        record.worstFitness   = m_ga.getWorstFitness();
-        record.bestWatch      = m_ga.getBestWatch();
-
-        m_evolutionHistory.addRecord(record);
-
-        // 2. GET THE BEST WATCH OF THE NEW GENERATION
-        auto bestWatch = m_ga.getBestWatch();
-
-        // 3. DISPLAY BEST WATCH ON CANVAS
-        if (bestWatch) {
-            watchCanvas->setWatch(bestWatch.get());
+    // RUN BUTTON (AUTO EVOLVE)
+    connect(controlPanel, &WatchGA::GUI::ControlPanel::runClicked, this, [this]() {
+        if (!m_isRunning) {
+            m_isRunning = true;
+            m_runTimer->start();
+            qDebug() << "Started Auto Run";
         }
+    });
 
-        // 4. UPDATE GRAPH WITH REAL FITNESS
-        m_currentGeneration++;
-        statsPanel->updateAverageFitness(m_currentGeneration, m_ga.getAverageFitness());
+    // STOP BUTTON
+    connect(controlPanel, &WatchGA::GUI::ControlPanel::pauseClicked, this, [this]() {
+        m_isRunning = false;
+        m_runTimer->stop();
+        qDebug() << "Stopped Auto Run";
     });
 
     connect(controlPanel, &WatchGA::GUI::ControlPanel::resetClicked, this, [this](){
@@ -186,4 +167,47 @@ void MainWindow::initializeGeneticAlgorithmFirstRun(){
     m_ga.setCrossoverStrategy(createCrossoverStrategy(crossover));
     m_ga.setMutationStrategy(createMutationStrategy(mutation));
     m_ga.reset();
+}
+void MainWindow::runOneGeneration()
+{
+    if (m_currentGeneration == 0) {
+        initializeGeneticAlgorithmFirstRun();
+    } 
+
+    qDebug() << "Step: Evolving Generation" << m_currentGeneration + 1;
+    int nextGen = m_currentGeneration + 1;
+
+    // Set up a tooltip popup
+    QString suffix;
+    if (nextGen % 10 == 1 && nextGen % 100 != 11) suffix = "st";
+    else if (nextGen % 10 == 2 && nextGen % 100 != 12) suffix = "nd";
+    else if (nextGen % 10 == 3 && nextGen % 100 != 13) suffix = "rd";
+    else suffix = "th";
+
+    // Show the popup
+    QPoint topCenter = mapToGlobal(QPoint(width() / 2 - 100, 40));
+    QToolTip::showText(topCenter, QString("Generating %1%2 generation...").arg(nextGen).arg(suffix), nullptr,QRect(), 1500);
+
+    // 1. RUN 1 FULL EVOLUTIONARY GENERATION
+    m_ga.runGeneration();
+    WatchGA::FileIO::EvolutionHistory::GenerationRecord record; //following the struct
+    record.generationNumber = m_currentGeneration + 1;
+    record.bestFitness    = m_ga.getBestFitness();
+    record.averageFitness = m_ga.getAverageFitness();
+    record.worstFitness   = m_ga.getWorstFitness();
+    record.bestWatch      = m_ga.getBestWatch();
+
+    m_evolutionHistory.addRecord(record);
+
+    // 2. GET THE BEST WATCH OF THE NEW GENERATION
+    auto bestWatch = m_ga.getBestWatch();
+
+    // 3. DISPLAY BEST WATCH ON CANVAS
+    if (bestWatch) {
+        watchCanvas->setWatch(bestWatch.get());
+    }
+
+    // 4. UPDATE GRAPH WITH REAL FITNESS
+    m_currentGeneration++;
+    statsPanel->updateAverageFitness(m_currentGeneration, m_ga.getAverageFitness());
 }
