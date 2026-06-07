@@ -9,7 +9,7 @@
 #include <QVBoxLayout>
 #include <QSizePolicy>
 #include <functional>
-#include <QToolTip> // for step button pop up
+#include <QToolTip>
 void setStatsPanelEvolutionHistory(const WatchGA::FileIO::EvolutionHistory* hist);
 
 MainWindow::MainWindow(QWidget *parent)
@@ -53,35 +53,27 @@ MainWindow::MainWindow(QWidget *parent)
     // INITIALIZE REAL GENETIC ALGORITHM
     // =========================================================
     m_currentGeneration = 0;
-    // m_ga.reset(); // Starts population + evaluates generation 0
-
-    // // Show BEST WATCH of GENERATION 0
-    // watchCanvas->setWatch(m_ga.getBestWatch().get());
-    // statsPanel->updateAverageFitness(0, m_ga.getAverageFitness());
 
     // =========================================================
     // STEP BUTTON — EVOLVE + SHOW BEST WATCH (REAL SYSTEM)
     // =========================================================
     connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
-        // Start Population if at gen 0, DO THE SAME FOR RUN 
-        if (m_currentGeneration == 0) m_ga.reset(); 
+        if (m_currentGeneration == 0) m_ga.reset();
 
         qDebug() << "Step: Evolving Generation" << m_currentGeneration + 1;
         int nextGen = m_currentGeneration + 1;
 
-        // Set up a tooltip popup
         QString suffix;
         if (nextGen % 10 == 1 && nextGen % 100 != 11) suffix = "st";
         else if (nextGen % 10 == 2 && nextGen % 100 != 12) suffix = "nd";
         else if (nextGen % 10 == 3 && nextGen % 100 != 13) suffix = "rd";
         else suffix = "th";
 
-        // Show the popup
         QPoint topCenter = mapToGlobal(QPoint(width() / 2 - 100, 40));
         QToolTip::showText(topCenter, QString("Generating %1%2 generation...").arg(nextGen).arg(suffix), nullptr,QRect(), 1500);
-        // 1. RUN 1 FULL EVOLUTIONARY GENERATION
+
         m_ga.runGeneration();
-        WatchGA::FileIO::EvolutionHistory::GenerationRecord record; //following the struct
+        WatchGA::FileIO::EvolutionHistory::GenerationRecord record;
         record.generationNumber = m_currentGeneration + 1;
         record.bestFitness    = m_ga.getBestFitness();
         record.averageFitness = m_ga.getAverageFitness();
@@ -90,20 +82,19 @@ MainWindow::MainWindow(QWidget *parent)
 
         m_evolutionHistory.addRecord(record);
 
-        // 2. GET THE BEST WATCH OF THE NEW GENERATION
         auto bestWatch = m_ga.getBestWatch();
 
-        // 3. DISPLAY BEST WATCH ON CANVAS
         if (bestWatch) {
             watchCanvas->setWatch(bestWatch.get());
         }
 
-        // 4. UPDATE GRAPH WITH REAL FITNESS
         m_currentGeneration++;
         statsPanel->updateAverageFitness(m_currentGeneration, m_ga.getAverageFitness());
+
+        // // NEW: COSMETIC ONLY - Update canvas with current generation
+        // watchCanvas->setGeneration(m_currentGeneration);
     });
 
-    // Connect GA callback to graph
     m_ga.setStatsCallback([this](int gen, double avg) {
         statsPanel->updateAverageFitness(gen, avg);
     });
