@@ -2,18 +2,18 @@
 #include "WatchCanvas.h"
 #include "ControlPanel.h"
 #include "StatsPanel.h"
-#include "../algorithm/GeneticAlgorithm.h"
 #include "../genome/Watch.h"
 #include "../fileio/EvolutionHistory.h"
+#include "../algorithm/GeneticAlgorithm.h"
+#include "../algorithm/CrossoverStrategy.h"
+#include "../algorithm/MutationStrategy.h"
+#include "../algorithm/SelectionStrategy.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSizePolicy>
 #include <functional>
 #include <QToolTip> // for step button pop up
 #include <memory>
-#include "../algorithm/CrossoverStrategy.h"
-#include "../algorithm/MutationStrategy.h"
-#include "../algorithm/SelectionStrategy.h"
 
 // Access the same s_config as ControlPanel
 namespace WatchGA {namespace GUI {extern FileIO::ConfigManager s_config;}}
@@ -139,7 +139,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(controlPanel, &WatchGA::GUI::ControlPanel::resetClicked, this, [this](){
-        qDebug() << "Current Population: " << WatchGA::GUI::s_config.getInt("populationSize", 100);
+        resetEvolution();
     });
 
     // Connect GA callback to graph
@@ -147,7 +147,10 @@ MainWindow::MainWindow(QWidget *parent)
         statsPanel->updateAverageFitness(gen, avg);
     });
 }
+
 void MainWindow::initializeGeneticAlgorithmFirstRun(){
+    if (m_strategiesInitialized)
+        return;
     using namespace WatchGA::GUI;
     using namespace WatchGA::Algorithm;
     // Get latest values from the shared config
@@ -166,12 +169,15 @@ void MainWindow::initializeGeneticAlgorithmFirstRun(){
     m_ga.setSelectionStrategy(createSelectionStrategy(selection));
     m_ga.setCrossoverStrategy(createCrossoverStrategy(crossover));
     m_ga.setMutationStrategy(createMutationStrategy(mutation));
-    m_ga.reset();
+    m_strategiesInitialized = true; // prevent creating the strategies again
+    // m_ga.reset();
 }
+
 void MainWindow::runOneGeneration()
 {
     if (m_currentGeneration == 0) {
         initializeGeneticAlgorithmFirstRun();
+        m_ga.reset();
     } 
 
     qDebug() << "Step: Evolving Generation" << m_currentGeneration + 1;
@@ -210,4 +216,36 @@ void MainWindow::runOneGeneration()
     // 4. UPDATE GRAPH WITH REAL FITNESS
     m_currentGeneration++;
     statsPanel->updateAverageFitness(m_currentGeneration, m_ga.getAverageFitness());
+}
+
+void MainWindow::resetEvolution()
+{
+    // STOP ANY RUNNING AUTO-EVOLUTION FIRST
+    if (m_isRunning) {
+        m_runTimer->stop();
+        m_isRunning = false;
+        qDebug() << "Auto-run stopped during reset";
+    }
+
+    // Clear old callback first (prevents dangling pointer)
+    m_ga.setStatsCallback(nullptr);
+
+    // RESET EVOLUTION STATE
+    m_currentGeneration = 0;
+    m_evolutionHistory.clear(); 
+    m_strategiesInitialized = false;
+    
+    // Clear graph/history
+    // statsPanel->clearGraph(); // Clear the stats panel graph IMPLEMENT
+
+    // CLEAR WATCH CANVAS
+    // watchCanvas->clearWatch(); IMPLEMENT
+
+    // 4. RESET THE GENETIC ALGORITHM
+    // Re-bind callback safely
+    m_ga.setStatsCallback([this](int gen, double avg) {
+        statsPanel->updateAverageFitness(gen, avg);
+    });
+
+    qDebug() << "Evolution FULLY reset to Generation 0";
 }

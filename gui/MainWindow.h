@@ -23,6 +23,9 @@ private:
     int m_currentGeneration;
     void initializeGeneticAlgorithmFirstRun();
     void runOneGeneration();
+    void resetEvolution();
+
+    bool m_strategiesInitialized = false; // Prevents crashing
 
     // Status
     bool m_isRunning = false; // ADD THIS
