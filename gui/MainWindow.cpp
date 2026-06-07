@@ -230,10 +230,7 @@ void MainWindow::resetEvolution()
     m_strategiesInitialized = false;
     
     // Clear graph/history
-    // statsPanel->clearGraph(); // Clear the stats panel graph IMPLEMENT
-
-    // CLEAR WATCH CANVAS
-    // watchCanvas->clearWatch(); IMPLEMENT
+    statsPanel->clearGraph();
 
     // 4. RESET THE GENETIC ALGORITHM
     // Re-bind callback safely
