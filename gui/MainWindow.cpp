@@ -101,9 +101,22 @@ MainWindow::MainWindow(QWidget *parent)
     statsPanel->setFixedSize(450, 260);
     rightLayout->addWidget(statsPanel);
 
+    // Save & Load Buttons
+    QPushButton* btnSaveWatch = new QPushButton("Save Best Watch");
+    QPushButton* btnLoadWatch = new QPushButton("Load Watch");
+    rightLayout->addWidget(btnSaveWatch);
+    rightLayout->addWidget(btnLoadWatch);
+
     rightLayout->addStretch();
     mainLayout->addWidget(rightContainer);
-
+    
+    connect(btnSaveWatch, &QPushButton::clicked, this, [this]() {
+        qDebug() << "Save Watch Clicked";
+    });
+    connect(btnLoadWatch, &QPushButton::clicked, this, [this]() {
+        qDebug() << "Save Watch Clicked";
+    });
+    
     // =========================================================
     // INITIALIZE REAL GENETIC ALGORITHM
     // =========================================================
