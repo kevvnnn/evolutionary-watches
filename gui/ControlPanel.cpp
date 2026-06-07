@@ -48,6 +48,7 @@ ControlPanel::ControlPanel(QWidget* parent) :
         qDebug() << "Pause button clicked";
         ui->pauseBtn->setEnabled(false);
         ui->runBtn->setEnabled(true);
+        ui->stepBtn->setEnabled(true);
         emit pauseClicked();
     });
     

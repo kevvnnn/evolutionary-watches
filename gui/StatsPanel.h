@@ -13,6 +13,10 @@
 #include <QValueAxis>
 #include <QChartView>
 
+// For Clicking in graph
+#include <QPoint>
+#include <QMouseEvent>
+
 class StatsPanel : public QWidget
 {
     Q_OBJECT
@@ -39,6 +43,11 @@ private:
     QValueAxis*      axisY;
 
     std::vector<std::pair<int, double>> fitnessData;
+    // for showing info
+    void showGenerationInfo(int generation);
+
+protected:
+    void mousePressEvent(QMouseEvent* event) override;
 };
 
 #endif

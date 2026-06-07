@@ -4,10 +4,12 @@
 #include "StatsPanel.h"
 #include "GeneticAlgorithm.h"
 #include "../genome/Watch.h"
+#include "../fileio/EvolutionHistory.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSizePolicy>
 #include <functional>
+void setStatsPanelEvolutionHistory(const WatchGA::FileIO::EvolutionHistory* hist);
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -39,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     rightLayout->addWidget(controlPanel);
 
     statsPanel = new StatsPanel(rightContainer);
+    setStatsPanelEvolutionHistory(&m_evolutionHistory);
     statsPanel->setFixedSize(450, 260);
     rightLayout->addWidget(statsPanel);
 
@@ -46,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout->addWidget(rightContainer);
 
     // =========================================================
-    // ✅ INITIALIZE REAL GENETIC ALGORITHM
+    // INITIALIZE REAL GENETIC ALGORITHM
     // =========================================================
     m_currentGeneration = 0;
     m_ga.reset(); // Starts population + evaluates generation 0
@@ -56,13 +59,21 @@ MainWindow::MainWindow(QWidget *parent)
     statsPanel->updateAverageFitness(0, m_ga.getAverageFitness());
 
     // =========================================================
-    // ✅ STEP BUTTON — EVOLVE + SHOW BEST WATCH (REAL SYSTEM)
+    // STEP BUTTON — EVOLVE + SHOW BEST WATCH (REAL SYSTEM)
     // =========================================================
     connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
         qDebug() << "Step: Evolving Generation" << m_currentGeneration + 1;
 
         // 1. RUN 1 FULL EVOLUTIONARY GENERATION
         m_ga.runGeneration();
+        WatchGA::FileIO::EvolutionHistory::GenerationRecord record;
+        record.generationNumber = m_currentGeneration + 1;
+        record.bestFitness    = m_ga.getBestFitness();
+        record.averageFitness = m_ga.getAverageFitness();
+        record.worstFitness   = m_ga.getWorstFitness();
+        record.bestWatch      = m_ga.getBestWatch();
+
+        m_evolutionHistory.addRecord(record);
 
         // 2. GET THE BEST WATCH OF THE NEW GENERATION
         auto bestWatch = m_ga.getBestWatch();

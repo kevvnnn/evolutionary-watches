@@ -5,7 +5,7 @@
 #include "WatchCanvas.h"
 #include "StatsPanel.h"
 #include "../fileio/EvolutionHistory.h"
-#include "../algorithm/GeneticAlgorithm.h" // ✅ ADD THIS
+#include "../algorithm/GeneticAlgorithm.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
