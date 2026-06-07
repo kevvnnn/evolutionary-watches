@@ -17,9 +17,6 @@ private:
     double m_fitnessScore;
     bool m_isValid;
 
-    // ---------------------------------------------------------------------
-    // ✅ NEW: Canvas size tracking (add these two lines in the private section)
-    // ---------------------------------------------------------------------
     int m_canvasWidth  = 600;  // Default fallback size
     int m_canvasHeight = 600;
 
@@ -54,9 +51,6 @@ public:
     std::unique_ptr<Watch> clone() const;
     std::string toString() const override;
 
-    // ---------------------------------------------------------------------
-    // ✅ NEW: Canvas size setter (add this method in the public section)
-    // ---------------------------------------------------------------------
     void setCanvasSize(int width, int height) {
         m_canvasWidth  = width;
         m_canvasHeight = height;

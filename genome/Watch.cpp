@@ -121,30 +121,42 @@ void Watch::setFitnessScore(double score) { m_fitnessScore = score; }
 bool Watch::isValid() const { return m_isValid; }
 void Watch::setValid(bool valid) { m_isValid = valid; }
 
-// FIXED: Added missing namespace for enums
 bool Watch::checkEssentialComponents() const {
-    bool hasBalance = false, hasMain = false, hasHair = false, hasHour = false, hasMinute = false;
+    int balanceCount = 0;
+    int mainCount = 0;
+    int hairCount = 0;
+    int hourCount = 0;
+    int minuteCount = 0;
+    int gearCount = 0;
+
     using namespace Components;
 
     for (const auto& comp : m_components) {
-        if (dynamic_cast<const BalanceWheel*>(comp.get()))
-            hasBalance = true;
-
-        if (const auto* s = dynamic_cast<const Spring*>(comp.get())) {
-            if (s->getType() == Spring::SpringType::MAINSPRING)
-                hasMain = true;
-            if (s->getType() == Spring::SpringType::HAIRSPRING)
-                hasHair = true;
+        if (dynamic_cast<const BalanceWheel*>(comp.get())) {
+            balanceCount++;
         }
-
-        if (const auto* h = dynamic_cast<const Hand*>(comp.get())) {
-            if (h->getType() == Hand::HandType::HOUR)
-                hasHour = true;
-            if (h->getType() == Hand::HandType::MINUTE)
-                hasMinute = true;
+        else if (dynamic_cast<const Gear*>(comp.get())) {
+            gearCount++;
+        }
+        else if (const auto* s = dynamic_cast<const Spring*>(comp.get())) {
+            if (s->getType() == Spring::SpringType::MAINSPRING) mainCount++;
+            else if (s->getType() == Spring::SpringType::HAIRSPRING) hairCount++;
+        }
+        else if (const auto* h = dynamic_cast<const Hand*>(comp.get())) {
+            if (h->getType() == Hand::HandType::HOUR) hourCount++;
+            else if (h->getType() == Hand::HandType::MINUTE) minuteCount++;
         }
     }
-    return hasBalance && hasMain && hasHair && hasHour && hasMinute;
+
+    // THE EXECUTIONER:
+    // The watch MUST have EXACTLY 1 of every core organ, and AT LEAST 1 transmission gear.
+    // If it has 0, or if it has 2+, it instantly dies (returns false -> Fitness 0.0).
+    return (balanceCount == 1 && 
+            mainCount == 1 && 
+            hairCount == 1 && 
+            hourCount == 1 && 
+            minuteCount == 1 && 
+            gearCount >= 1); 
 }
 
 // Full clone for GA population

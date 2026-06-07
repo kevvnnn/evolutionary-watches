@@ -6,8 +6,6 @@
 #include <random>
 #include <algorithm>
 
-// TODO FIX are keywords to check for skipped work to be done
-
 namespace WatchGA {
 namespace Algorithm {
 
@@ -56,7 +54,6 @@ GeneticAlgorithm::GeneticAlgorithm(unsigned int populationSize, double mutationR
 // PRIVATE HELPER METHODS
 // ------------------------------
 void GeneticAlgorithm::initializePopulation() {
-	// TODO: temp cout
 	std::cout << "Initializing population of " << m_populationSize << "...\n";
 
 	// Clear any existing data just in case this is called during a reset
@@ -85,12 +82,11 @@ void GeneticAlgorithm::initializePopulation() {
 }
 
 void GeneticAlgorithm::evaluatePopulation() {
-	// TODO: temp cout
 	std::cout << "Evaluating generation " << m_currentGeneration << "...\n";
 
 	m_fitnessScores.clear();
 	m_bestFitness = -1.0; // reset best tracker
-	m_worstFitness = 101.0; // reset worst tracker // TODO: test this!
+	m_worstFitness = 101.0; // reset worst tracker
 	double totalFitness = 0.0;
 
 	for (const auto& watch : m_population) {
