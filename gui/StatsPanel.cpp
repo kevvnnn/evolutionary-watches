@@ -1,8 +1,13 @@
 #include "StatsPanel.h"
+#include "../fileio/EvolutionHistory.h"
 #include <QFont>
 #include <QPen>
 #include <QColor>
 #include <QPainter>
+#include <QMessageBox>
+
+// pointer to history (we'll set from MainWindow)
+static const WatchGA::FileIO::EvolutionHistory* s_evolutionHistory = nullptr;
 
 StatsPanel::StatsPanel(QWidget *parent)
     : QWidget(parent)
@@ -109,4 +114,45 @@ void StatsPanel::updateAverageFitness(int generation, double avgFitness)
 
     fitnessChart->update();
     chartView->repaint();
+}
+
+void StatsPanel::mousePressEvent(QMouseEvent* event)
+{
+    QPointF clickPos = chartView->chart()->mapToValue(event->pos(), avgFitnessSeries);
+    int gen = qRound(clickPos.x());
+
+    if (gen >= 0)
+        showGenerationInfo(gen);
+}
+
+// ✅ SHOW REAL GENERATION HISTORY
+void StatsPanel::showGenerationInfo(int generation)
+{
+    if (!s_evolutionHistory) {
+        QMessageBox::information(this, "Info", "History not available");
+        return;
+    }
+
+    try {
+        const auto& rec = s_evolutionHistory->getRecord(generation);
+        QString msg = QString(
+            "Generation %1\n"
+            "Best:  %2\n"
+            "Avg:   %3\n"
+            "Worst: %4"
+        ).arg(generation)
+         .arg(rec.bestFitness, 0, 'f', 2)
+         .arg(rec.averageFitness, 0, 'f', 2)
+         .arg(rec.worstFitness, 0, 'f', 2);
+
+        QMessageBox::information(this, "Generation Data", msg);
+    } catch (...) {
+        QMessageBox::warning(this, "Error", "Invalid generation");
+    }
+}
+
+// functionality to set history from MainWindow
+void setStatsPanelEvolutionHistory(const WatchGA::FileIO::EvolutionHistory* hist)
+{
+    s_evolutionHistory = hist;
 }

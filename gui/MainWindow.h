@@ -5,7 +5,7 @@
 #include "WatchCanvas.h"
 #include "StatsPanel.h"
 #include "../fileio/EvolutionHistory.h"
-#include "../algorithm/GeneticAlgorithm.h" // ✅ ADD THIS
+#include "../algorithm/GeneticAlgorithm.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -21,6 +21,12 @@ private:
     WatchGA::FileIO::EvolutionHistory m_evolutionHistory;
     WatchGA::Algorithm::GeneticAlgorithm m_ga;
     int m_currentGeneration;
+    void initializeGeneticAlgorithmFirstRun();
+    void runOneGeneration();
+
+    // Status
+    bool m_isRunning = false; // ADD THIS
+    QTimer* m_runTimer;       // ADD THIS
 };
 
 #endif // MAINWINDOW_H
