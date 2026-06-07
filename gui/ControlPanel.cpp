@@ -6,8 +6,8 @@
 namespace WatchGA {
 namespace GUI {
 
-// Static config manager
-static FileIO::ConfigManager s_config;
+// config manager
+WatchGA::FileIO::ConfigManager s_config;
 
 ControlPanel::ControlPanel(QWidget* parent) : 
     QWidget(parent),
@@ -17,7 +17,13 @@ ControlPanel::ControlPanel(QWidget* parent) :
     
     //Create and reset config on startup
     s_config = FileIO::ConfigManager("config.txt");
-    s_config.clear();
+    s_config.setInt("populationSize", 100);
+    s_config.setDouble("mutationRate", 0.1);
+    s_config.setDouble("crossoverRate", 0.8);
+    s_config.setInt("elitismCount", 2);
+    s_config.setString("selectionStrategy", "Tournament");
+    s_config.setString("crossoverStrategy", "One Point");
+    s_config.setString("mutationStrategy", "Swap");
     s_config.saveConfig();
 
     // Set the pause button to disabled at start
@@ -265,6 +271,7 @@ void ControlPanel::controlParameter(bool control){
     ui->selectionCombo->setEnabled(control);
     ui->crossoverCombo->setEnabled(control);
     ui->mutationCombo->setEnabled(control);
+    ui->resetToDefaults->setEnabled(control);
 }
 
 } // namespace GUI

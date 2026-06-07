@@ -10,6 +10,9 @@
 #include <QSizePolicy>
 #include <functional>
 #include <QToolTip> // for step button pop up
+
+// Access the same s_config as ControlPanel
+namespace WatchGA {namespace GUI {extern FileIO::ConfigManager s_config;}}
 void setStatsPanelEvolutionHistory(const WatchGA::FileIO::EvolutionHistory* hist);
 
 MainWindow::MainWindow(QWidget *parent)
@@ -64,7 +67,24 @@ MainWindow::MainWindow(QWidget *parent)
     // =========================================================
     connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
         // Start Population if at gen 0, DO THE SAME FOR RUN 
-        if (m_currentGeneration == 0) m_ga.reset(); 
+        if (m_currentGeneration == 0) {
+            using namespace WatchGA::GUI;
+            using namespace WatchGA::Algorithm;
+            // Get latest values from the shared config
+            int popSize = s_config.getInt("populationSize", 100);
+            double mutRate = s_config.getDouble("mutationRate", 0.1);
+            double crossRate = s_config.getDouble("crossoverRate", 0.8);
+            int elitism = s_config.getInt("elitismCount", 2);
+            std::string selection = s_config.getString("selectionStrategy", "Tournament");
+            std::string crossover = s_config.getString("crossoverStrategy", "One Point");
+            std::string mutation = s_config.getString("mutationStrategy", "Swap");
+            // Apply the configs to the GA
+            m_ga.setPopulationSize(popSize);
+            m_ga.setMutationRate(mutRate);
+            m_ga.setCrossoverRate(crossRate);
+            m_ga.setElitismCount(elitism);
+            m_ga.reset();
+        } 
 
         qDebug() << "Step: Evolving Generation" << m_currentGeneration + 1;
         int nextGen = m_currentGeneration + 1;
@@ -79,6 +99,9 @@ MainWindow::MainWindow(QWidget *parent)
         // Show the popup
         QPoint topCenter = mapToGlobal(QPoint(width() / 2 - 100, 40));
         QToolTip::showText(topCenter, QString("Generating %1%2 generation...").arg(nextGen).arg(suffix), nullptr,QRect(), 1500);
+
+        
+
         // 1. RUN 1 FULL EVOLUTIONARY GENERATION
         m_ga.runGeneration();
         WatchGA::FileIO::EvolutionHistory::GenerationRecord record; //following the struct
@@ -101,6 +124,10 @@ MainWindow::MainWindow(QWidget *parent)
         // 4. UPDATE GRAPH WITH REAL FITNESS
         m_currentGeneration++;
         statsPanel->updateAverageFitness(m_currentGeneration, m_ga.getAverageFitness());
+    });
+
+    connect(controlPanel, &WatchGA::GUI::ControlPanel::resetClicked, this, [this](){
+        qDebug() << "Current Population: " << WatchGA::GUI::s_config.getInt("populationSize", 100);
     });
 
     // Connect GA callback to graph

@@ -2,6 +2,7 @@
 #define CONTROLPANEL_H
 
 #include <QWidget>
+#include "../fileio/ConfigManager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ControlPanel; }
@@ -10,6 +11,8 @@ QT_END_NAMESPACE
 namespace WatchGA {
 namespace GUI {
 
+// Allow it to be used by other files
+extern WatchGA::FileIO::ConfigManager s_config;
 /**
  * @brief The control panel for simulation parameters
  * 
