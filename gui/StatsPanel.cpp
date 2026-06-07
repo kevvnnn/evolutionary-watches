@@ -151,7 +151,7 @@ void StatsPanel::showGenerationInfo(int generation)
     }
 }
 
-// ✅ ADD THIS FUNCTION (to set history from MainWindow)
+// functionality to set history from MainWindow
 void setStatsPanelEvolutionHistory(const WatchGA::FileIO::EvolutionHistory* hist)
 {
     s_evolutionHistory = hist;

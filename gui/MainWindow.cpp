@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QSizePolicy>
 #include <functional>
+#include <QToolTip> // for step button pop up
 void setStatsPanelEvolutionHistory(const WatchGA::FileIO::EvolutionHistory* hist);
 
 MainWindow::MainWindow(QWidget *parent)
@@ -63,7 +64,15 @@ MainWindow::MainWindow(QWidget *parent)
     // =========================================================
     connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
         qDebug() << "Step: Evolving Generation" << m_currentGeneration + 1;
+        int nextGen = m_currentGeneration + 1;
+        QString suffix;
+        if (nextGen % 10 == 1 && nextGen % 100 != 11) suffix = "st";
+        else if (nextGen % 10 == 2 && nextGen % 100 != 12) suffix = "nd";
+        else if (nextGen % 10 == 3 && nextGen % 100 != 13) suffix = "rd";
+        else suffix = "th";
 
+        QPoint topCenter = mapToGlobal(QPoint(width() / 2 - 100, 40));
+        QToolTip::showText(topCenter, QString("Generating %1%2 generation...").arg(nextGen).arg(suffix), nullptr,QRect(), 1500);
         // 1. RUN 1 FULL EVOLUTIONARY GENERATION
         m_ga.runGeneration();
         WatchGA::FileIO::EvolutionHistory::GenerationRecord record;
