@@ -35,30 +35,38 @@ OnePointCrossover::crossover(
     const auto& p1 = parent1->getAllComponents();
     const auto& p2 = parent2->getAllComponents();
 
-    size_t minSize = std::min(p1.size(), p2.size());
-    
-    if (minSize <= 1) {
-        return {std::make_shared<Genome::Watch>(*parent1), std::make_shared<Genome::Watch>(*parent2)};
-    }
-
-    std::uniform_int_distribution<size_t> dist(1, minSize - 1);
-    size_t crossoverPoint = dist(getRng());
-
-    // Assemble the children sequentially to preserve array indices
-    // Build Child 1: Parent 1 (Front) + Parent 2 (Back)
-    for (size_t i = 0; i < crossoverPoint && i < p1.size(); ++i) {
+    // 1. COPY CORE ORGANS (Indices 0-4)
+    // These 5 parts must exist in every child exactly as they were in the parents.
+    // We limit the loop to the size of the parent in case a watch is somehow invalid/too small.
+    for (size_t i = 0; i < 5 && i < p1.size(); ++i) {
         child1->addComponent(p1[i]->clone());
     }
-    for (size_t i = crossoverPoint; i < p2.size(); ++i) {
-        child1->addComponent(p2[i]->clone());
-    }
-
-    // Build Child 2: Parent 2 (Front) + Parent 1 (Back)
-    for (size_t i = 0; i < crossoverPoint && i < p2.size(); ++i) {
+    for (size_t i = 0; i < 5 && i < p2.size(); ++i) {
         child2->addComponent(p2[i]->clone());
     }
-    for (size_t i = crossoverPoint; i < p1.size(); ++i) {
-        child2->addComponent(p1[i]->clone());
+
+    // 2. CROSSOVER GEARS (Indices 5 to end)
+    // We slice only the gear/jewel section of the genome.
+    size_t p1GearCount = (p1.size() > 5) ? (p1.size() - 5) : 0;
+    size_t p2GearCount = (p2.size() > 5) ? (p2.size() - 5) : 0;
+    size_t minGears = std::min(p1GearCount, p2GearCount);
+
+    if (minGears > 0) {
+        // Pick a crossover point relative to the start of the gear section
+        std::uniform_int_distribution<size_t> dist(1, minGears);
+        size_t slice = dist(getRng());
+
+        // Child 1: Core(P1) + Gears(P1, 0 to slice) + Gears(P2, slice to end)
+        for (size_t i = 5; i < 5 + slice; ++i) child1->addComponent(p1[i]->clone());
+        for (size_t i = 5 + slice; i < p2.size(); ++i) child1->addComponent(p2[i]->clone());
+
+        // Child 2: Core(P2) + Gears(P2, 0 to slice) + Gears(P1, slice to end)
+        for (size_t i = 5; i < 5 + slice; ++i) child2->addComponent(p2[i]->clone());
+        for (size_t i = 5 + slice; i < p1.size(); ++i) child2->addComponent(p1[i]->clone());
+    } else {
+        // If no gears exist, just copy remaining components to avoid emptiness
+        for (size_t i = 5; i < p1.size(); ++i) child1->addComponent(p1[i]->clone());
+        for (size_t i = 5; i < p2.size(); ++i) child2->addComponent(p2[i]->clone());
     }
 
     child1->setValid(true);

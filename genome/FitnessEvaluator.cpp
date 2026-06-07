@@ -139,22 +139,24 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
         }
     }
     
-    // // =========================================================================
-    // // LIMIT HAIRSPRING & MAINSPRING
-    // // =========================================================================
+    // =========================================================================
+    // THE GEAR TRAIN TORQUE REWARD (Fixes Add/Remove 1-Gear Trap)
+    // =========================================================================
+    int totalGears = 0;
+    for (const auto& comp : watch.getAllComponents()) {
+        if (dynamic_cast<const Components::Gear*>(comp.get())) totalGears++;
+    }
 
-    // int hairspringCount = 0;
-    // int mainspringCount = 0;
-
-    // // Apply the executioner penalties after the loop
-    // if (hairspringCount > 1) {
-    //     double violation = hairspringCount - 1.0;
-    //     raw -= 5.0 * (violation * violation); // Massive penalty for hoarding
-    // }
-    // if (mainspringCount > 1) {
-    //     double violation = mainspringCount - 1.0;
-    //     raw -= 5.0 * (violation * violation); // Massive penalty for hoarding
-    // }
+    // Punish 1-gear watches, reward 3-to-5 gear watches
+    if (totalGears == 1) {
+        raw -= 0.15; // Too weak, cannot step up the gear ratio
+    } else if (totalGears == 2) {
+        raw -= 0.05; // Barely enough torque
+    } else if (totalGears >= 3 && totalGears <= 5) {
+        raw += 0.05; // The Horological Goldilocks Zone! (Massive Reward)
+    } else if (totalGears > 5) {
+        raw -= 0.05 * (totalGears - 5); // Too much friction, energy is lost
+    }
 
     // Floor the raw score to 0.0 so negative penalties don't break the log math
     if (raw < 0.0) raw = 0.0;
