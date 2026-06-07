@@ -21,6 +21,7 @@ private:
     WatchGA::FileIO::EvolutionHistory m_evolutionHistory;
     WatchGA::Algorithm::GeneticAlgorithm m_ga;
     int m_currentGeneration;
+    void initializeGeneticAlgorithmFirstRun();
 };
 
 #endif // MAINWINDOW_H

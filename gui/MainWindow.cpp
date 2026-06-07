@@ -2,7 +2,7 @@
 #include "WatchCanvas.h"
 #include "ControlPanel.h"
 #include "StatsPanel.h"
-#include "GeneticAlgorithm.h"
+#include "../algorithm/GeneticAlgorithm.h"
 #include "../genome/Watch.h"
 #include "../fileio/EvolutionHistory.h"
 #include <QHBoxLayout>
@@ -10,10 +10,56 @@
 #include <QSizePolicy>
 #include <functional>
 #include <QToolTip> // for step button pop up
+#include <memory>
+#include "../algorithm/CrossoverStrategy.h"
+#include "../algorithm/MutationStrategy.h"
+#include "../algorithm/SelectionStrategy.h"
 
 // Access the same s_config as ControlPanel
 namespace WatchGA {namespace GUI {extern FileIO::ConfigManager s_config;}}
 void setStatsPanelEvolutionHistory(const WatchGA::FileIO::EvolutionHistory* hist);
+
+// Selection Strategy Factory
+std::unique_ptr<WatchGA::Core::ISelectionStrategy> createSelectionStrategy(const std::string& name)
+{
+    if (name == "Tournament") {
+        return std::make_unique<WatchGA::Algorithm::TournamentSelection>(3);
+    }
+    if (name == "Roulette Wheel") {
+        return std::make_unique<WatchGA::Algorithm::RouletteWheelSelection>();
+    }
+    // Default
+    return std::make_unique<WatchGA::Algorithm::TournamentSelection>(3);
+}
+
+// Crossover Strategy Factory
+std::unique_ptr<WatchGA::Core::ICrossoverStrategy> createCrossoverStrategy(const std::string& name)
+{
+    if (name == "One Point") {
+        return std::make_unique<WatchGA::Algorithm::OnePointCrossover>();
+    }
+    if (name == "Uniform") {
+        return std::make_unique<WatchGA::Algorithm::UniformCrossover>();
+    }
+    // Default
+    return std::make_unique<WatchGA::Algorithm::OnePointCrossover>();
+}
+
+// Mutation Strategy Factory
+std::unique_ptr<WatchGA::Core::IMutationStrategy> createMutationStrategy(const std::string& name)
+{
+    if (name == "Swap") {
+        return std::make_unique<WatchGA::Algorithm::SwapMutation>();
+    }
+    if (name == "Parameter") {
+        return std::make_unique<WatchGA::Algorithm::ParameterMutation>(0.1);
+    }
+    if (name == "AddRemove") {
+        return std::make_unique<WatchGA::Algorithm::AddRemoveMutation>(50);
+    }
+    // Default
+    return std::make_unique<WatchGA::Algorithm::SwapMutation>();
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -68,22 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
         // Start Population if at gen 0, DO THE SAME FOR RUN 
         if (m_currentGeneration == 0) {
-            using namespace WatchGA::GUI;
-            using namespace WatchGA::Algorithm;
-            // Get latest values from the shared config
-            int popSize = s_config.getInt("populationSize", 100);
-            double mutRate = s_config.getDouble("mutationRate", 0.1);
-            double crossRate = s_config.getDouble("crossoverRate", 0.8);
-            int elitism = s_config.getInt("elitismCount", 2);
-            std::string selection = s_config.getString("selectionStrategy", "Tournament");
-            std::string crossover = s_config.getString("crossoverStrategy", "One Point");
-            std::string mutation = s_config.getString("mutationStrategy", "Swap");
-            // Apply the configs to the GA
-            m_ga.setPopulationSize(popSize);
-            m_ga.setMutationRate(mutRate);
-            m_ga.setCrossoverRate(crossRate);
-            m_ga.setElitismCount(elitism);
-            m_ga.reset();
+            initializeGeneticAlgorithmFirstRun();
         } 
 
         qDebug() << "Step: Evolving Generation" << m_currentGeneration + 1;
@@ -134,4 +165,25 @@ MainWindow::MainWindow(QWidget *parent)
     m_ga.setStatsCallback([this](int gen, double avg) {
         statsPanel->updateAverageFitness(gen, avg);
     });
+}
+void MainWindow::initializeGeneticAlgorithmFirstRun(){
+    using namespace WatchGA::GUI;
+    using namespace WatchGA::Algorithm;
+    // Get latest values from the shared config
+    int popSize = s_config.getInt("populationSize", 100);
+    double mutRate = s_config.getDouble("mutationRate", 0.1);
+    double crossRate = s_config.getDouble("crossoverRate", 0.8);
+    int elitism = s_config.getInt("elitismCount", 2);
+    std::string selection = s_config.getString("selectionStrategy", "Tournament");
+    std::string crossover = s_config.getString("crossoverStrategy", "One Point");
+    std::string mutation = s_config.getString("mutationStrategy", "Swap");
+    // Apply the configs to the GA
+    m_ga.setPopulationSize(popSize);
+    m_ga.setMutationRate(mutRate);
+    m_ga.setCrossoverRate(crossRate);
+    m_ga.setElitismCount(elitism);
+    m_ga.setSelectionStrategy(createSelectionStrategy(selection));
+    m_ga.setCrossoverStrategy(createCrossoverStrategy(crossover));
+    m_ga.setMutationStrategy(createMutationStrategy(mutation));
+    m_ga.reset();
 }
