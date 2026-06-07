@@ -1,5 +1,6 @@
 #include "Gear.h"
 #include <stdexcept>
+#include <sstream>  // For clean string formatting
 
 namespace WatchGA {
 namespace Genome {
@@ -133,18 +134,20 @@ std::unique_ptr<WatchComponent> Gear::clone() const {
     return std::make_unique<Gear>(*this);
 }
 
-// Debug string for Assembly Manifest
+// Debug string for Assembly Manifest — BULLET POINT FORMAT
 std::string Gear::toString() const {
-    std::string base = WatchComponent::toString() +
-           " [Gear | Teeth: " + std::to_string(m_toothCount) +
-           ", Dia: " + std::to_string(m_diameter) + "mm]";
-           
-    // Append the Jewel data if one is equipped
+    std::ostringstream oss;
+    oss << WatchComponent::toString() << "\n"
+        << "• Tooth Count: " << m_toothCount << "\n"
+        << "• Diameter: " << m_diameter << "mm\n"
+        << "• Meshing Quality: " << m_meshingQuality;
+    
+    // Append jewel info if present
     if (hasJewel()) {
-        base += " -> [Includes Cap Jewel: " + std::string(m_jewel->isCapJewel() ? "Yes" : "No") + "]";
+        oss << "\n• Includes Cap Jewel: " << (m_jewel->isCapJewel() ? "Yes" : "No");
     }
     
-    return base;
+    return oss.str();
 }
 
 } // namespace Components

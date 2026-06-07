@@ -299,8 +299,11 @@ void runEvolutionTimeLapse() {
 
     // Inject strategies
     ga.setSelectionStrategy(std::make_unique<TournamentSelection>(3));
-    ga.setCrossoverStrategy(std::make_unique<UniformCrossover>());
+    // ga.setCrossoverStrategy(std::make_unique<UniformCrossover>());
+    ga.setCrossoverStrategy(std::make_unique<OnePointCrossover>());
+    // ga.setMutationStrategy(std::make_unique<SwapMutation>());
     ga.setMutationStrategy(std::make_unique<ParameterMutation>(0.15));
+    // ga.setMutationStrategy(std::make_unique<AddRemoveMutation>(20));
     
     ga.reset(); 
 

@@ -108,11 +108,6 @@ MainWindow::MainWindow(QWidget *parent)
     // INITIALIZE REAL GENETIC ALGORITHM
     // =========================================================
     m_currentGeneration = 0;
-    // m_ga.reset(); // Starts population + evaluates generation 0
-
-    // // Show BEST WATCH of GENERATION 0
-    // watchCanvas->setWatch(m_ga.getBestWatch().get());
-    // statsPanel->updateAverageFitness(0, m_ga.getAverageFitness());
 
     // =========================================================
     // STEP BUTTON — EVOLVE + SHOW BEST WATCH (REAL SYSTEM)
@@ -142,7 +137,6 @@ MainWindow::MainWindow(QWidget *parent)
         resetEvolution();
     });
 
-    // Connect GA callback to graph
     m_ga.setStatsCallback([this](int gen, double avg) {
         statsPanel->updateAverageFitness(gen, avg);
     });
