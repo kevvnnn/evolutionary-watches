@@ -14,6 +14,7 @@
 #include <functional>
 #include <QToolTip> // for step button pop up
 #include <memory>
+#include <QPushButton>
 
 // Access the same s_config as ControlPanel
 namespace WatchGA {namespace GUI {extern FileIO::ConfigManager s_config;}}
