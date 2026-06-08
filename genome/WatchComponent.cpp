@@ -71,7 +71,6 @@ std::string WatchComponent::toString() const
     std::ostringstream oss;
     oss << "• Name: "         << m_name       << "\n"
         << "• Weight: "       << m_weight     << "g\n"
-        << "• Friction: "     << m_friction   << "\n"
-        << "• Position: ("    << m_x << ", " << m_y << ")";
+        << "• Friction: "     << m_friction;
     return oss.str();
 }
