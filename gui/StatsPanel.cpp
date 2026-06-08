@@ -35,15 +35,15 @@ void StatsPanel::setupUI()
     headerLayout->setSpacing(8);
 
     // Title label at the top of the panel
-    titleLabel = new QLabel("Average Fitness per Generation", this);
-    QFont font = titleLabel->font();
-    font.setBold(true);
-    font.setPointSize(10);
-    titleLabel->setFont(font);
-    titleLabel->setStyleSheet("color: #222;");
+    // titleLabel = new QLabel("Average Fitness per Generation", this);
+    // QFont font = titleLabel->font();
+    // font.setBold(true);
+    // font.setPointSize(10);
+    // titleLabel->setFont(font);
+    // titleLabel->setStyleSheet("color: #222;");
 
     // Add title to the top bar
-    headerLayout->addWidget(titleLabel);
+    // headerLayout->addWidget(titleLabel);
     headerLayout->addStretch();
 
     // Add top bar to main layout
@@ -55,15 +55,15 @@ void StatsPanel::setupChart()
 {
     // Create the chart object
     fitnessChart = new QChart();
-    fitnessChart->setTitle("Fitness Trend");
+    // fitnessChart->setTitle("Fitness Trend");
     fitnessChart->setTitleFont(QFont("Arial", 9));
-    fitnessChart->legend()->setVisible(true);
-    fitnessChart->legend()->setAlignment(Qt::AlignBottom);
+    fitnessChart->legend()->setVisible(false);
+    // fitnessChart->legend()->setAlignment(Qt::AlignBottom);
     fitnessChart->setBackgroundBrush(QColor("#ffffff"));
 
     // Create the blue line that shows fitness over time
     avgFitnessSeries = new QLineSeries();
-    avgFitnessSeries->setName("Avg Fitness");
+    // avgFitnessSeries->setName("Avg Fitness");
     avgFitnessSeries->setPen(QPen(QColor(0, 120, 212), 2));
     fitnessChart->addSeries(avgFitnessSeries);
 
