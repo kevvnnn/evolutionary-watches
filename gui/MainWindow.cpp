@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget* rightContainer = new QWidget;
     QVBoxLayout* rightLayout = new QVBoxLayout(rightContainer);
 
-    WatchGA::GUI::ControlPanel* controlPanel = new WatchGA::GUI::ControlPanel;
+    controlPanel = new WatchGA::GUI::ControlPanel;
     rightLayout->addWidget(controlPanel);
 
     statsPanel = new StatsPanel(rightContainer);
@@ -261,6 +261,12 @@ void MainWindow::runOneGeneration()
     // 4. UPDATE GRAPH WITH REAL FITNESS
     m_currentGeneration++;
     statsPanel->updateAverageFitness(m_currentGeneration, m_ga.getAverageFitness());
+
+    // Update Stats panel
+    controlPanel->setCurrentGeneration(m_currentGeneration);
+    controlPanel->setBestFitness(m_ga.getBestFitness());
+    controlPanel->setAverageFitness(m_ga.getAverageFitness());
+
 }
 
 void MainWindow::resetEvolution()

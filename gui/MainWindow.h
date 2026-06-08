@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "WatchCanvas.h"
 #include "StatsPanel.h"
+#include "ControlPanel.h"
 #include "../fileio/EvolutionHistory.h"
 #include "../algorithm/GeneticAlgorithm.h"
 
@@ -32,8 +33,10 @@ private:
     bool m_strategiesInitialized = false; // Prevents crashing
 
     // Status
-    bool m_isRunning = false; // ADD THIS
-    QTimer* m_runTimer;       // ADD THIS
+    bool m_isRunning = false;
+    QTimer* m_runTimer;
+
+    WatchGA::GUI::ControlPanel* controlPanel;
 };
 
 #endif // MAINWINDOW_H

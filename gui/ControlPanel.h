@@ -83,8 +83,15 @@ public:
     void setCrossoverStrategy(const QString& strategyName);
     void setMutationStrategy(const QString& strategyName);
 
+    // Statistics
+    void setCurrentGeneration(int gen);
+    void setBestFitness(double val);
+    void setAverageFitness(double val);
+    // void setWorstFitness(double val);
+
     // Disable changes of parameters
     void controlParameter(bool);
+
 };
 
 } // namespace GUI

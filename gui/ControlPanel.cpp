@@ -278,5 +278,25 @@ void ControlPanel::controlParameter(bool control){
     ui->resetToDefaults->setEnabled(control);
 }
 
+void ControlPanel::setCurrentGeneration(int gen)
+{
+    ui->generationValue->setText(QString::number(gen));
+}
+
+void ControlPanel::setBestFitness(double val)
+{
+    ui->bestFitnessValue->setText(QString::number(val, 'f', 2));
+}
+
+void ControlPanel::setAverageFitness(double val)
+{
+    ui->avgFitnessValue->setText(QString::number(val, 'f', 2));
+}
+
+// void ControlPanel::setWorstFitness(double val)
+// {
+//     // ui->worstFitnessValue->setText(QString::number(val, 'f', 2));
+// }
+
 } // namespace GUI
 } // namespace WatchGA
