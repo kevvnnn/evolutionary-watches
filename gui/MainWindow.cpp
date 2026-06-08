@@ -8,6 +8,7 @@
 #include "../algorithm/CrossoverStrategy.h"
 #include "../algorithm/MutationStrategy.h"
 #include "../algorithm/SelectionStrategy.h"
+#include "../fileio/WatchFileIO.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSizePolicy>
@@ -15,6 +16,7 @@
 #include <QToolTip> // for step button pop up
 #include <memory>
 #include <QPushButton>
+#include <QFileDialog>
 
 // Access the same s_config as ControlPanel
 namespace WatchGA {namespace GUI {extern FileIO::ConfigManager s_config;}}
@@ -111,11 +113,46 @@ MainWindow::MainWindow(QWidget *parent)
     rightLayout->addStretch();
     mainLayout->addWidget(rightContainer);
     
+    // --------------------------
+    // SAVE BEST WATCH
+    // --------------------------
     connect(btnSaveWatch, &QPushButton::clicked, this, [this]() {
-        qDebug() << "Save Watch Clicked";
+        auto bestWatch = m_ga.getBestWatch();
+        if (!bestWatch) {
+            QToolTip::showText(mapToGlobal(rect().center()), "No watch to save!", nullptr, QRect(), 2000);
+            return;
+        }
+
+        QString path = QFileDialog::getSaveFileName(this, "Save Best Watch", "", "Binary Watch (*.bin)");
+        if (path.isEmpty()) return;
+
+        WatchGA::FileIO::WatchFileIO saver(path.toStdString());
+        bool ok = saver.saveWatch(*bestWatch, 0);
+
+        if (ok)
+            QToolTip::showText(mapToGlobal(rect().center()), "Watch saved!", nullptr, QRect(), 2000);
+        else
+            QToolTip::showText(mapToGlobal(rect().center()), "Save failed!", nullptr, QRect(), 2000);
     });
+
+    // --------------------------
+    // LOAD WATCH
+    // --------------------------
     connect(btnLoadWatch, &QPushButton::clicked, this, [this]() {
-        qDebug() << "Save Watch Clicked";
+        QString path = QFileDialog::getOpenFileName(this, "Load Watch", "", "Binary Watch (*.bin)");
+        if (path.isEmpty()) return;
+
+        WatchGA::FileIO::WatchFileIO loader(path.toStdString());
+        
+        // FIX: Transfer ownership to the MainWindow variable so it doesn't get destroyed!
+        m_loadedWatch = loader.loadWatch(0);
+
+        if (m_loadedWatch) {
+            watchCanvas->setWatch(m_loadedWatch.get());
+            QToolTip::showText(mapToGlobal(rect().center()), "Watch loaded!", nullptr, QRect(), 2000);
+        } else {
+            QToolTip::showText(mapToGlobal(rect().center()), "Load failed!", nullptr, QRect(), 2000);
+        }
     });
     
     // =========================================================

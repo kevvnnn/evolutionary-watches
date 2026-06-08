@@ -13,7 +13,7 @@ public:
     MainWindow(QWidget* parent = nullptr);
 
 private:
-    // UI
+ // UI
     WatchCanvas* watchCanvas;
     StatsPanel* statsPanel;
 
@@ -21,6 +21,10 @@ private:
     WatchGA::FileIO::EvolutionHistory m_evolutionHistory;
     WatchGA::Algorithm::GeneticAlgorithm m_ga;
     int m_currentGeneration;
+    
+    // Holds the loaded watch in memory
+    std::unique_ptr<WatchGA::Genome::Watch> m_loadedWatch;
+    
     void initializeGeneticAlgorithmFirstRun();
     void runOneGeneration();
     void resetEvolution();
