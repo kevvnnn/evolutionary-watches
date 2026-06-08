@@ -20,7 +20,6 @@ private:
     QLabel* m_lblName;
     QLabel* m_lblWeight;
     QLabel* m_lblFriction;
-    QLabel* m_lblPosition;
     QLabel* m_lblEfficiency;
 };
 
