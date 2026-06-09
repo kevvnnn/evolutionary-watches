@@ -69,8 +69,9 @@ std::unique_ptr<WatchComponent> BalanceWheel::clone() const {
 
 std::string BalanceWheel::toString() const {
     return WatchComponent::toString() + "\n"
-           "• Type: Balance Wheel\n"
-           "• Isochronism: " + std::to_string(m_isochronism);
+           "• Isochronism: " + std::to_string(m_isochronism) + "\n"
+           "• Amplitude: " + std::to_string(m_amplitude) + " deg\n"
+           "• MoI: " + std::to_string(m_momentOfInertia);
 }
 
 } // namespace Components

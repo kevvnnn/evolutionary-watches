@@ -69,8 +69,11 @@ std::string Hand::toString() const {
         case HandType::MINUTE: typeStr = "Minute Hand"; break;
         case HandType::SECOND: typeStr = "Second Hand"; break;
     }
+    
     return WatchComponent::toString() + "\n"
-           "• Type: " + typeStr;
+           "• Type: " + typeStr + "\n"
+           "• Balance: " + std::to_string(m_balance) + "\n"
+           "• Length: " + std::to_string(m_length) + "mm";
 }
 
 } // namespace Components

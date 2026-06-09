@@ -86,8 +86,12 @@ std::unique_ptr<WatchComponent> Spring::clone() const {
 
 std::string Spring::toString() const {
     std::string typeStr = (m_type == SpringType::MAINSPRING) ? "Mainspring" : "Hairspring";
+    
     return WatchComponent::toString() + "\n"
-           "• Type: " + typeStr;
+           "• Type: " + typeStr + "\n"
+           "• Elasticity: " + std::to_string(m_elasticity) + "\n"
+           "• Fatigue Res: " + std::to_string(m_fatigueResistance) + "\n"
+           "• Length: " + std::to_string(m_length) + "mm";
 }
 
 } // namespace Components
