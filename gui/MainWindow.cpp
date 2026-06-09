@@ -201,7 +201,27 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(btnLogHistory, &QPushButton::clicked, this, [this](){
-        qDebug() << "Log clicked";
+        qDebug() << "Save Log clicked";
+        // Check if theres history to save
+        if (m_evolutionHistory.getRecordCount() == 0) {
+            QToolTip::showText(mapToGlobal(rect().center()),"No evolution history to save!", nullptr, QRect(), 2000);
+            return;
+        }
+
+        QString path = QFileDialog::getSaveFileName(
+            this,
+            "Save Evolution History",
+            "",
+            "Evolution History log (*.txt *.csv);;All Files (*.*)"
+        );
+        if (path.isEmpty()) return;
+
+        bool ok = m_evolutionHistory.saveToFile(path.toStdString());
+        if (ok)
+            QToolTip::showText(mapToGlobal(rect().center()), "Evolution history saved!",nullptr, QRect(), 2000);
+        else
+            QToolTip::showText(mapToGlobal(rect().center()), "Save failed!",nullptr, QRect(), 2000);
+
     });
 
     m_ga.setStatsCallback([this](int gen, double avg) {
