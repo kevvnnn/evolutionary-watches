@@ -6,6 +6,9 @@
 
 <img src="images-for-readme/gen0vs50comparison.png" style="width: 80%;" alt="Comparison between a generation 0 and generation 50 watch design">
 
+## Download
+You can download the directly executable simulator app through our repository releases or this <a href="https://github.com/kevvnnn/evolutionary-watches/releases/tag/1.0.0">link!</a>
+
 ## Overview
 WatchGA is a computational physics and evolutionary biology simulator designed to autonomously engineer mechanical watch gear trains. Starting from a randomized pool of physical components (gears, springs, balance wheels, and synthetic ruby jewels), the engine applies simplified physics constraints to evaluate structural integrity and kinetic efficiency. Over 50 generations, the algorithm naturally discovers real-world watchmaking principles, such as the 17-jewel friction-reduction standard and optimal gear ratio modules, without human intervention.
 
