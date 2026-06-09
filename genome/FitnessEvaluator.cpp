@@ -7,7 +7,10 @@
 namespace WatchGA {
 namespace Genome {
 
-// Default weights for good watch evolution
+// ---------------------------------------------------------
+// CONSTRUCTORS
+// ---------------------------------------------------------
+
 FitnessEvaluator::FitnessEvaluator()
     : m_accuracyWeight(0.7),
       m_efficiencyWeight(0.3),
@@ -25,10 +28,14 @@ FitnessEvaluator::FitnessEvaluator(double accuracyWeight, double efficiencyWeigh
 {
 }
 
-// FIXED: Added namespace to find BalanceWheel
+// ---------------------------------------------------------
+// INTERNAL SCORING HELPERS
+// ---------------------------------------------------------
+
 double FitnessEvaluator::calculateAccuracyScore(const Watch& watch) const {
     using namespace Components;
-
+    
+    // Find the Balance Wheel and return its isochronism as the baseline accuracy
     for (const auto& comp : watch.getAllComponents()) {
         if (const auto* bw = dynamic_cast<const BalanceWheel*>(comp.get())) {
             return bw->getIsochronism();
@@ -37,42 +44,46 @@ double FitnessEvaluator::calculateAccuracyScore(const Watch& watch) const {
     return 0.0;
 }
 
-// Average efficiency of all components
 double FitnessEvaluator::calculateEfficiencyScore(const Watch& watch) const {
     double total = 0.0;
     unsigned int count = 0;
+    
     for (const auto& comp : watch.getAllComponents()) {
         total += comp->calculateEfficiency();
         count++;
     }
+    // Return the averaged efficiency of all parts combined
     return (count == 0) ? 0.0 : (total / count);
 }
 
-// Penalize overly complex watches
 double FitnessEvaluator::calculateComplexityPenalty(const Watch& watch) const {
+    // Punishes watches for "part-spamming" (e.g., using 20 gears when 5 would do)
     return watch.getComponentCount() * m_complexityPenaltyFactor;
 }
 
-// Log scaling prevents score inflation
 double FitnessEvaluator::applyLogScaling(double raw) const {
     if (raw <= 0.0) return 0.0;
     return log(raw * (m_logBase - 1.0) + 1.0) / log(m_logBase);
 }
 
-// MAIN FITNESS FUNCTION
+// =========================================================================
+// MAIN FITNESS FUNCTION (THE PHYSICS ENGINE)
+// =========================================================================
+
 double FitnessEvaluator::evaluate(const Watch& watch) const {
+    // 1. Immediate Execution Guard: Invalid or missing core organs result in instant death
     if (!watch.isValid() || !watch.checkEssentialComponents())
         return 0.0;
 
+    // 2. Calculate Base Physics Score
     double accuracy = calculateAccuracyScore(watch);
     double efficiency = calculateEfficiencyScore(watch);
     double penalty = calculateComplexityPenalty(watch);
 
-    // Calculate the raw base score
     double raw = (accuracy * m_accuracyWeight) + (efficiency * m_efficiencyWeight) - penalty;
 
     // =========================================================================
-    // CONTINUOUS QUADRATIC PENALTIES (The "Smooth" Physics Guard)
+    // 3. CONTINUOUS QUADRATIC PENALTIES (The "Smooth" Physics Guard)
     // =========================================================================
     double hourHandLength = 0.0;
     double minuteHandLength = 0.0;
@@ -80,26 +91,25 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
     using namespace Components;
     for (const auto& comp : watch.getAllComponents()) {
         
-        // A. Guard Against Knocking (Smooth Penalty past 315 degrees)
+        // Case A: Guard Against Knocking (Amplitude limit)
         if (auto* bw = dynamic_cast<const BalanceWheel*>(comp.get())) {
             double amp = bw->getAmplitude();
             if (amp > 315.0) {
                 double violation = amp - 315.0;
-                raw -= 0.001 * (violation * violation); 
+                raw -= 0.001 * (violation * violation); // Smooth quadratic drop
             }
         }
         
-        // B. Guard Against Micro-Gears (Smooth Penalty below 0.08 module)
+        // Case B: Guard Against Micro-Gears (Module limit)
         else if (auto* gear = dynamic_cast<const Gear*>(comp.get())) {
             double module = gear->getDiameter() / static_cast<double>(gear->getToothCount());
             if (module < 0.08) {
                 double violation = 0.08 - module;
-                // Multiplier is high (100.0) because module violations are tiny decimals
-                raw -= 100.0 * (violation * violation); 
+                raw -= 100.0 * (violation * violation); // Massive quadratic multiplier for impossible physics
             }
         }
 
-        // C. Extract Hand Lengths
+        // Case C: Extract Hand Lengths for Case Geometry Check
         else if (auto* hand = dynamic_cast<const Hand*>(comp.get())) {
             if (hand->getType() == Hand::HandType::HOUR) {
                 hourHandLength = hand->getLength();
@@ -110,11 +120,11 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
     }
 
     // =========================================================================
-    // 36MM DIAL & LEGIBILITY (Continuous Scaling)
+    // 4. 36MM DIAL & LEGIBILITY CHECKS
     // =========================================================================
     if (hourHandLength > 0.0 && minuteHandLength > 0.0) {
         
-        // 1. Case Scraping: Smooth penalty for exceeding 18mm radius
+        // A. Case Scraping: Hand cannot physically exceed the 18mm dial radius
         if (hourHandLength > 18.0) {
             double violation = hourHandLength - 18.0;
             raw -= 0.02 * (violation * violation);
@@ -124,15 +134,14 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
             raw -= 0.02 * (violation * violation);
         }
 
-        // 2. Legibility Gap: Smooth penalty if difference is under 4.0mm
+        // B. Legibility Gap: Minute hand must be noticeably longer than hour hand
         double gap = minuteHandLength - hourHandLength;
-        // If gap is negative (hour is longer), the penalty will naturally be massive
         if (gap < 4.0) {
             double violation = 4.0 - gap;
             raw -= 0.02 * (violation * violation);
         }
 
-        // 3. Dial Sweeping: Smooth penalty if minute hand is too short (< 15.0mm)
+        // C. Dial Sweeping: Minute hand shouldn't be awkwardly short
         if (minuteHandLength < 15.0) {
             double violation = 15.0 - minuteHandLength;
             raw -= 0.02 * (violation * violation);
@@ -140,14 +149,14 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
     }
     
     // =========================================================================
-    // THE GEAR TRAIN TORQUE REWARD (Fixes Add/Remove 1-Gear Trap)
+    // 5. THE GEAR TRAIN TORQUE REWARD
     // =========================================================================
     int totalGears = 0;
     for (const auto& comp : watch.getAllComponents()) {
         if (dynamic_cast<const Components::Gear*>(comp.get())) totalGears++;
     }
 
-    // Punish 1-gear watches, reward 3-to-5 gear watches
+    // Step-up ratio physics simulation based on total gears
     if (totalGears == 1) {
         raw -= 0.15; // Too weak, cannot step up the gear ratio
     } else if (totalGears == 2) {
@@ -158,21 +167,25 @@ double FitnessEvaluator::evaluate(const Watch& watch) const {
         raw -= 0.05 * (totalGears - 5); // Too much friction, energy is lost
     }
 
-    // Floor the raw score to 0.0 so negative penalties don't break the log math
+    // 6. Safety Clamp and Log Scaling
     if (raw < 0.0) raw = 0.0;
-
     return applyLogScaling(raw);
 }
 
-// Getters and setters
+// ---------------------------------------------------------
+// GETTERS & SETTERS
+// ---------------------------------------------------------
 double FitnessEvaluator::getAccuracyWeight() const { return m_accuracyWeight; }
 void FitnessEvaluator::setAccuracyWeight(double weight) { m_accuracyWeight = weight; }
+
 double FitnessEvaluator::getEfficiencyWeight() const { return m_efficiencyWeight; }
 void FitnessEvaluator::setEfficiencyWeight(double weight) { m_efficiencyWeight = weight; }
+
 double FitnessEvaluator::getComplexityPenaltyFactor() const { return m_complexityPenaltyFactor; }
 void FitnessEvaluator::setComplexityPenaltyFactor(double factor) { m_complexityPenaltyFactor = factor; }
+
 double FitnessEvaluator::getLogBase() const { return m_logBase; }
 void FitnessEvaluator::setLogBase(double logBase) { m_logBase = logBase; }
 
-}
-}
+} // namespace Genome
+} // namespace WatchGA

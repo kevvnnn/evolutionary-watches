@@ -2,7 +2,7 @@
 #define WATCH_GA_GENOME_COMPONENTS_GEAR_H
 
 #include "../WatchComponent.h"
-#include "Jewel.h" // Make sure this path is correct for your directory structure
+#include "Jewel.h" 
 #include <memory>
 #include <string>
 
@@ -10,7 +10,13 @@ namespace WatchGA {
 namespace Genome {
 namespace Components {
 
-// Gear component for power transmission
+/**
+ * @class Gear
+ * @brief Represents a power transmission wheel in the watch train.
+ * * STRUCTURAL NOTE: This class utilizes Object-Oriented Composition.
+ * A Gear physically "owns" a Jewel bearing via a std::unique_ptr, guaranteeing
+ * at the memory level that a single gear can never hoard more than one jewel.
+ */
 class Gear : public WatchComponent {
 private:
     unsigned int m_toothCount;
@@ -21,25 +27,29 @@ private:
     std::unique_ptr<Jewel> m_jewel;
 
 public:
-    // Constructors & Destructor
+    // ---------------------------------------------------------
+    // CONSTRUCTORS
+    // ---------------------------------------------------------
     Gear();
     Gear(const std::string& name, double weight, double friction,
          unsigned int toothCount, double diameter, double meshingQuality);
     ~Gear() override = default;
 
-    // Deep copy semantics (required because we own a unique_ptr)
+    // ---------------------------------------------------------
+    // DEEP COPY SEMANTICS (Required because we own a unique_ptr)
+    // ---------------------------------------------------------
     Gear(const Gear& other);
     Gear& operator=(const Gear& other);
 
-    // ---------------------------------------------------------
-    // Jewel Management
-    // ---------------------------------------------------------
+    // =========================================================
+    // JEWEL MANAGEMENT (Composition Interface)
+    // =========================================================
     void setJewel(std::unique_ptr<Jewel> jewel);
     const Jewel* getJewel() const;
     bool hasJewel() const;
 
     // ---------------------------------------------------------
-    // Gear Properties (Getters & Setters)
+    // GEAR PROPERTIES (Getters & Setters)
     // ---------------------------------------------------------
     unsigned int getToothCount() const;
     void setToothCount(unsigned int toothCount);
@@ -50,9 +60,9 @@ public:
     double getMeshingQuality() const;
     void setMeshingQuality(double quality);
 
-    // ---------------------------------------------------------
-    // WatchComponent Overrides
-    // ---------------------------------------------------------
+    // =========================================================
+    // WATCHCOMPONENT OVERRIDES
+    // =========================================================
     double calculateEfficiency() const override;
     std::unique_ptr<WatchComponent> clone() const override;
     std::string toString() const override;

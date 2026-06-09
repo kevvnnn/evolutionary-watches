@@ -6,7 +6,9 @@ namespace WatchGA {
 namespace Genome {
 namespace Components {
 
-// Default
+// ---------------------------------------------------------
+// CONSTRUCTORS
+// ---------------------------------------------------------
 BalanceWheel::BalanceWheel()
     : m_momentOfInertia(1.0),
       m_isochronism(0.9),
@@ -26,15 +28,16 @@ BalanceWheel::BalanceWheel(const std::string& name, double weight, double fricti
     setAmplitude(amplitude);
 }
 
-// Getters
+// ---------------------------------------------------------
+// GETTERS & SETTERS (With Physics Clamping)
+// ---------------------------------------------------------
 double BalanceWheel::getMomentOfInertia() const { return m_momentOfInertia; }
 double BalanceWheel::getIsochronism() const { return m_isochronism; }
 double BalanceWheel::getAmplitude() const { return m_amplitude; }
 
-// Validation
 void BalanceWheel::setMomentOfInertia(double moi) {
     if (moi < 0.1)
-        throw std::invalid_argument("Moment of inertia minimum is 0.1");
+        throw std::invalid_argument("Moment of inertia minimum is 0.1 to prevent physics engine crash.");
     m_momentOfInertia = moi;
 }
 
@@ -50,22 +53,20 @@ void BalanceWheel::setAmplitude(double amplitude) {
     else m_amplitude = amplitude;
 }
 
-// Timekeeping efficiency
+// =========================================================
+// WATCHCOMPONENT OVERRIDES
+// =========================================================
+
 double BalanceWheel::calculateEfficiency() const {
+    // Punishes deviations from the horological ideal of 270 degrees
     return m_isochronism *
            (1.0 - std::abs(m_amplitude - 270.0) / 360.0) *
            (1.0 - 1.0 / (m_momentOfInertia + 1.0));
 }
 
-// Deep copy for evolution
 std::unique_ptr<WatchComponent> BalanceWheel::clone() const {
     return std::make_unique<BalanceWheel>(*this);
 }
-
-// std::string BalanceWheel::toString() const {
-//     return WatchComponent::toString() +
-//            " [BalanceWheel | Isochronism: " + std::to_string(m_isochronism) + "]";
-// }
 
 std::string BalanceWheel::toString() const {
     return WatchComponent::toString() + "\n"

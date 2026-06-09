@@ -7,27 +7,38 @@ namespace WatchGA {
 namespace Genome {
 namespace Components {
 
-// Jewel bearing for low-friction movement
+/**
+ * @class Jewel
+ * @brief Represents a synthetic ruby bearing used to virtually eliminate friction.
+ * * STRUCTURAL NOTE: Jewels cannot exist independently in the topology. 
+ * They are instantiated directly inside a Gear object as a nested compositional gene.
+ */
 class Jewel : public WatchComponent {
 private:
     double m_hardness;
     bool m_isCapJewel;
 
 public:
+    // ---------------------------------------------------------
+    // CONSTRUCTORS
+    // ---------------------------------------------------------
     Jewel();
     Jewel(const std::string& name, double weight, double friction,
           double hardness, bool isCapJewel);
     ~Jewel() override = default;
 
-    // Getters
+    // ---------------------------------------------------------
+    // GETTERS & SETTERS
+    // ---------------------------------------------------------
     double getHardness() const;
-    bool isCapJewel() const;
-
-    // Setters
     void setHardness(double hardness);
+
+    bool isCapJewel() const;
     void setIsCapJewel(bool isCapJewel);
 
-    // Overrides
+    // =========================================================
+    // WATCHCOMPONENT OVERRIDES
+    // =========================================================
     double calculateEfficiency() const override;
     std::unique_ptr<WatchComponent> clone() const override;
     std::string toString() const override;

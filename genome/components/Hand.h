@@ -7,7 +7,12 @@ namespace WatchGA {
 namespace Genome {
 namespace Components {
 
-// Time indicator hands
+/**
+ * @class Hand
+ * @brief Represents the visual time indicators (Hour, Minute, Second).
+ * * Hands must be physically balanced to prevent draining torque from the gear train.
+ * Their length is strictly audited by the FitnessEvaluator to prevent scraping the case.
+ */
 class Hand : public WatchComponent {
 public:
     enum class HandType {
@@ -22,22 +27,29 @@ private:
     double m_balance;
 
 public:
+    // ---------------------------------------------------------
+    // CONSTRUCTORS
+    // ---------------------------------------------------------
     Hand();
     Hand(const std::string& name, double weight, double friction,
          HandType type, double length, double balance);
     ~Hand() override = default;
 
-    // Getters
+    // ---------------------------------------------------------
+    // GETTERS & SETTERS
+    // ---------------------------------------------------------
     HandType getType() const;
-    double getLength() const;
-    double getBalance() const;
-
-    // Setters
     void setType(HandType type);
+
+    double getLength() const;
     void setLength(double length);
+
+    double getBalance() const;
     void setBalance(double balance);
 
-    // Overrides
+    // =========================================================
+    // WATCHCOMPONENT OVERRIDES
+    // =========================================================
     double calculateEfficiency() const override;
     std::unique_ptr<WatchComponent> clone() const override;
     std::string toString() const override;

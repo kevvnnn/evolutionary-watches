@@ -7,7 +7,12 @@ namespace WatchGA {
 namespace Genome {
 namespace Components {
 
-// Power and regulation springs
+/**
+ * @class Spring
+ * @brief Represents the kinetic energy storage and regulation components.
+ * * The Mainspring provides the raw motive force for the entire watch.
+ * The Hairspring provides the delicate counter-force for the Balance Wheel.
+ */
 class Spring : public WatchComponent {
 public:
     enum class SpringType {
@@ -22,24 +27,32 @@ private:
     double m_length;
 
 public:
+    // ---------------------------------------------------------
+    // CONSTRUCTORS
+    // ---------------------------------------------------------
     Spring();
     Spring(const std::string& name, double weight, double friction,
            SpringType type, double elasticity, double fatigueResistance, double length);
     ~Spring() override = default;
 
-    // Getters
+    // ---------------------------------------------------------
+    // GETTERS & SETTERS
+    // ---------------------------------------------------------
     SpringType getType() const;
-    double getElasticity() const;
-    double getFatigueResistance() const;
-    double getLength() const;
-
-    // Setters
     void setType(SpringType type);
+
+    double getElasticity() const;
     void setElasticity(double elasticity);
+
+    double getFatigueResistance() const;
     void setFatigueResistance(double resistance);
+
+    double getLength() const;
     void setLength(double length);
 
-    // Overrides
+    // =========================================================
+    // WATCHCOMPONENT OVERRIDES
+    // =========================================================
     double calculateEfficiency() const override;
     std::unique_ptr<WatchComponent> clone() const override;
     std::string toString() const override;
