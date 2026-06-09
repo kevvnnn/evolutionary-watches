@@ -68,7 +68,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     setWindowTitle("WatchGA - Evolution Viewer");
-    setFixedSize(1166, 760);
+    // Set the window size here if its not enough
+    setFixedSize(1166, 820);
 
     // Timer Initialization
     m_runTimer = new QTimer(this);
@@ -101,14 +102,25 @@ MainWindow::MainWindow(QWidget *parent)
 
     statsPanel = new StatsPanel(rightContainer);
     setStatsPanelEvolutionHistory(&m_evolutionHistory);
-    statsPanel->setFixedSize(450, 260);
+    statsPanel->setFixedSize(450, 230);
     rightLayout->addWidget(statsPanel);
 
     // Save & Load Buttons
+    QWidget *SaveLoadWatchRow = new QWidget;
+    QHBoxLayout* buttonLayout = new QHBoxLayout(SaveLoadWatchRow);
+    buttonLayout->setSpacing(10);
+    buttonLayout->setContentsMargins(0, 0, 0, 0);
+
     QPushButton* btnSaveWatch = new QPushButton("Save Best Watch");
     QPushButton* btnLoadWatch = new QPushButton("Load Watch");
-    rightLayout->addWidget(btnSaveWatch);
-    rightLayout->addWidget(btnLoadWatch);
+    btnSaveWatch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    btnLoadWatch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    buttonLayout->addWidget(btnSaveWatch);
+    buttonLayout->addWidget(btnLoadWatch);
+    rightLayout->addWidget(SaveLoadWatchRow);
+
+    QPushButton* btnLogHistory = new QPushButton("Save Evolution History");
+    rightLayout->addWidget(btnLogHistory);
 
     rightLayout->addStretch();
     mainLayout->addWidget(rightContainer);
@@ -186,6 +198,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(controlPanel, &WatchGA::GUI::ControlPanel::resetClicked, this, [this](){
         resetEvolution();
+    });
+
+    connect(btnLogHistory, &QPushButton::clicked, this, [this](){
+        qDebug() << "Log clicked";
     });
 
     m_ga.setStatsCallback([this](int gen, double avg) {
