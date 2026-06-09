@@ -23,7 +23,7 @@ private:
 
 public:
     Hand();
-    Hand(const std::string& name, double weight, double friction, double x, double y,
+    Hand(const std::string& name, double weight, double friction,
          HandType type, double length, double balance);
     ~Hand() override = default;
 

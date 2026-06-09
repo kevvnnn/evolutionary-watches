@@ -152,7 +152,7 @@ void ParameterMutation::mutate(std::shared_ptr<Genome::Watch>& watch, double mut
                         bool flippedCap = (capFlip(getRng()) == 0) ? !oldJewel->isCapJewel() : oldJewel->isCapJewel();
 
                         auto mutatedJewel = std::make_unique<Jewel>(
-                            "Mutated_Jewel", 0.01, 0.005, 0.0, 0.0, mutatedHardness, flippedCap
+                            "Mutated_Jewel", 0.01, 0.005, mutatedHardness, flippedCap
                         );
                         gear->setJewel(std::move(mutatedJewel));
                     }
@@ -162,7 +162,7 @@ void ParameterMutation::mutate(std::shared_ptr<Genome::Watch>& watch, double mut
                     std::uniform_real_distribution<double> hardDist(8.5, 9.5);
                     
                     auto newJewel = std::make_unique<Jewel>(
-                        "Spontaneous_Jewel", 0.01, 0.005, 0.0, 0.0, hardDist(getRng()), static_cast<bool>(coinFlip(getRng()))
+                        "Spontaneous_Jewel", 0.01, 0.005, hardDist(getRng()), static_cast<bool>(coinFlip(getRng()))
                     );
                     gear->setJewel(std::move(newJewel));
                 }
@@ -203,7 +203,7 @@ void AddRemoveMutation::mutate(std::shared_ptr<Genome::Watch>& watch, double mut
     std::uniform_int_distribution<int> actionDist(0, 1);
     bool addPart = (actionDist(getRng()) == 0);
 
-    // ACTION 1: Spawning a New Gear
+// ACTION 1: Spawning a New Gear
     if (addPart && watch->getComponentCount() < m_maxComponents) {
         std::uniform_int_distribution<unsigned int> teethDist(8, 40);
         std::uniform_real_distribution<double> statDist(0.1, 1.0);
@@ -213,11 +213,20 @@ void AddRemoveMutation::mutate(std::shared_ptr<Genome::Watch>& watch, double mut
             "Mutated_Gear", 
             statDist(getRng()), // Random weight 
             statDist(getRng()), // Random friction 
-            0.0, 0.0,           // Coordinates
             teethDist(getRng()),// Random tooth sizing 
             10.0,               // Standard millimeter diameter 
             statDist(getRng())  // Random meshing profile 
         );
+
+        // 50% chance of adding a jewel
+        std::uniform_int_distribution<int> coinFlip(0, 1);
+        if (coinFlip(getRng()) == 0) {
+            std::uniform_real_distribution<double> hardDist(8.5, 9.5);
+            auto newJewel = std::make_unique<Genome::Components::Jewel>(
+                "Spawned_Jewel", 0.01, 0.005, hardDist(getRng()), static_cast<bool>(coinFlip(getRng()))
+            );
+            newGear->setJewel(std::move(newJewel)); // Inject the jewel into the gear
+        }
 
         // Hand over the unique pointer to the watch assembly 
         watch->addComponent(std::move(newGear));

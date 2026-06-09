@@ -188,15 +188,7 @@ void Watch::randomize() {
     
     // Base properties (0.9 friction is basically sandpaper)
     std::uniform_real_distribution<double> weightDist(0.1, 5.0);
-    std::uniform_real_distribution<double> frictionDist(0.01, 0.9); 
-
-// ╔═══════════════════════════════════════════════════════
-// ║ 👉 ONLY CHANGE IS HERE: REPLACE THIS LINE
-// ╚═══════════════════════════════════════════════════════
-    // OLD: std::uniform_real_distribution<double> posDist(-20.0, 20.0);
-    // NEW: SPREAD ACROSS THE CANVAS
-    std::uniform_real_distribution<double> posDist(-120.0, 120.0);
-
+    std::uniform_real_distribution<double> frictionDist(0.01, 0.9);
     
     // Quality properties (0.1 is awful, 1.0 is perfect)
     std::uniform_real_distribution<double> qualityDist(0.1, 1.0); 
@@ -208,22 +200,22 @@ void Watch::randomize() {
     // Hands: varying lengths and terrible balances
     std::uniform_real_distribution<double> handLenDist(5.0, 25.0);
     addComponent(std::make_unique<Hand>(
-        "HourHand", weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        "HourHand", weightDist(gen), frictionDist(gen),
         Hand::HandType::HOUR, handLenDist(gen), qualityDist(gen)
     ));
     addComponent(std::make_unique<Hand>(
-        "MinuteHand", weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        "MinuteHand", weightDist(gen), frictionDist(gen),
         Hand::HandType::MINUTE, handLenDist(gen), qualityDist(gen)
     ));
 
     // Springs: varying elasticity and fatigue resistance
     std::uniform_real_distribution<double> springLenDist(1.0, 50.0);
     addComponent(std::make_unique<Spring>(
-        "MainSpring", weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        "MainSpring", weightDist(gen), frictionDist(gen),
         Spring::SpringType::MAINSPRING, qualityDist(gen), qualityDist(gen), springLenDist(gen)
     ));
     addComponent(std::make_unique<Spring>(
-        "HairSpring", weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        "HairSpring", weightDist(gen), frictionDist(gen),
         Spring::SpringType::HAIRSPRING, qualityDist(gen), qualityDist(gen), springLenDist(gen)
     ));
 
@@ -231,7 +223,7 @@ void Watch::randomize() {
     std::uniform_real_distribution<double> moiDist(0.1, 10.0);
     std::uniform_real_distribution<double> ampDist(90.0, 360.0); // 270 is optimal
     addComponent(std::make_unique<BalanceWheel>(
-        "BalWheel", weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+        "BalWheel", weightDist(gen), frictionDist(gen),
         moiDist(gen), qualityDist(gen), ampDist(gen)
     ));
 
@@ -252,7 +244,7 @@ void Watch::randomize() {
         // A. Create the Gear
         std::string gearName = "Gear_" + std::to_string(i + 1);
         auto newGear = std::make_unique<WatchGA::Genome::Components::Gear>(
-            gearName, weightDist(gen), frictionDist(gen), posDist(gen), posDist(gen), 
+            gearName, weightDist(gen), frictionDist(gen),
             teethDist(gen), diameterDist(gen), qualityDist(gen)
         );
 
@@ -260,7 +252,7 @@ void Watch::randomize() {
         if (boolDist(gen) == 1) {
             std::string jewelName = "Jewel_For_" + gearName;
             auto newJewel = std::make_unique<WatchGA::Genome::Components::Jewel>(
-                jewelName, 0.01, 0.005, posDist(gen), posDist(gen), 
+                jewelName, 0.01, 0.005,
                 hardnessDist(gen), static_cast<bool>(boolDist(gen))
             );
             

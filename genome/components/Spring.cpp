@@ -13,9 +13,9 @@ Spring::Spring()
 {
 }
 
-Spring::Spring(const std::string& name, double weight, double friction, double x, double y,
+Spring::Spring(const std::string& name, double weight, double friction,
                SpringType type, double elasticity, double fatigueResistance, double length)
-    : WatchComponent(name, weight, friction, x, y),
+    : WatchComponent(name, weight, friction),
       m_type(type),
       m_elasticity(elasticity),
       m_fatigueResistance(fatigueResistance),

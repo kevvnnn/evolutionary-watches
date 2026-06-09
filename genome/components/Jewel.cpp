@@ -10,9 +10,9 @@ Jewel::Jewel()
 {
 }
 
-Jewel::Jewel(const std::string& name, double weight, double friction, double x, double y,
+Jewel::Jewel(const std::string& name, double weight, double friction,
              double hardness, bool isCapJewel)
-    : WatchComponent(name, weight, friction, x, y),
+    : WatchComponent(name, weight, friction),
       m_hardness(hardness),
       m_isCapJewel(isCapJewel)
 {

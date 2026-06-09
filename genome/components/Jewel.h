@@ -15,7 +15,7 @@ private:
 
 public:
     Jewel();
-    Jewel(const std::string& name, double weight, double friction, double x, double y,
+    Jewel(const std::string& name, double weight, double friction,
           double hardness, bool isCapJewel);
     ~Jewel() override = default;
 

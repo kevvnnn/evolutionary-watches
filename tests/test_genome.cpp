@@ -25,13 +25,13 @@ int main()
     cout << "[INFO] Created watch: " << myWatch->toString() << endl;
 
     // 2. Add essential components
-    myWatch->addComponent(make_unique<Gear>("Gear_Main", 2.0, 0.1, 10, 10, 12, 6.0, 0.9));
-    myWatch->addComponent(make_unique<Jewel>("Jewel_Cap", 0.5, 0.02, 10, 15, 9.5, true));
-    myWatch->addComponent(make_unique<BalanceWheel>("Balance_Main", 1.8, 0.05, 10, 20, 1.2, 0.95, 270.0));
-    myWatch->addComponent(make_unique<Spring>("Spring_Main", 1.2, 0.03, 10, 25, Spring::SpringType::MAINSPRING, 0.92, 0.95, 12.0));
-    myWatch->addComponent(make_unique<Spring>("Spring_Hair", 0.3, 0.01, 10, 30, Spring::SpringType::HAIRSPRING, 0.98, 0.97, 4.0));
-    myWatch->addComponent(make_unique<Hand>("Hand_Hour", 0.7, 0.04, 10, 35, Hand::HandType::HOUR, 12.0, 0.96));
-    myWatch->addComponent(make_unique<Hand>("Hand_Minute", 0.5, 0.03, 10, 40, Hand::HandType::MINUTE, 15.0, 0.97));
+    myWatch->addComponent(make_unique<Gear>("Gear_Main", 2.0, 0.1, 12, 6.0, 0.9));
+    myWatch->addComponent(make_unique<Jewel>("Jewel_Cap", 0.5, 0.02, 9.5, true));
+    myWatch->addComponent(make_unique<BalanceWheel>("Balance_Main", 1.8, 0.05, 1.2, 0.95, 270.0));
+    myWatch->addComponent(make_unique<Spring>("Spring_Main", 1.2, 0.03, Spring::SpringType::MAINSPRING, 0.92, 0.95, 12.0));
+    myWatch->addComponent(make_unique<Spring>("Spring_Hair", 0.3, 0.01, Spring::SpringType::HAIRSPRING, 0.98, 0.97, 4.0));
+    myWatch->addComponent(make_unique<Hand>("Hand_Hour", 0.7, 0.04, Hand::HandType::HOUR, 12.0, 0.96));
+    myWatch->addComponent(make_unique<Hand>("Hand_Minute", 0.5, 0.03, Hand::HandType::MINUTE, 15.0, 0.97));
 
     cout << "[INFO] Added " << myWatch->getComponentCount() << " components." << endl;
     cout << endl;

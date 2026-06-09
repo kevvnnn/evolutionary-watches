@@ -6,19 +6,15 @@ using namespace WatchGA::Genome;
 WatchComponent::WatchComponent()
     : m_name("Unnamed"),
       m_weight(0.0),
-      m_friction(0.0),
-      m_x(0.0),
-      m_y(0.0)
+      m_friction(0.0)
 {
 }
 
-WatchComponent::WatchComponent(const std::string& name, double weight, double friction, double x, double y)
+WatchComponent::WatchComponent(const std::string& name, double weight, double friction)
     : SystemObject(name), 
       m_name(name),
       m_weight(weight),
-      m_friction(friction),
-      m_x(x),
-      m_y(y)
+      m_friction(friction)
 {
 }
 
@@ -37,16 +33,6 @@ double WatchComponent::getFriction() const
     return m_friction;
 }
 
-double WatchComponent::getX() const
-{
-    return m_x;
-}
-
-double WatchComponent::getY() const
-{
-    return m_y;
-}
-
 void WatchComponent::setWeight(double weight)
 {
     if (weight >= 0)
@@ -57,12 +43,6 @@ void WatchComponent::setFriction(double friction)
 {
     if (friction >= 0)
         m_friction = friction;
-}
-
-void WatchComponent::setPosition(double x, double y)
-{
-    m_x = x;
-    m_y = y;
 }
 
 // Bullet-point tooltip format

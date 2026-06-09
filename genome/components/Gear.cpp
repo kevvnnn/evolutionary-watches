@@ -20,9 +20,9 @@ Gear::Gear()
 }
 
 // Full constructor with validation
-Gear::Gear(const std::string& name, double weight, double friction, double x, double y,
+Gear::Gear(const std::string& name, double weight, double friction,
            unsigned int toothCount, double diameter, double meshingQuality)
-    : WatchComponent(name, weight, friction, x, y),
+    : WatchComponent(name, weight, friction),
       m_toothCount(toothCount),
       m_diameter(diameter),
       m_meshingQuality(meshingQuality),

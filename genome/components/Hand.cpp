@@ -12,9 +12,9 @@ Hand::Hand()
 {
 }
 
-Hand::Hand(const std::string& name, double weight, double friction, double x, double y,
+Hand::Hand(const std::string& name, double weight, double friction,
            HandType type, double length, double balance)
-    : WatchComponent(name, weight, friction, x, y),
+    : WatchComponent(name, weight, friction),
       m_type(type),
       m_length(length),
       m_balance(balance)

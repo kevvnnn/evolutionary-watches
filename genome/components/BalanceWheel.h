@@ -16,7 +16,7 @@ private:
 
 public:
     BalanceWheel();
-    BalanceWheel(const std::string& name, double weight, double friction, double x, double y,
+    BalanceWheel(const std::string& name, double weight, double friction,
                  double momentOfInertia, double isochronism, double amplitude);
     ~BalanceWheel() override = default;
 

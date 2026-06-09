@@ -62,8 +62,6 @@ void WatchFileIO::writeWatch(std::ostream& out, const Genome::Watch& watch) cons
         writeString(out, comp->getName());
         double w = comp->getWeight(); out.write(reinterpret_cast<const char*>(&w), sizeof(double));
         double f = comp->getFriction(); out.write(reinterpret_cast<const char*>(&f), sizeof(double));
-        double x = comp->getX(); out.write(reinterpret_cast<const char*>(&x), sizeof(double));
-        double y = comp->getY(); out.write(reinterpret_cast<const char*>(&y), sizeof(double));
 
         // Downcast to find exactly what component this is and save its unique DNA
         if (auto* gear = dynamic_cast<const Gear*>(comp)) {
@@ -123,11 +121,9 @@ std::unique_ptr<Genome::Watch> WatchFileIO::readWatch(std::istream& in) const {
     using namespace Genome::Components;
     for (unsigned int i = 0; i < compCount; ++i) {
         std::string cname = readString(in);
-        double w, f, x, y;
+        double w, f;
         in.read(reinterpret_cast<char*>(&w), sizeof(double));
         in.read(reinterpret_cast<char*>(&f), sizeof(double));
-        in.read(reinterpret_cast<char*>(&x), sizeof(double));
-        in.read(reinterpret_cast<char*>(&y), sizeof(double));
 
         int type; in.read(reinterpret_cast<char*>(&type), sizeof(int));
         
@@ -138,12 +134,12 @@ std::unique_ptr<Genome::Watch> WatchFileIO::readWatch(std::istream& in) const {
             in.read(reinterpret_cast<char*>(&mq), sizeof(double));
             in.read(reinterpret_cast<char*>(&hj), sizeof(bool));
             
-            auto gear = std::make_unique<Gear>(cname, w, f, x, y, tc, dia, mq);
+            auto gear = std::make_unique<Gear>(cname, w, f, tc, dia, mq);
             if (hj) {
                 double jh; bool jc;
                 in.read(reinterpret_cast<char*>(&jh), sizeof(double));
                 in.read(reinterpret_cast<char*>(&jc), sizeof(bool));
-                gear->setJewel(std::make_unique<Jewel>("Jewel_For_"+cname, 0.01, 0.005, 0, 0, jh, jc));
+                gear->setJewel(std::make_unique<Jewel>("Jewel_For_"+cname, 0.01, 0.005, jh, jc));
             }
             watch->addComponent(std::move(gear));
         } 
@@ -152,7 +148,7 @@ std::unique_ptr<Genome::Watch> WatchFileIO::readWatch(std::istream& in) const {
             in.read(reinterpret_cast<char*>(&moi), sizeof(double));
             in.read(reinterpret_cast<char*>(&iso), sizeof(double));
             in.read(reinterpret_cast<char*>(&amp), sizeof(double));
-            watch->addComponent(std::make_unique<BalanceWheel>(cname, w, f, x, y, moi, iso, amp));
+            watch->addComponent(std::make_unique<BalanceWheel>(cname, w, f, moi, iso, amp));
         } 
         else if (type == 3) { // Spring
             int stype; double el, fr, len;
@@ -160,20 +156,20 @@ std::unique_ptr<Genome::Watch> WatchFileIO::readWatch(std::istream& in) const {
             in.read(reinterpret_cast<char*>(&el), sizeof(double));
             in.read(reinterpret_cast<char*>(&fr), sizeof(double));
             in.read(reinterpret_cast<char*>(&len), sizeof(double));
-            watch->addComponent(std::make_unique<Spring>(cname, w, f, x, y, static_cast<Spring::SpringType>(stype), el, fr, len));
+            watch->addComponent(std::make_unique<Spring>(cname, w, f, static_cast<Spring::SpringType>(stype), el, fr, len));
         } 
         else if (type == 4) { // Hand
             int htype; double len, bal;
             in.read(reinterpret_cast<char*>(&htype), sizeof(int));
             in.read(reinterpret_cast<char*>(&len), sizeof(double));
             in.read(reinterpret_cast<char*>(&bal), sizeof(double));
-            watch->addComponent(std::make_unique<Hand>(cname, w, f, x, y, static_cast<Hand::HandType>(htype), len, bal));
+            watch->addComponent(std::make_unique<Hand>(cname, w, f, static_cast<Hand::HandType>(htype), len, bal));
         } 
         else if (type == 5) { // Jewel
             double hard; bool cap;
             in.read(reinterpret_cast<char*>(&hard), sizeof(double));
             in.read(reinterpret_cast<char*>(&cap), sizeof(bool));
-            watch->addComponent(std::make_unique<Jewel>(cname, w, f, x, y, hard, cap));
+            watch->addComponent(std::make_unique<Jewel>(cname, w, f, hard, cap));
         }
     }
     return watch;

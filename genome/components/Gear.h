@@ -23,7 +23,7 @@ private:
 public:
     // Constructors & Destructor
     Gear();
-    Gear(const std::string& name, double weight, double friction, double x, double y,
+    Gear(const std::string& name, double weight, double friction,
          unsigned int toothCount, double diameter, double meshingQuality);
     ~Gear() override = default;
 

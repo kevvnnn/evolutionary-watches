@@ -14,9 +14,9 @@ BalanceWheel::BalanceWheel()
 {
 }
 
-BalanceWheel::BalanceWheel(const std::string& name, double weight, double friction, double x, double y,
+BalanceWheel::BalanceWheel(const std::string& name, double weight, double friction,
                            double momentOfInertia, double isochronism, double amplitude)
-    : WatchComponent(name, weight, friction, x, y),
+    : WatchComponent(name, weight, friction),
       m_momentOfInertia(momentOfInertia),
       m_isochronism(isochronism),
       m_amplitude(amplitude)

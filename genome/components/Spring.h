@@ -23,7 +23,7 @@ private:
 
 public:
     Spring();
-    Spring(const std::string& name, double weight, double friction, double x, double y,
+    Spring(const std::string& name, double weight, double friction,
            SpringType type, double elasticity, double fatigueResistance, double length);
     ~Spring() override = default;
 
