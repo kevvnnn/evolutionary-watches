@@ -1,45 +1,51 @@
 #include "ComponentInspector.h"
 #include "../genome/WatchComponent.h"
 
+// Constructor Sets up layout, labels, style, and default values
 ComponentInspector::ComponentInspector(QWidget* parent) : QWidget(parent)
 {
     // Fix inspector panel width for consistent UI layout
     setFixedWidth(280);
 
-    // Create main vertical layout and set spacing/margins
+    // Main vertical layout with spacing
     m_layout = new QVBoxLayout(this);
     m_layout->setSpacing(8);
     m_layout->setContentsMargins(10, 10, 10, 10);
 
-    // Initialize all property labels with default "empty" text
+    // Initialize property labels with default "empty" text
     m_lblName = new QLabel("Component: None");
     m_lblWeight = new QLabel("Weight: N/A");
     m_lblFriction = new QLabel("Friction: N/A");
-    // m_lblPosition = new QLabel("Position: (N/A, N/A)");
     m_lblEfficiency = new QLabel("Efficiency: N/A");
 
+    // Add all labels to layout
     m_layout->addWidget(m_lblName);
     m_layout->addWidget(m_lblWeight);
     m_layout->addWidget(m_lblFriction);
     m_layout->addWidget(m_lblEfficiency);
-    m_layout->addStretch();
+    m_layout->addStretch(); // Push content upward
 
+    // Dark theme styling for inspector panel
     setStyleSheet("background-color: #2b2b2b; color: #a9b7c6;");
 }
 
+// Show component properties in UI labels
 void ComponentInspector::showComponentData(WatchGA::Genome::WatchComponent* comp)
 {
+    // If no component, clear display
     if (!comp) {
         clearInspector();
         return;
     }
 
+    // Update each label with formatted component data
     m_lblName->setText(QString("Component: %1").arg(QString::fromStdString(comp->getName())));
     m_lblWeight->setText(QString("Weight: %1 g").arg(comp->getWeight(), 0, 'f', 2));
     m_lblFriction->setText(QString("Friction: %1").arg(comp->getFriction(), 0, 'f', 3));
     m_lblEfficiency->setText(QString("Efficiency: %1%").arg(comp->calculateEfficiency() * 100, 0, 'f', 1));
 }
 
+// Reset all fields to default empty state
 void ComponentInspector::clearInspector()
 {
     m_lblName->setText("Component: None");

@@ -7,24 +7,30 @@
 #include "../genome/WatchComponent.h"
 
 /**
- * @class ComponentInspector
- * @brief A Qt UI widget that displays real-time properties of a selected WatchComponent
+ * @brief UI panel that displays properties of a selected watch component
  *
- * This widget acts as a property inspector panel. It shows key attributes
- * of a watch component (name, weight, friction, efficiency) using QLabels.
- * It connects to slots to update display when a component is selected 
+ * Shows real-time info like name, weight, friction, and efficiency.
+ * Used in the GUI to inspect individual watch parts when clicked.
  */
 class ComponentInspector : public QWidget {
     Q_OBJECT
 public:
+    /**
+     * @brief Constructor - Sets up the inspector panel UI
+     * @param parent Parent widget for Qt hierarchy
+     */
     explicit ComponentInspector(QWidget* parent = nullptr);
 
 public slots:
     /**
-     * @brief Displays detailed data from a given WatchComponent in the UI
-     * @param comp Pointer to the watch component to inspect
+     * @brief Displays all properties from a given WatchComponent
+     * @param comp The component to inspect and display
      */
     void showComponentData(WatchGA::Genome::WatchComponent* comp);
+
+    /**
+     * @brief Resets all labels to default "N/A" state
+     */
     void clearInspector();
 
 private:

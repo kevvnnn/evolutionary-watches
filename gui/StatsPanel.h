@@ -1,7 +1,6 @@
 #ifndef STATSPANEL_H
 #define STATSPANEL_H
 
-// Include all necessary Qt libraries
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -17,50 +16,69 @@
 #include <vector>
 #include <utility>
 
-// Shows a fitness graph that tracks average fitness over generations
+/**
+ * @brief Shows a real-time fitness graph during evolution
+ *
+ * Displays average fitness across generations.
+ * Supports clicking to view detailed generation stats.
+ */
 class StatsPanel : public QWidget
 {
     Q_OBJECT
 
 public:
-    // Constructor
+    /**
+     * @brief Constructor - sets up graph and layout
+     * @param parent Parent widget
+     */
     explicit StatsPanel(QWidget *parent = nullptr);
 
-    // Destructor
-    ~StatsPanel();
+    ~StatsPanel() override;
 
-    // Set the fitness value for the very first generation
+    /**
+     * @brief Sets initial fitness for generation 0
+     * @param fitness Starting fitness value
+     */
     void setFirstGenerationWatchFitness(double fitness);
 
 public slots:
-    // Add a new data point to the graph (update the line)
+    /**
+     * @brief Adds a new data point to the fitness graph
+     * @param generation Current generation number
+     * @param avgFitness Average fitness of the population
+     */
     void updateAverageFitness(int generation, double avgFitness);
 
-    // Clear the entire graph when we press Reset in the main window
+    /**
+     * @brief Clears all data and resets the graph
+     */
     void clearGraph();
 
 protected:
-    // Detect mouse clicks on the graph to show generation info
+    /**
+     * @brief Handles mouse clicks on the graph
+     * @param event Mouse event
+     */
     void mousePressEvent(QMouseEvent* event) override;
 
 private:
     // Set up the top bar and layout of the panel
     void setupUI();
 
-    // Set up the chart, axes, and line style
+    /// Sets up chart, axes, and visual style
     void setupChart();
 
-    // Show a pop-up with info for a specific generation
+    /// Shows detailed stats for a clicked generation
     void showGenerationInfo(int generation);
 
     // Layouts
     QVBoxLayout *mainLayout;
     QHBoxLayout *headerLayout;
 
-    // Title text at the top
+    // UI
     QLabel *titleLabel;
 
-    // Chart components
+    // Chart
     QChart *fitnessChart;
     QLineSeries *avgFitnessSeries;
     QValueAxis *axisX;

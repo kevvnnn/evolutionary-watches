@@ -13,17 +13,17 @@
 #include <QVBoxLayout>
 #include <QSizePolicy>
 #include <functional>
-#include <QToolTip> // for step button pop up
+#include <QToolTip>
 #include <memory>
 #include <QPushButton>
 #include <QFileDialog>
-#include <QScrollArea> // for resizable windows
+#include <QScrollArea>
 
-// Access the same s_config as ControlPanel
+// Access shared config
 namespace WatchGA {namespace GUI {extern FileIO::ConfigManager s_config;}}
 void setStatsPanelEvolutionHistory(const WatchGA::FileIO::EvolutionHistory* hist);
 
-// Selection Strategy Factory
+// GA Strategy Factory
 std::unique_ptr<WatchGA::Core::ISelectionStrategy> createSelectionStrategy(const std::string& name)
 {
     if (name == "Tournament") {
@@ -32,11 +32,9 @@ std::unique_ptr<WatchGA::Core::ISelectionStrategy> createSelectionStrategy(const
     if (name == "Roulette Wheel") {
         return std::make_unique<WatchGA::Algorithm::RouletteWheelSelection>();
     }
-    // Default
     return std::make_unique<WatchGA::Algorithm::TournamentSelection>(3);
 }
 
-// Crossover Strategy Factory
 std::unique_ptr<WatchGA::Core::ICrossoverStrategy> createCrossoverStrategy(const std::string& name)
 {
     if (name == "One Point") {
@@ -45,11 +43,9 @@ std::unique_ptr<WatchGA::Core::ICrossoverStrategy> createCrossoverStrategy(const
     if (name == "Uniform") {
         return std::make_unique<WatchGA::Algorithm::UniformCrossover>();
     }
-    // Default
     return std::make_unique<WatchGA::Algorithm::OnePointCrossover>();
 }
 
-// Mutation Strategy Factory
 std::unique_ptr<WatchGA::Core::IMutationStrategy> createMutationStrategy(const std::string& name)
 {
     if (name == "Swap") {
@@ -61,21 +57,25 @@ std::unique_ptr<WatchGA::Core::IMutationStrategy> createMutationStrategy(const s
     if (name == "AddRemove") {
         return std::make_unique<WatchGA::Algorithm::AddRemoveMutation>(50);
     }
-    // Default
     return std::make_unique<WatchGA::Algorithm::ParameterMutation>(0.1);
 }
 
+// ---------------------------------------------------------------------------
+// MainWindow Constructor: Builds UI, connects buttons, sets up layout
+// ---------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent),
+      m_currentGeneration(0),
+      m_strategiesInitialized(false),
+      m_isRunning(false)
 {
-setWindowTitle("WatchGA - Evolution Viewer");
-    resize(1000, 750); 
+    setWindowTitle("WatchGA - Evolution Viewer");
+    resize(1000, 750);
 
-    // Timer Initialization
+    // Auto-run timer
     m_runTimer = new QTimer(this);
-    m_runTimer->setInterval(300); // 0.3 seconds delay
+    m_runTimer->setInterval(300);
     connect(m_runTimer, &QTimer::timeout, this, &MainWindow::runOneGeneration);
-    m_isRunning = false;
 
     // Wrapping the GUI in a scroll area so it is resizable
     QScrollArea* scrollArea = new QScrollArea(this);
@@ -90,7 +90,7 @@ setWindowTitle("WatchGA - Evolution Viewer");
     mainLayout->setContentsMargins(20, 20, 20, 20);
     mainLayout->setSpacing(30);
 
-    // LEFT: Watch Canvas
+    // Left: Watch display canvas
     QWidget* leftContainer = new QWidget;
     QHBoxLayout* leftLayout = new QHBoxLayout(leftContainer);
     leftLayout->setAlignment(Qt::AlignCenter);
@@ -100,7 +100,7 @@ setWindowTitle("WatchGA - Evolution Viewer");
     leftLayout->addWidget(watchCanvas);
     mainLayout->addWidget(leftContainer);
 
-    // RIGHT: Panels
+    // Right: Control + Stats + Buttons
     QWidget* rightContainer = new QWidget;
     QVBoxLayout* rightLayout = new QVBoxLayout(rightContainer);
 
@@ -112,7 +112,7 @@ setWindowTitle("WatchGA - Evolution Viewer");
     statsPanel->setFixedSize(450, 230);
     rightLayout->addWidget(statsPanel);
 
-    // Save & Load Buttons
+    // Save / Load Buttons
     QWidget *SaveLoadWatchRow = new QWidget;
     QHBoxLayout* buttonLayout = new QHBoxLayout(SaveLoadWatchRow);
     buttonLayout->setSpacing(10);
@@ -131,10 +131,8 @@ setWindowTitle("WatchGA - Evolution Viewer");
 
     rightLayout->addStretch();
     mainLayout->addWidget(rightContainer);
-    
-    // --------------------------
-    // SAVE BEST WATCH
-    // --------------------------
+
+    // Save Best Watch
     connect(btnSaveWatch, &QPushButton::clicked, this, [this]() {
         auto bestWatch = m_ga.getBestWatch();
         if (!bestWatch) {
@@ -154,16 +152,14 @@ setWindowTitle("WatchGA - Evolution Viewer");
             QToolTip::showText(mapToGlobal(rect().center()), "Save failed!", nullptr, QRect(), 2000);
     });
 
-    // --------------------------
-    // LOAD WATCH
-    // --------------------------
+    // Load Watch
     connect(btnLoadWatch, &QPushButton::clicked, this, [this]() {
         QString path = QFileDialog::getOpenFileName(this, "Load Watch", "", "Binary Watch (*.bin)");
         if (path.isEmpty()) return;
 
         WatchGA::FileIO::WatchFileIO loader(path.toStdString());
         
-        // FIX: Transfer ownership to the MainWindow variable so it doesn't get destroyed!
+        // Transfer ownership to the MainWindow variable so it doesn't get destroyed!
         m_loadedWatch = loader.loadWatch(0);
 
         if (m_loadedWatch) {
@@ -173,21 +169,14 @@ setWindowTitle("WatchGA - Evolution Viewer");
             QToolTip::showText(mapToGlobal(rect().center()), "Load failed!", nullptr, QRect(), 2000);
         }
     });
-    
-    // =========================================================
-    // INITIALIZE REAL GENETIC ALGORITHM
-    // =========================================================
-    m_currentGeneration = 0;
 
-    // =========================================================
-    // STEP BUTTON — EVOLVE + SHOW BEST WATCH (REAL SYSTEM)
-    // =========================================================
+    // Step one generation
     connect(controlPanel, &WatchGA::GUI::ControlPanel::stepClicked, this, [this]() {
-        // Start Population if at gen 0, DO THE SAME FOR RUN 
+        // Start Population if at gen 0, do the same for Run 
         runOneGeneration();
     });
 
-    // RUN BUTTON (AUTO EVOLVE)
+    // Auto-run
     connect(controlPanel, &WatchGA::GUI::ControlPanel::runClicked, this, [this]() {
         if (!m_isRunning) {
             m_isRunning = true;
@@ -196,17 +185,19 @@ setWindowTitle("WatchGA - Evolution Viewer");
         }
     });
 
-    // STOP BUTTON
+    // Pause auto-run
     connect(controlPanel, &WatchGA::GUI::ControlPanel::pauseClicked, this, [this]() {
         m_isRunning = false;
         m_runTimer->stop();
         qDebug() << "Stopped Auto Run";
     });
 
+    // Reset
     connect(controlPanel, &WatchGA::GUI::ControlPanel::resetClicked, this, [this](){
         resetEvolution();
     });
 
+    // Save evolution log
     connect(btnLogHistory, &QPushButton::clicked, this, [this](){
         qDebug() << "Save Log clicked";
         // Check if theres history to save
@@ -228,45 +219,49 @@ setWindowTitle("WatchGA - Evolution Viewer");
             QToolTip::showText(mapToGlobal(rect().center()), "Evolution history saved!",nullptr, QRect(), 2000);
         else
             QToolTip::showText(mapToGlobal(rect().center()), "Save failed!",nullptr, QRect(), 2000);
-
     });
 
+    // Connect GA stats to graph
     m_ga.setStatsCallback([this](int gen, double avg) {
         statsPanel->updateAverageFitness(gen, avg);
     });
 }
 
+// Initialize GA strategies and settings from config
 void MainWindow::initializeGeneticAlgorithmFirstRun(){
     if (m_strategiesInitialized)
         return;
+
     using namespace WatchGA::GUI;
-    using namespace WatchGA::Algorithm;
     // Get latest values from the shared config
     int popSize = s_config.getInt("populationSize", 100);
     double mutRate = s_config.getDouble("mutationRate", 0.1);
     double crossRate = s_config.getDouble("crossoverRate", 0.8);
     int elitism = s_config.getInt("elitismCount", 2);
+
     std::string selection = s_config.getString("selectionStrategy", "Tournament");
     std::string crossover = s_config.getString("crossoverStrategy", "One Point");
     std::string mutation = s_config.getString("mutationStrategy", "Swap");
-    // Apply the configs to the GA
+
     m_ga.setPopulationSize(popSize);
     m_ga.setMutationRate(mutRate);
     m_ga.setCrossoverRate(crossRate);
     m_ga.setElitismCount(elitism);
+
     m_ga.setSelectionStrategy(createSelectionStrategy(selection));
     m_ga.setCrossoverStrategy(createCrossoverStrategy(crossover));
     m_ga.setMutationStrategy(createMutationStrategy(mutation));
-    m_strategiesInitialized = true; // prevent creating the strategies again
-    // m_ga.reset();
+
+    m_strategiesInitialized = true;
 }
 
+// Run one evolutionary generation
 void MainWindow::runOneGeneration()
 {
     if (m_currentGeneration == 0) {
         initializeGeneticAlgorithmFirstRun();
         m_ga.reset();
-    } 
+    }
 
     qDebug() << "Step: Evolving Generation" << m_currentGeneration + 1;
     int nextGen = m_currentGeneration + 1;
@@ -280,12 +275,14 @@ void MainWindow::runOneGeneration()
 
     // Show the popup
     QPoint topCenter = mapToGlobal(QPoint(width() / 2 - 100, 40));
-    QToolTip::showText(topCenter, QString("Generating %1%2 generation...").arg(nextGen).arg(suffix), nullptr,QRect(), 1500);
+    QToolTip::showText(topCenter, QString("Generating %1...").arg(nextGen), nullptr, QRect(), 1500);
 
-    // 1. RUN 1 FULL EVOLUTIONARY GENERATION
+    // Run full generation
     m_ga.runGeneration();
-    WatchGA::FileIO::EvolutionHistory::GenerationRecord record; //following the struct
-    record.generationNumber = m_currentGeneration + 1;
+
+    // Record stats
+    WatchGA::FileIO::EvolutionHistory::GenerationRecord record;
+    record.generationNumber = nextGen;
     record.bestFitness    = m_ga.getBestFitness();
     record.averageFitness = m_ga.getAverageFitness();
     record.worstFitness   = m_ga.getWorstFitness();
@@ -293,15 +290,13 @@ void MainWindow::runOneGeneration()
 
     m_evolutionHistory.addRecord(record);
 
-    // 2. GET THE BEST WATCH OF THE NEW GENERATION
+    // Get and Show best watch
     auto bestWatch = m_ga.getBestWatch();
-
-    // 3. DISPLAY BEST WATCH ON CANVAS
     if (bestWatch) {
         watchCanvas->setWatch(bestWatch.get());
     }
 
-    // 4. UPDATE GRAPH WITH REAL FITNESS
+    // Update Graph and Stats panel
     m_currentGeneration++;
     statsPanel->updateAverageFitness(m_currentGeneration, m_ga.getAverageFitness());
 
@@ -309,12 +304,11 @@ void MainWindow::runOneGeneration()
     controlPanel->setCurrentGeneration(m_currentGeneration);
     controlPanel->setBestFitness(m_ga.getBestFitness());
     controlPanel->setAverageFitness(m_ga.getAverageFitness());
-
 }
 
 void MainWindow::resetEvolution()
 {
-    // STOP ANY RUNNING AUTO-EVOLUTION FIRST
+    // Stop timer
     if (m_isRunning) {
         m_runTimer->stop();
         m_isRunning = false;
@@ -324,9 +318,9 @@ void MainWindow::resetEvolution()
     // Clear old callback first (prevents dangling pointer)
     m_ga.setStatsCallback(nullptr);
 
-    // RESET EVOLUTION STATE
+    // Reset Evolution State
     m_currentGeneration = 0;
-    m_evolutionHistory.clear(); 
+    m_evolutionHistory.clear();
     m_strategiesInitialized = false;
     
     // Clear graph/history

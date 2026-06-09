@@ -349,13 +349,11 @@ public:
         generationLabel->setText(QCoreApplication::translate("ControlPanel", "Generation:", nullptr));
         bestFitnessLabel->setText(QCoreApplication::translate("ControlPanel", "Best Fitness:", nullptr));
         avgFitnessLabel->setText(QCoreApplication::translate("ControlPanel", "Avg Fitness:", nullptr));
-    } // retranslateUi
+    }
 
 };
 
-namespace Ui {
-    class ControlPanel: public Ui_ControlPanel {};
-} // namespace Ui
+namespace Ui { class ControlPanel: public Ui_ControlPanel {};}
 
 QT_END_NAMESPACE
 

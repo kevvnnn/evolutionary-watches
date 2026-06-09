@@ -11,21 +11,37 @@ namespace WatchGA::Genome {
     class WatchComponent;
 }
 
+/**
+ * @brief Renders the watch and components in the GUI
+ *
+ * Draws gears, springs, hands, and other parts.
+ * Handles mouse hover, tooltips, and animation.
+ */
 class WatchCanvas : public QWidget
 {
     Q_OBJECT
 public:
+    /**
+     * @brief Constructor - sets up rendering and animation
+     * @param parent Parent widget
+     */
     explicit WatchCanvas(QWidget *parent = nullptr);
     ~WatchCanvas() override = default;
 
-    // Add a setter to inject the real Watch from algorithm
+    /**
+     * @brief Sets the watch to display
+     * @param watch The watch to render
+     */
     void setWatch(WatchGA::Genome::Watch* watch);
 
 protected:
+    /// Draws the watch and all components
     void paintEvent(QPaintEvent *event) override;
+    /// Detects mouse hover for tooltips
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private slots:
+    /// Updates animation frame
     void updateAnimation();
 
 private:
