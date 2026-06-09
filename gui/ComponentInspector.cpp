@@ -3,11 +3,15 @@
 
 ComponentInspector::ComponentInspector(QWidget* parent) : QWidget(parent)
 {
+    // Fix inspector panel width for consistent UI layout
     setFixedWidth(280);
+
+    // Create main vertical layout and set spacing/margins
     m_layout = new QVBoxLayout(this);
     m_layout->setSpacing(8);
     m_layout->setContentsMargins(10, 10, 10, 10);
 
+    // Initialize all property labels with default "empty" text
     m_lblName = new QLabel("Component: None");
     m_lblWeight = new QLabel("Weight: N/A");
     m_lblFriction = new QLabel("Friction: N/A");

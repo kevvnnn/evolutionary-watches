@@ -44,7 +44,7 @@ ControlPanel::ControlPanel(QWidget* parent) :
     connect(ui->crossoverCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::onCrossoverStrategyChanged);
     connect(ui->mutationCombo, &QComboBox::currentIndexChanged, this, &ControlPanel::onMutationStrategyChanged);
     
-
+    // Run and disable all controls that conflict
     connect(ui->runBtn, &QPushButton::clicked, this, [this](){
         qDebug() << "Run button clicked";
         ui->runBtn->setEnabled(false);
@@ -54,6 +54,7 @@ ControlPanel::ControlPanel(QWidget* parent) :
         emit runClicked();
     });
     
+    // Pause and disable all controls that conflict
     connect(ui->pauseBtn, &QPushButton::clicked, this, [this](){
         qDebug() << "Pause button clicked";
         ui->pauseBtn->setEnabled(false);
@@ -62,6 +63,7 @@ ControlPanel::ControlPanel(QWidget* parent) :
         emit pauseClicked();
     });
     
+    // Resets the button states and UI, and emits a signal to the mainwindow 
     connect(ui->resetBtn, &QPushButton::clicked, this, [this](){
         qDebug() << "Reset button clicked";
         ui->runBtn->setEnabled(true);
@@ -74,12 +76,14 @@ ControlPanel::ControlPanel(QWidget* parent) :
         emit resetClicked();
     });
     
+    // Generate one generation
     connect(ui->stepBtn, &QPushButton::clicked, this, [this](){
         qDebug() << "Step button clicked";
         controlParameter(false);
         emit stepClicked();
     });
 
+    // Resets parameters to default values
     connect(ui->resetToDefaults,&QPushButton::clicked, this, [this](){
         qDebug() << "Reset to Default clicked";
 
@@ -267,6 +271,10 @@ void ControlPanel::setMutationStrategy(const QString& strategyName)
     }
 }
 
+/**
+ * @brief Sets the parameters to be enabled/disabled
+ * @param control true/false
+ */
 void ControlPanel::controlParameter(bool control){
     ui->populationSpin->setEnabled(control);
     ui->mutationSpin->setEnabled(control);
