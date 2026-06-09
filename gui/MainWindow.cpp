@@ -17,6 +17,7 @@
 #include <memory>
 #include <QPushButton>
 #include <QFileDialog>
+#include <QScrollArea> // for resizable windows
 
 // Access the same s_config as ControlPanel
 namespace WatchGA {namespace GUI {extern FileIO::ConfigManager s_config;}}
@@ -67,9 +68,8 @@ std::unique_ptr<WatchGA::Core::IMutationStrategy> createMutationStrategy(const s
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowTitle("WatchGA - Evolution Viewer");
-    // Set the window size here if its not enough
-    setFixedSize(1166, 820);
+setWindowTitle("WatchGA - Evolution Viewer");
+    resize(1000, 750); 
 
     // Timer Initialization
     m_runTimer = new QTimer(this);
@@ -77,8 +77,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_runTimer, &QTimer::timeout, this, &MainWindow::runOneGeneration);
     m_isRunning = false;
 
-    QWidget* centralWidget = new QWidget(this);
-    setCentralWidget(centralWidget);
+    // Wrapping the GUI in a scroll area so it is resizable
+    QScrollArea* scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);       // Lets the inner UI breathe
+    scrollArea->setFrameShape(QFrame::NoFrame); // Removes ugly inset borders
+
+    QWidget* centralWidget = new QWidget(scrollArea);
+    scrollArea->setWidget(centralWidget);
+    setCentralWidget(scrollArea);               // Set the scroll area as the core widget
+
     QHBoxLayout* mainLayout = new QHBoxLayout(centralWidget);
     mainLayout->setContentsMargins(20, 20, 20, 20);
     mainLayout->setSpacing(30);
