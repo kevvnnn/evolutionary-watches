@@ -242,8 +242,7 @@ void AddRemoveMutation::mutate(std::shared_ptr<Genome::Watch>& watch, double mut
     // ACTION 2: Deleting a Component (Destructive Filtering)
     // We require 5 core organs + at least 1 gear, so we only delete if count > 6
     else if (!addPart && watch->getComponentCount() > 6) { 
-        
-        // THE FIX: Protect the Core DNA! 
+
         // Indices 0-4 are the vital organs. Gears start at index 5.
         // We force the deletion target to ONLY pick from the gear indices.
         std::uniform_int_distribution<unsigned int> targetDist(5, watch->getComponentCount() - 1);
