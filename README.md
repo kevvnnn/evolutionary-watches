@@ -46,7 +46,7 @@ The evolutionary engine is highly modular, allowing users to hot-swap selection,
 ## Average Results & Evolutionary Trajectory
 Across standard 50-generation test runs (Population: 125), the algorithm reliably exhibits a distinct, two-phase evolutionary timeline:
 
-* **Generation 0 (The Chaos Phase):** Randomly generated populations exhibit high infant lethality (Average Fitness: ~0.3 vs. Best Fitness: ~0.85). Early watches feature chaotic, high-friction gear trains (10–14 parts) that struggle to transfer power.
+* **Generation 0 (The Chaos Phase):** Randomly generated populations exhibit high infant lethality (Average Fitness: ~0.3 vs. Best Fitness: ~0.85). Early watches feature chaotic, high-friction gear trains that struggle to transfer power.
 * **Generation 15–25 (The Great Pruning):** The algorithm learns that excess transmission gears sap energy via friction penalties. The population genetically converges on a strict **8-part architecture** (5 core organs + exactly 3 gears)—mathematically proving the real-world optimum for minimalist torque transfer.
 * **Generation 50 (Chronometer Convergence):** With the structure locked, the AI shifts to parameter polishing. Average Fitness skyrockets to tightly track the Best Fitness (>0.94 Avg / >0.95 Best). Final watches routinely hit metallurgical limits, demonstrate selective Cap Jewel placement to reduce friction, and perfectly size gear modules to achieve a chronometer-grade balance wheel amplitude of ~215° to 280°.
 
